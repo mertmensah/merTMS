@@ -2,6 +2,14 @@
 
 AI-powered logistics platform for optimizing freight operations, load planning, and route optimization.
 
+## 🚀 Live Demo
+
+**Frontend:** [https://mertmensah.github.io/merTMS/](https://mertmensah.github.io/merTMS/)
+
+**Backend API:** [https://mertms-nwh7.onrender.com](https://mertms-nwh7.onrender.com) *(Click to wake up server after inactivity)*
+
+> **Note:** The Render free tier spins down after 15 minutes of inactivity. Click the backend link above to wake it up (may take 30-60 seconds).
+
 ## Features
 
 ### 📊 Dashboard

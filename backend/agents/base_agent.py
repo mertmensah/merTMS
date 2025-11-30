@@ -25,7 +25,7 @@ class BaseAgent:
         Args:
             prompt: The prompt to send to Gemini
             temperature: Creativity level (0.0-1.0)
-            timeout: Request timeout in seconds (default 120)
+            timeout: Request timeout in seconds (not currently enforced by SDK)
             
         Returns:
             The AI response text
@@ -36,8 +36,7 @@ class BaseAgent:
                 prompt,
                 generation_config=genai.types.GenerationConfig(
                     temperature=temperature,
-                ),
-                request_options={'timeout': timeout}
+                )
             )
             print(f"[{self.agent_type}] Gemini response received")
             return response.text

@@ -44,31 +44,70 @@ def facility_location_analysis():
         data = request.get_json()
         k = data.get('k', 3)  # Number of facilities/centers
         
-        # Get orders from database
+        # Get orders and facilities from database
         client = SupabaseClient()
         orders = client.get_all_orders()
+        facilities = client.get_all_facilities()
         
         if not orders or len(orders) == 0:
             return jsonify({"error": "No orders available for analysis"}), 400
+        
+        # Create facility lookup by city/name
+        facility_lookup = {}
+        for facility in facilities:
+            facility_name = facility.get('name', '')
+            city = facility.get('city', '')
+            lat = facility.get('latitude')
+            lon = facility.get('longitude')
+            
+            if lat and lon:
+                facility_lookup[facility_name.lower()] = {'lat': lat, 'lon': lon, 'city': city, 'state': facility.get('state', '')}
+                if city:
+                    facility_lookup[city.lower()] = {'lat': lat, 'lon': lon, 'city': city, 'state': facility.get('state', '')}
         
         # Step 1: Group orders by unique customer location and aggregate weights
         location_dict = {}
         
         for order in orders:
-            delivery_lat = order.get('delivery_lat')
-            delivery_lon = order.get('delivery_lon')
-            weight = order.get('weight')
+            destination = order.get('destination', '')
+            weight = order.get('weight_lbs')  # Changed from 'weight' to 'weight_lbs'
+            customer = order.get('customer', 'Unknown')
             
-            # Skip orders without valid location or weight data
-            if not delivery_lat or not delivery_lon or not weight:
+            # Skip orders without valid destination or weight
+            if not destination or not weight:
                 continue
             
             try:
-                lat = float(delivery_lat)
-                lon = float(delivery_lon)
                 wgt = float(weight)
             except (ValueError, TypeError):
                 continue
+            
+            # Try to find coordinates for this destination
+            # Parse destination string (e.g., "Orlando, FL" or "Houston, TX - Houston DC")
+            dest_lower = destination.lower()
+            coords = None
+            
+            # Try exact match first
+            if dest_lower in facility_lookup:
+                coords = facility_lookup[dest_lower]
+            else:
+                # Try to extract city from destination string
+                parts = destination.split(',')
+                if len(parts) >= 2:
+                    city = parts[0].strip().lower()
+                    if city in facility_lookup:
+                        coords = facility_lookup[city]
+                elif '-' in destination:
+                    # Handle format like "Houston, TX - Houston DC"
+                    city = destination.split(',')[0].strip().lower()
+                    if city in facility_lookup:
+                        coords = facility_lookup[city]
+            
+            if not coords:
+                continue  # Skip if we can't find coordinates
+            
+            lat = coords['lat']
+            lon = coords['lon']
             
             # Create a unique key for this location (rounded to 4 decimals for grouping)
             location_key = (round(lat, 4), round(lon, 4))
@@ -78,9 +117,9 @@ def facility_location_analysis():
                     'lat': lat,
                     'lon': lon,
                     'total_weight': 0,
-                    'customer_name': order.get('customer_name', 'Unknown'),
-                    'city': order.get('delivery_city', ''),
-                    'state': order.get('delivery_state', ''),
+                    'customer_name': customer,
+                    'city': coords['city'],
+                    'state': coords['state'],
                     'order_count': 0
                 }
             
@@ -91,7 +130,7 @@ def facility_location_analysis():
         customer_locations = list(location_dict.values())
         
         if len(customer_locations) == 0:
-            return jsonify({"error": "No valid customer locations found in orders"}), 400
+            return jsonify({"error": "No valid customer locations found in orders. Orders may not have matching facilities in database."}), 400
         
         if len(customer_locations) < k:
             return jsonify({

@@ -220,6 +220,8 @@
   padding: 1.5rem;
   border-radius: 8px;
   border: 1px solid #ddd;
+  position: relative;
+  z-index: 1;
 }
 
 .tower-map-section h3 {
@@ -234,6 +236,15 @@
   font-size: 0.9rem;
 }
 
+/* Fix for leaflet popup artifacts */
+.leaflet-popup-pane {
+  z-index: 700 !important;
+}
+
+.leaflet-container {
+  z-index: 0 !important;
+}
+
 .map-legend {
   display: flex;
   justify-content: center;
@@ -242,6 +253,8 @@
   padding: 1rem;
   background: #f5f5f5;
   border-radius: 6px;
+  position: relative;
+  z-index: 1;
 }
 
 .legend-item {

@@ -35,12 +35,14 @@ def health_check():
 # Network Engineering - Facility Location endpoint
 @app.route('/api/network/facility-location', methods=['POST'])
 def facility_location_analysis():
+    from database.supabase_client import SupabaseClient
     try:
         data = request.get_json()
         k = data.get('k', 3)  # Number of facilities/centers
         
         # Get orders from database
-        orders = supabase_client.get_all_orders()
+        client = SupabaseClient()
+        orders = client.get_all_orders()
         
         if not orders or len(orders) == 0:
             return jsonify({"error": "No orders available for analysis"}), 400

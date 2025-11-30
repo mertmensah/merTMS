@@ -46,10 +46,6 @@ function FacilityLocation() {
     }
   };
 
-  useEffect(() => {
-    runAnalysis();
-  }, []);
-
   const handleSliderChange = (e) => {
     setK(parseInt(e.target.value));
   };

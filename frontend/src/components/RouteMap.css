@@ -29,23 +29,35 @@
 
 .map-legend {
   position: absolute;
-  bottom: 20px;
-  left: 20px;
-  background: #ffffff;
-  padding: 1rem;
-  border-radius: 4px;
+  bottom: 10px;
+  left: 10px;
+  background: rgba(255, 255, 255, 0.95);
+  padding: 8px 12px;
+  border-radius: 6px;
   border: 1px solid #e0e0e0;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  z-index: 1;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  z-index: 1000;
+  width: auto;
+  max-width: min(200px, 30vw);
+}
+
+@media (max-width: 768px) {
+  .map-legend {
+    bottom: 5px;
+    left: 5px;
+    padding: 6px 10px;
+    max-width: 150px;
+  }
 }
 
 .legend-item {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-  margin-bottom: 0.5rem;
-  font-size: 0.9rem;
+  gap: 6px;
+  margin-bottom: 6px;
+  font-size: 11px;
   color: #000000;
+  white-space: nowrap;
 }
 
 .legend-item:last-child {

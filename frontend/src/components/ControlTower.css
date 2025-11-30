@@ -248,28 +248,39 @@
 .map-legend {
   display: flex;
   justify-content: center;
-  gap: 2rem;
-  margin-top: 1rem;
-  padding: 1rem;
-  background: #f5f5f5;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-top: 0.75rem;
+  padding: 0.75rem;
+  background: rgba(245, 245, 245, 0.95);
   border-radius: 6px;
   position: relative;
   z-index: 1;
+  width: auto;
+}
+
+@media (max-width: 768px) {
+  .map-legend {
+    gap: 0.5rem;
+    padding: 0.5rem;
+  }
 }
 
 .legend-item {
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  font-size: 0.9rem;
+  font-size: 0.85rem;
+  white-space: nowrap;
 }
 
 .legend-marker {
-  width: 20px;
-  height: 20px;
+  width: 16px;
+  height: 16px;
   border-radius: 50%;
   border: 2px solid #fff;
   box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+  flex-shrink: 0;
 }
 
 .legend-marker.green {

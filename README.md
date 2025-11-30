@@ -10,6 +10,8 @@ AI-powered logistics platform for optimizing freight operations, load planning, 
 
 > **Note:** The Render free tier spins down after 15 minutes of inactivity. Click the backend link above to wake it up (may take 30-60 seconds). Allow 1-2 minutes for initial connection.
 
+> **🔓 Open Access:** Currently, the platform is accessible without authentication to allow users to explore and experience the system. See roadmap below for planned authentication features.
+
 ## Features
 
 ### 📊 Dashboard
@@ -134,6 +136,46 @@ npm run dev
 - id, load_id, total_miles, total_drive_hours
 - fuel_cost_estimate, efficiency_score
 - created_at
+
+## 🗺️ Roadmap
+
+### Phase 1: Multi-Tenancy & Authentication (Planned)
+**User Authentication & Organizations**
+- [ ] Supabase Auth integration for secure login/signup
+- [ ] Email/password authentication
+- [ ] OAuth support (Google, GitHub, Microsoft)
+- [ ] Organization management system
+- [ ] Domain-based auto-assignment (e.g., all @company.com users join Company org)
+- [ ] Row Level Security (RLS) policies for data isolation
+- [ ] Role-based access control (Admin, User, Viewer)
+- [ ] User profile management
+- [ ] Organization-scoped data (orders, loads, facilities)
+
+**Benefits:**
+- Each organization sees only their own data
+- Secure, database-level access control
+- Free on Supabase (up to 50K monthly active users)
+- Seamless integration with existing PostgreSQL database
+
+### Phase 2: Advanced Features (Future)
+- [ ] Real-time GPS tracking integration
+- [ ] Carrier portal for load acceptance
+- [ ] Customer portal for shipment tracking
+- [ ] EDI integration with major ERPs
+- [ ] Mobile app (iOS/Android)
+- [ ] Advanced reporting and BI dashboards
+- [ ] Predictive analytics for demand forecasting
+- [ ] Carbon footprint tracking
+- [ ] Multi-language support
+
+### Phase 3: Enterprise Features (Future)
+- [ ] White-label deployment options
+- [ ] Custom branding per organization
+- [ ] API marketplace for third-party integrations
+- [ ] Webhook system for event notifications
+- [ ] Advanced AI features (demand prediction, dynamic pricing)
+- [ ] Blockchain-based proof of delivery
+- [ ] IoT sensor integration (temperature, humidity)
 
 ## License
 

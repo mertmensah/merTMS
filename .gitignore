@@ -26,7 +26,10 @@ build/
 # Generated data
 data/generated/
 *.csv
-*.json
+
+# Config files to ignore
+backend/.env
+frontend/.env
 
 # IDE
 .vscode/

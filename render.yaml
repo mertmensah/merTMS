@@ -4,6 +4,7 @@ services:
     runtime: python
     buildCommand: pip install -r backend/requirements.txt
     startCommand: cd backend && gunicorn --bind 0.0.0.0:$PORT app:app
+    healthCheckPath: /health
     envVars:
       - key: SUPABASE_URL
         sync: false

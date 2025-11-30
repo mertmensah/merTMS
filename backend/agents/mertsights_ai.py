@@ -21,6 +21,11 @@ class MertsightsAI:
     def __init__(self, db_client):
         """Initialize with database client and Gemini API"""
         self.db_client = db_client
+        
+        # Validate API key
+        if not GEMINI_API_KEY or GEMINI_API_KEY == "your-gemini-api-key":
+            raise ValueError("GEMINI_API_KEY environment variable not configured")
+        
         genai.configure(api_key=GEMINI_API_KEY)
         self.model = genai.GenerativeModel(GEMINI_MODEL)
         

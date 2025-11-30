@@ -878,13 +878,20 @@ def mertsights_query():
         return jsonify(result), 200 if result.get("success") else 400
         
     except Exception as e:
-        print(f"[MERTSIGHTS] ERROR: {str(e)}")
+        error_msg = str(e)
+        print(f"[MERTSIGHTS] ERROR: {error_msg}")
         import traceback
         traceback.print_exc()
         
+        # Provide more helpful error messages
+        if "GEMINI_API_KEY" in error_msg:
+            error_msg = "Gemini API key not configured. Please set GEMINI_API_KEY environment variable."
+        elif "API key" in error_msg or "authentication" in error_msg.lower():
+            error_msg = "Invalid Gemini API key. Please check your API key configuration."
+        
         return jsonify({
             "success": False,
-            "error": f"mertsightsAI error: {str(e)}"
+            "error": f"mertsightsAI error: {error_msg}"
         }), 500
 
 if __name__ == '__main__':

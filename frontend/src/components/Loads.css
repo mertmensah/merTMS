@@ -1,0 +1,268 @@
+.loads {
+  padding: 2rem;
+}
+
+.header-section {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+}
+
+.btn-primary {
+  background: #176B91;
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: background 0.2s;
+}
+
+.btn-primary:hover {
+  background: #46B1E1;
+}
+
+.btn-secondary {
+  background: white;
+  color: #000;
+  border: 1px solid #e0e0e0;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: all 0.2s;
+}
+
+.btn-secondary:hover {
+  background: #f5f5f5;
+  border-color: #176B91;
+}
+
+.loads-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.loads-summary {
+  background: #fafafa;
+  padding: 1rem 1.5rem;
+  border-radius: 4px;
+  margin-bottom: 1.5rem;
+  border: 1px solid #e0e0e0;
+}
+
+.loads-summary p {
+  margin: 0.5rem 0;
+  color: #666666;
+}
+
+.loads-summary strong {
+  color: #000000;
+  font-weight: 600;
+}
+
+.info-note {
+  color: #176B91;
+  font-style: italic;
+  font-size: 0.9rem;
+  margin-top: 0.5rem;
+}
+
+/* Table Styles */
+.loads-table {
+  overflow-x: auto;
+  margin-bottom: 1rem;
+}
+
+.loads-table table {
+  width: 100%;
+  border-collapse: collapse;
+  background: white;
+  border: 1px solid #ddd;
+}
+
+.loads-table thead {
+  background: #176B91;
+  color: white;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.loads-table th {
+  padding: 1rem;
+  text-align: left;
+  font-weight: 600;
+  border-right: 1px solid rgba(255, 255, 255, 0.1);
+  user-select: none;
+}
+
+.loads-table th:last-child {
+  border-right: none;
+}
+
+.loads-table tbody tr {
+  border-bottom: 1px solid #ddd;
+  transition: background 0.15s ease;
+  cursor: pointer;
+}
+
+.loads-table tbody tr:hover {
+  background: #f0f8fc;
+}
+
+.loads-table tbody tr.selected-row {
+  background: #d4edf7 !important;
+  border-left: 3px solid #176B91;
+}
+
+.loads-table tbody tr.selected-row td:first-child {
+  padding-left: calc(1rem - 3px);
+}
+
+.loads-table td {
+  padding: 0.75rem 1rem;
+  color: #000;
+  border-right: 1px solid #f0f0f0;
+}
+
+.loads-table td:last-child {
+  border-right: none;
+}
+
+.loads-table .empty-state {
+  text-align: center;
+  padding: 3rem;
+  color: #666;
+  font-style: italic;
+}
+
+.load-number {
+  font-family: 'Courier New', monospace;
+  font-weight: 600;
+  color: #000;
+}
+
+/* Context Menu */
+.context-menu {
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  min-width: 250px;
+  padding: 0.5rem 0;
+  z-index: 1000;
+}
+
+.context-menu-item {
+  padding: 0.75rem 1.25rem;
+  cursor: pointer;
+  transition: background 0.15s ease;
+  font-size: 0.9rem;
+  color: #000;
+}
+
+.context-menu-item:hover {
+  background: #f0f8fc;
+  color: #176B91;
+}
+
+.context-menu-divider {
+  height: 1px;
+  background: #e0e0e0;
+  margin: 0.5rem 0;
+}
+
+.stat-card {
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 1.5rem;
+  text-align: center;
+}
+
+.stat-card h3 {
+  font-size: 0.9rem;
+  color: #666;
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+}
+
+.stat-value {
+  font-size: 2rem;
+  font-weight: 600;
+  color: #000;
+  margin: 0;
+}
+
+.status-badge {
+  padding: 0.25rem 0.75rem;
+  border-radius: 12px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  display: inline-block;
+}
+
+.status-planning {
+  background: #fff3cd;
+  color: #856404;
+}
+
+.status-dispatched {
+  background: #d1ecf1;
+  color: #0c5460;
+}
+
+.status-in-transit {
+  background: #d4edda;
+  color: #155724;
+}
+
+.status-delivered {
+  background: #d4edda;
+  color: #155724;
+}
+
+/* Pagination Controls */
+.pagination-controls {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.75rem;
+  margin-top: 1.5rem;
+  padding: 1rem 0;
+}
+
+.btn-pagination {
+  background: #176B91;
+  color: #ffffff;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.btn-pagination:hover:not(:disabled) {
+  background: #46B1E1;
+}
+
+.btn-pagination:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  background: #cccccc;
+  color: #666666;
+}
+
+.page-info {
+  font-weight: 600;
+  color: #000000;
+  padding: 0 1rem;
+  font-size: 1rem;
+}

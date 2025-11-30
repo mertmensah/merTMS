@@ -1,0 +1,68 @@
+import axios from 'axios';
+
+// Use environment variable if available, otherwise detect based on build mode
+const API_URL = import.meta.env.VITE_API_URL || (
+  import.meta.env.PROD 
+    ? 'https://your-render-app.onrender.com/api'
+    : 'http://localhost:5000/api'
+);
+
+const api = axios.create({
+  baseURL: API_URL,
+  headers: {
+    'Content-Type': 'application/json',
+  },
+  timeout: 180000, // 3 minute timeout for long AI operations
+});
+
+export const tmsAPI = {
+  // Orders
+  getOrders: () => api.get('/orders'),
+  createOrder: (orderData) => api.post('/orders', orderData),
+  generateOrders: (count = 10) => api.post('/orders/generate', { count }),
+  generateMonthlyOrders: () => api.post('/orders/generate', { monthly: true }),
+  clearOrders: () => api.delete('/orders/clear'),
+  
+  // Load Optimization
+  optimizeLoads: (orderIds = []) => api.post('/loads/optimize', { order_ids: orderIds }),
+  
+  // Loads
+  getLoads: () => api.get('/loads'),
+  getLoadById: (loadId) => api.get(`/loads/${loadId}`),
+  simulateTodayLoads: () => api.post('/loads/simulate-today'),
+  
+  // Route Planning
+  optimizeRoute: (loadData) => api.post('/routes/optimize', { load_data: loadData }),
+  
+  // Cost Analysis
+  analyzeCosts: (loadPlan, routePlan) => api.post('/costs/analyze', { 
+    load_plan: loadPlan, 
+    route_plan: routePlan 
+  }),
+  
+  // Analytics
+  getDashboard: () => api.get('/analytics/dashboard'),
+  
+  // Carriers
+  getCarriers: () => api.get('/carriers'),
+  
+  // Products
+  getProducts: () => api.get('/products'),
+  createProduct: (productData) => api.post('/products', productData),
+  seedProducts: () => api.post('/products/seed'),
+  
+  // Facilities
+  getFacilities: () => api.get('/facilities'),
+  getFacilityByCode: (facilityCode) => api.get(`/facilities/code/${facilityCode}`),
+  getFacilityByCity: (city) => api.get(`/facilities/city/${city}`),
+  getOrigins: () => api.get('/facilities/origins'),
+  getDestinations: () => api.get('/facilities/destinations'),
+  
+  // Map Visualization
+  getLoadRoutesMapData: (loadPlan) => api.post('/map/load-routes', { load_plan: loadPlan }),
+  
+  // AI Assistant
+  chatWithAssistant: (data) => api.post('/assistant/chat', data),
+};
+
+export default api;

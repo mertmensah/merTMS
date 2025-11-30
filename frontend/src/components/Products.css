@@ -1,0 +1,173 @@
+.products {
+  padding: 0;
+}
+
+.products-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 2rem;
+}
+
+.products-header h2 {
+  font-size: 2rem;
+  margin: 0 0 0.5rem 0;
+  color: #000;
+}
+
+.products-header p {
+  color: #666;
+  margin: 0;
+}
+
+.products-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.products-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.product-card {
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.product-header {
+  padding: 1.5rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.product-header:hover {
+  background: #f9f9f9;
+}
+
+.product-info {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.product-info h3 {
+  margin: 0;
+  font-size: 1.1rem;
+  color: #176B91;
+  font-weight: 600;
+}
+
+.product-name {
+  margin: 0;
+  font-size: 1rem;
+  color: #000;
+  font-weight: 500;
+}
+
+.hazmat-badge {
+  background: #dc3545;
+  color: #fff;
+  padding: 0.25rem 0.75rem;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.expand-icon {
+  font-size: 1.2rem;
+  color: #666;
+}
+
+.product-details {
+  padding: 1.5rem;
+  border-top: 1px solid #eee;
+  background: #fafafa;
+}
+
+.detail-section {
+  margin-bottom: 1.5rem;
+}
+
+.detail-section:last-child {
+  margin-bottom: 0;
+}
+
+.detail-section h4 {
+  font-size: 0.9rem;
+  color: #666;
+  margin: 0 0 0.75rem 0;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.detail-section p {
+  margin: 0;
+  color: #333;
+  line-height: 1.6;
+}
+
+.dimensions-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 0.75rem;
+}
+
+.dimension-item, .info-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5rem;
+  background: #fff;
+  border-radius: 4px;
+  border: 1px solid #e0e0e0;
+}
+
+.dimension-item .label, .info-item .label {
+  color: #666;
+  font-size: 0.9rem;
+}
+
+.dimension-item .value, .info-item .value {
+  color: #000;
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+
+.pallet-info, .compliance-info {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 0.75rem;
+}
+
+.info-item .value.hazmat {
+  color: #dc3545;
+}
+
+.info-item .value.safe {
+  color: #28a745;
+}
+
+.empty-state {
+  background: #fff;
+  border: 2px dashed #ddd;
+  border-radius: 8px;
+  padding: 3rem 2rem;
+  text-align: center;
+}
+
+.empty-state p {
+  color: #999;
+  font-size: 1rem;
+  margin: 0;
+}

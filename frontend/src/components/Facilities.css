@@ -1,0 +1,295 @@
+.facilities, .products, .settings {
+  padding: 0;
+}
+
+.facilities h2, .products h2, .settings h2 {
+  font-size: 1.8rem;
+  margin-bottom: 0.5rem;
+}
+
+/* Facilities Management */
+.facilities .header-section {
+  margin-bottom: 2rem;
+}
+
+.facilities-stats {
+  display: flex;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.stat-badge {
+  background: #fff;
+  border: 1px solid #e0e0e0;
+  border-radius: 6px;
+  padding: 0.75rem 1.25rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.stat-label {
+  font-size: 0.9rem;
+  color: #666;
+}
+
+.stat-value {
+  font-size: 1.4rem;
+  font-weight: 600;
+  color: #176B91;
+}
+
+.stat-value.origin {
+  color: #176B91;
+}
+
+.stat-value.destination {
+  color: #46B1E1;
+}
+
+/* Search Section */
+.search-section {
+  background: #fff;
+  border-radius: 8px;
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.search-section h3 {
+  font-size: 1.2rem;
+  margin-bottom: 1rem;
+  color: #333;
+}
+
+.search-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.search-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.search-field label {
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: #555;
+}
+
+.search-field input {
+  padding: 0.6rem;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 0.95rem;
+  transition: border-color 0.2s;
+}
+
+.search-field input:focus {
+  outline: none;
+  border-color: #176B91;
+}
+
+.search-actions {
+  display: flex;
+  gap: 0.5rem;
+  align-items: flex-end;
+}
+
+.search-actions button {
+  padding: 0.6rem 1.5rem;
+  border: none;
+  border-radius: 4px;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.btn-primary {
+  background: #176B91;
+  color: white;
+}
+
+.btn-primary:hover {
+  background: #135272;
+}
+
+.btn-secondary {
+  background: #f5f5f5;
+  color: #333;
+  border: 1px solid #ddd;
+}
+
+.btn-secondary:hover {
+  background: #e0e0e0;
+}
+
+.search-results-count {
+  font-size: 0.9rem;
+  color: #666;
+  padding-top: 0.5rem;
+  border-top: 1px solid #f0f0f0;
+}
+
+/* Results Section */
+.results-section {
+  min-height: 300px;
+}
+
+.loading-state,
+.empty-state {
+  background: #fff;
+  border-radius: 8px;
+  padding: 3rem;
+  text-align: center;
+  color: #999;
+}
+
+.facilities-group {
+  margin-bottom: 2rem;
+}
+
+.group-title {
+  font-size: 1.3rem;
+  margin-bottom: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  color: #333;
+}
+
+.type-badge {
+  display: inline-block;
+  padding: 0.4rem 1rem;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.type-badge.origin {
+  background: #e3f2fd;
+  color: #176B91;
+}
+
+.type-badge.destination {
+  background: #e1f5fe;
+  color: #46B1E1;
+}
+
+/* Facilities Grid */
+.facilities-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1rem;
+}
+
+.facility-card {
+  background: #fff;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  padding: 1.25rem;
+  transition: box-shadow 0.2s, transform 0.2s;
+}
+
+.facility-card:hover {
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  transform: translateY(-2px);
+}
+
+.origin-card {
+  border-left: 4px solid #176B91;
+}
+
+.destination-card {
+  border-left: 4px solid #46B1E1;
+}
+
+.facility-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: start;
+  margin-bottom: 1rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.facility-header h4 {
+  font-size: 1.1rem;
+  margin: 0;
+  color: #333;
+}
+
+.facility-code {
+  background: #f5f5f5;
+  padding: 0.25rem 0.6rem;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #666;
+  font-family: monospace;
+}
+
+.facility-details {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.detail-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.9rem;
+}
+
+.detail-label {
+  font-weight: 500;
+  color: #666;
+}
+
+.detail-value {
+  color: #333;
+  font-weight: 500;
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+  .search-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .search-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .facilities-stats {
+    flex-direction: column;
+  }
+
+  .facilities-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.coming-soon {
+  background: #fff;
+  border: 2px dashed #ddd;
+  border-radius: 8px;
+  padding: 4rem 2rem;
+  text-align: center;
+  margin-top: 2rem;
+}
+
+.coming-soon p {
+  font-size: 2rem;
+  color: #999;
+  margin: 0;
+}
+

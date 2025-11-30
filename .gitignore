@@ -1,0 +1,53 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+ENV/
+env/
+.venv/
+
+# Environment variables
+.env
+.env.local
+
+# Node
+node_modules/
+dist/
+build/
+.vite/
+
+# Database
+*.db
+*.sqlite
+
+# Generated data
+data/generated/
+*.csv
+*.json
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+logs/
+
+# Project specific test files
+test_*.py
+check_*.py
+seed_*.py
+quick_test.py
+apply_migration_*.py
+
+# Render
+.render/

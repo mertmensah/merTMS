@@ -1,0 +1,278 @@
+.order-management {
+  background: #ffffff;
+  border-radius: 4px;
+  padding: 2rem;
+  border: 1px solid #e0e0e0;
+}
+
+.header-section {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.header-section h2 {
+  color: #000000;
+  font-size: 2rem;
+  margin: 0;
+  font-weight: 600;
+  letter-spacing: -0.5px;
+}
+
+.button-group {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.btn-primary {
+  background: #176B91;
+  color: #ffffff;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 4px;
+  font-size: 1rem;
+  font-weight: 500;
+  transition: background 0.2s ease;
+}
+
+.btn-primary:hover:not(:disabled) {
+  background: #46B1E1;
+}
+
+.btn-primary:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  background: #cccccc;
+}
+
+.btn-danger {
+  background: #ffffff;
+  color: #d32f2f;
+  border: 1px solid #d32f2f;
+  padding: 0.75rem 1.5rem;
+  border-radius: 4px;
+  font-size: 1rem;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.btn-danger:hover:not(:disabled) {
+  background: #d32f2f;
+  color: #ffffff;
+}
+
+.btn-danger:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.orders-summary {
+  background: #fafafa;
+  padding: 1rem 1.5rem;
+  border-radius: 4px;
+  margin-bottom: 1.5rem;
+  border: 1px solid #e0e0e0;
+}
+
+.orders-summary p {
+  margin: 0.5rem 0;
+  color: #666666;
+}
+
+.orders-summary strong {
+  color: #000000;
+  font-weight: 600;
+}
+
+.info-note {
+  color: #176B91;
+  font-style: italic;
+  font-size: 0.9rem;
+  margin-top: 0.5rem;
+}
+
+.orders-table {
+  overflow-x: auto;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+thead {
+  background: #176B91;
+  color: #ffffff;
+  border-bottom: 2px solid #176B91;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+th {
+  padding: 1rem;
+  text-align: left;
+  font-weight: 600;
+  user-select: none;
+}
+
+tbody tr {
+  border-bottom: 1px solid #e0e0e0;
+  transition: background 0.2s ease;
+  cursor: pointer;
+}
+
+tbody tr:hover {
+  background: #f0f8fc;
+}
+
+tbody tr.selected-row {
+  background: #d4edf7 !important;
+  border-left: 3px solid #176B91;
+}
+
+tbody tr.selected-row td:first-child {
+  padding-left: calc(1rem - 3px);
+}
+
+td {
+  padding: 1rem;
+  color: #000000;
+}
+
+.order-number {
+  font-family: 'Courier New', monospace;
+  font-weight: 600;
+  color: #000000;
+}
+
+.priority {
+  padding: 0.25rem 0.75rem;
+  border-radius: 2px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  border: 1px solid;
+}
+
+.priority-high {
+  background: #ffffff;
+  color: #000000;
+  border-color: #000000;
+}
+
+.priority-normal {
+  background: #ffffff;
+  color: #666666;
+  border-color: #cccccc;
+}
+
+.priority-low {
+  background: #ffffff;
+  color: #999999;
+  border-color: #e0e0e0;
+}
+
+.status {
+  padding: 0.25rem 0.75rem;
+  border-radius: 2px;
+  font-size: 0.85rem;
+  font-weight: 500;
+}
+
+.status-pending {
+  background: #176B91;
+  color: #ffffff;
+}
+
+.status-completed {
+  background: #176B91;
+  color: #ffffff;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 3rem;
+  color: #666666;
+  font-size: 1.1rem;
+}
+
+.loading {
+  text-align: center;
+  padding: 3rem;
+  font-size: 1.2rem;
+  color: #000000;
+}
+
+/* Pagination Controls */
+.pagination-controls {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.75rem;
+  margin-top: 1.5rem;
+  padding: 1rem 0;
+}
+
+.btn-pagination {
+  background: #176B91;
+  color: #ffffff;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.btn-pagination:hover:not(:disabled) {
+  background: #46B1E1;
+}
+
+.btn-pagination:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  background: #cccccc;
+  color: #666666;
+}
+
+.page-info {
+  font-weight: 600;
+  color: #000000;
+  padding: 0 1rem;
+  font-size: 1rem;
+}
+
+/* Context Menu */
+.context-menu {
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  min-width: 250px;
+  padding: 0.5rem 0;
+  z-index: 1000;
+}
+
+.context-menu-item {
+  padding: 0.75rem 1.25rem;
+  cursor: pointer;
+  transition: background 0.15s ease;
+  font-size: 0.9rem;
+  color: #000;
+}
+
+.context-menu-item:hover {
+  background: #f0f8fc;
+  color: #176B91;
+}
+
+.context-menu-divider {
+  height: 1px;
+  background: #e0e0e0;
+  margin: 0.5rem 0;
+}

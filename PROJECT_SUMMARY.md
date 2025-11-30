@@ -204,7 +204,7 @@ ERP System → ERPDataGenerator → Supabase (PostgreSQL)
 ### 2. Configure Environment
 ```bash
 # Create backend/.env
-GEMINI_API_KEY=AIzaSyCCFzfQeVSsGf6C7Zw8FXZ2vPAOI7hKKPE
+GEMINI_API_KEY=your_gemini_api_key_here
 SUPABASE_URL=https://your-project.supabase.co
 SUPABASE_KEY=your-supabase-anon-key
 ```

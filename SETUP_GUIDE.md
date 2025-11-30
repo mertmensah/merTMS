@@ -55,11 +55,11 @@ Create `backend/.env` file:
 
 ```env
 # Google Gemini AI
-GEMINI_API_KEY=AIzaSyCCFzfQeVSsGf6C7Zw8FXZ2vPAOI7hKKPE
+GEMINI_API_KEY=your_gemini_api_key_here
 
 # Supabase Database
-SUPABASE_URL=https://jfmdxoiepcjxaitmhwkj.supabase.co
-SUPABASE_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpmbWR4b2llcGNqeGFpdG1od2tqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQ0MjA0NTEsImV4cCI6MjA3OTk5NjQ1MX0.od6iMVpiSRi8ytZPR_PJVwMycLz9kV4cIK6Q0YX9Q24
+SUPABASE_URL=your_supabase_project_url
+SUPABASE_KEY=your_supabase_anon_key
 
 # Flask Settings
 DEBUG=True

@@ -36,6 +36,10 @@ def health_check():
 @app.route('/api/network/facility-location', methods=['POST'])
 def facility_location_analysis():
     from database.supabase_client import SupabaseClient
+    import numpy as np
+    from sklearn.cluster import KMeans
+    from math import radians, sin, cos, sqrt, atan2
+    
     try:
         data = request.get_json()
         k = data.get('k', 3)  # Number of facilities/centers
@@ -47,83 +51,113 @@ def facility_location_analysis():
         if not orders or len(orders) == 0:
             return jsonify({"error": "No orders available for analysis"}), 400
         
-        # Prepare data for clustering
-        # Extract customer locations and weights
-        customer_data = []
+        # Step 1: Group orders by unique customer location and aggregate weights
+        location_dict = {}
+        
         for order in orders:
-            if order.get('delivery_lat') and order.get('delivery_lon') and order.get('weight'):
-                customer_data.append({
-                    'lat': float(order['delivery_lat']),
-                    'lon': float(order['delivery_lon']),
-                    'weight': float(order['weight']),
-                    'customer': order.get('customer_name', 'Unknown'),
+            delivery_lat = order.get('delivery_lat')
+            delivery_lon = order.get('delivery_lon')
+            weight = order.get('weight')
+            
+            # Skip orders without valid location or weight data
+            if not delivery_lat or not delivery_lon or not weight:
+                continue
+            
+            try:
+                lat = float(delivery_lat)
+                lon = float(delivery_lon)
+                wgt = float(weight)
+            except (ValueError, TypeError):
+                continue
+            
+            # Create a unique key for this location (rounded to 4 decimals for grouping)
+            location_key = (round(lat, 4), round(lon, 4))
+            
+            if location_key not in location_dict:
+                location_dict[location_key] = {
+                    'lat': lat,
+                    'lon': lon,
+                    'total_weight': 0,
+                    'customer_name': order.get('customer_name', 'Unknown'),
                     'city': order.get('delivery_city', ''),
-                    'state': order.get('delivery_state', '')
-                })
+                    'state': order.get('delivery_state', ''),
+                    'order_count': 0
+                }
+            
+            location_dict[location_key]['total_weight'] += wgt
+            location_dict[location_key]['order_count'] += 1
         
-        if len(customer_data) < k:
-            return jsonify({"error": f"Not enough unique locations for {k} facilities"}), 400
+        # Step 2: Convert aggregated locations to list
+        customer_locations = list(location_dict.values())
         
-        # Perform K-means clustering
-        import numpy as np
-        from sklearn.cluster import KMeans
+        if len(customer_locations) == 0:
+            return jsonify({"error": "No valid customer locations found in orders"}), 400
         
-        # Create coordinate matrix
-        coords = np.array([[d['lat'], d['lon']] for d in customer_data])
-        weights = np.array([d['weight'] for d in customer_data])
+        if len(customer_locations) < k:
+            return jsonify({
+                "error": f"Only {len(customer_locations)} unique customer location(s) found. Need at least {k} locations for {k} facilities. Try reducing k."
+            }), 400
         
-        # Weighted K-means using sample_weight
+        # Step 3: Prepare data for K-means clustering
+        coords = np.array([[loc['lat'], loc['lon']] for loc in customer_locations])
+        weights = np.array([loc['total_weight'] for loc in customer_locations])
+        
+        # Step 4: Perform weighted K-means clustering
         kmeans = KMeans(n_clusters=k, random_state=42, n_init=10)
         labels = kmeans.fit_predict(coords, sample_weight=weights)
         centers = kmeans.cluster_centers_
         
-        # Calculate metrics for each facility
+        # Haversine distance function
+        def haversine_distance(lat1, lon1, lat2, lon2):
+            R = 3959  # Earth radius in miles
+            lat1, lon1, lat2, lon2 = map(radians, [lat1, lon1, lat2, lon2])
+            dlat = lat2 - lat1
+            dlon = lon2 - lon1
+            a = sin(dlat/2)**2 + cos(lat1) * cos(lat2) * sin(dlon/2)**2
+            c = 2 * atan2(sqrt(a), sqrt(1-a))
+            return R * c
+        
+        # Step 5: Calculate metrics for each facility
         facilities = []
         for i, center in enumerate(centers):
             facility_lat, facility_lon = center[0], center[1]
             
             # Get customers assigned to this facility
-            cluster_customers = [customer_data[j] for j in range(len(customer_data)) if labels[j] == i]
+            cluster_locations = [customer_locations[j] for j in range(len(customer_locations)) if labels[j] == i]
             
             # Calculate average distance to customers
-            from math import radians, sin, cos, sqrt, atan2
-            def haversine_distance(lat1, lon1, lat2, lon2):
-                R = 3959  # Earth radius in miles
-                lat1, lon1, lat2, lon2 = map(radians, [lat1, lon1, lat2, lon2])
-                dlat = lat2 - lat1
-                dlon = lon2 - lon1
-                a = sin(dlat/2)**2 + cos(lat1) * cos(lat2) * sin(dlon/2)**2
-                c = 2 * atan2(sqrt(a), sqrt(1-a))
-                return R * c
-            
-            distances = [haversine_distance(facility_lat, facility_lon, c['lat'], c['lon']) for c in cluster_customers]
+            distances = [haversine_distance(facility_lat, facility_lon, loc['lat'], loc['lon']) for loc in cluster_locations]
             avg_distance = sum(distances) / len(distances) if distances else 0
-            total_volume = sum([c['weight'] for c in cluster_customers])
+            total_volume = sum([loc['total_weight'] for loc in cluster_locations])
+            total_orders = sum([loc['order_count'] for loc in cluster_locations])
             
             # Find nearest city using reverse geocoding approximation
-            # For now, find the closest customer city as proxy
-            closest_customer = min(cluster_customers, key=lambda c: haversine_distance(facility_lat, facility_lon, c['lat'], c['lon']))
+            closest_location = min(cluster_locations, key=lambda loc: haversine_distance(facility_lat, facility_lon, loc['lat'], loc['lon']))
             
             facilities.append({
                 'facility_id': i + 1,
                 'latitude': float(facility_lat),
                 'longitude': float(facility_lon),
-                'nearest_city': closest_customer['city'] or 'Unknown',
-                'nearest_state': closest_customer['state'] or 'Unknown',
+                'nearest_city': closest_location['city'] or 'Unknown',
+                'nearest_state': closest_location['state'] or 'Unknown',
                 'avg_customer_distance': round(avg_distance, 1),
                 'total_volume': round(total_volume, 0),
-                'num_customers': len(cluster_customers),
+                'num_customers': len(cluster_locations),
+                'total_orders': total_orders,
                 'cluster_label': i
             })
         
-        # Prepare customer demand points
+        # Step 6: Prepare demand points for visualization
         demand_points = []
-        for i, customer in enumerate(customer_data):
+        for i, location in enumerate(customer_locations):
             demand_points.append({
-                'latitude': customer['lat'],
-                'longitude': customer['lon'],
-                'weight': customer['weight'],
-                'customer': customer['customer'],
+                'latitude': location['lat'],
+                'longitude': location['lon'],
+                'weight': location['total_weight'],
+                'customer': location['customer_name'],
+                'city': location['city'],
+                'state': location['state'],
+                'order_count': location['order_count'],
                 'assigned_facility': int(labels[i]) + 1
             })
         
@@ -131,7 +165,9 @@ def facility_location_analysis():
             'facilities': facilities,
             'demand_points': demand_points,
             'k': k,
-            'total_demand': sum(weights),
+            'total_demand': float(sum(weights)),
+            'unique_locations': len(customer_locations),
+            'total_orders_analyzed': sum([loc['order_count'] for loc in customer_locations]),
             'analysis_date': pd.Timestamp.now().isoformat()
         }), 200
         

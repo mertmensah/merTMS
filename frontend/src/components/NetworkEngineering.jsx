@@ -7,13 +7,6 @@ function NetworkEngineering() {
 
   return (
     <div className="network-engineering">
-      <div className="network-header">
-        <h1>Network Engineering</h1>
-        <p className="network-subtitle">
-          Optimize your logistics network with advanced analytics and strategic planning tools
-        </p>
-      </div>
-
       <div className="network-tabs">
         <button
           className={`tab-button ${activeTab === 'facility-location' ? 'active' : ''}`}

@@ -63,6 +63,12 @@ export const tmsAPI = {
   
   // AI Assistant
   chatWithAssistant: (data) => api.post('/assistant/chat', data),
+  
+  // mertsightsAI - Conversational Analytics
+  queryMertsights: (question, conversationHistory = []) => api.post('/mertsights/query', {
+    question,
+    conversation_history: conversationHistory
+  }),
 };
 
 export default api;

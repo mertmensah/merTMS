@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import axios from 'axios';
+import api from '../services/api';
 import {
   BarChart, Bar, LineChart, Line, PieChart, Pie, Cell,
   XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer
@@ -46,7 +46,7 @@ const MertsightsAI = () => {
 
     try {
       // Call mertsightsAI API
-      const response = await axios.post('http://localhost:5000/api/mertsights/query', {
+      const response = await api.post('/mertsights/query', {
         question: userMessage,
         conversation_history: conversationHistory
       });

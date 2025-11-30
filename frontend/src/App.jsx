@@ -13,30 +13,79 @@ import './App.css'
 
 function App() {
   const [activeTab, setActiveTab] = useState('control-tower')
-  const [sidebarExpanded, setSidebarExpanded] = useState(false)
+  const [sidebarExpanded, setSidebarExpanded] = useState(true)
 
   const navItems = [
-    { id: 'control-tower', label: 'Control Tower', icon: '🎯' },
-    { id: 'orders', label: 'Orders', icon: '📋' },
-    { id: 'load-builder', label: 'Load Builder', icon: '🔧' },
-    { id: 'loads', label: 'Loads', icon: '🚛' },
-    { id: 'facilities', label: 'Facilities', icon: '🏭' },
-    { id: 'products', label: 'Products', icon: '📦' },
-    { id: 'mertsights-ai', label: 'mertsightsAI', icon: '📊' },
-    { id: 'network-engineering', label: 'Network Engineering Suite', icon: '🌐' },
-    { id: 'settings', label: 'Settings', icon: '⚙️' }
+    { 
+      id: 'control-tower', 
+      label: 'Control Tower', 
+      icon: '🎯',
+      description: 'Real-time shipment visibility and monitoring'
+    },
+    { 
+      id: 'orders', 
+      label: 'Orders', 
+      icon: '📋',
+      description: 'Manage customer orders and shipments'
+    },
+    { 
+      id: 'load-builder', 
+      label: 'Load Builder', 
+      icon: '🔧',
+      description: 'Optimize truck loads with AI assistance'
+    },
+    { 
+      id: 'loads', 
+      label: 'Loads', 
+      icon: '🚛',
+      description: 'View and track all truck loads'
+    },
+    { 
+      id: 'facilities', 
+      label: 'Facilities', 
+      icon: '🏭',
+      description: 'Warehouse and distribution center network'
+    },
+    { 
+      id: 'products', 
+      label: 'Products', 
+      icon: '📦',
+      description: 'Product catalog and specifications'
+    },
+    { 
+      id: 'mertsights-ai', 
+      label: 'mertsightsAI', 
+      icon: '📊',
+      description: 'AI-powered analytics and insights'
+    },
+    { 
+      id: 'network-engineering', 
+      label: 'Network Engineering', 
+      icon: '🌐',
+      description: 'Network design and optimization tools'
+    },
+    { 
+      id: 'settings', 
+      label: 'Settings', 
+      icon: '⚙️',
+      description: 'System configuration and preferences'
+    }
   ]
 
   return (
     <div className="app">
       <div className={`sidebar ${sidebarExpanded ? 'expanded' : ''}`}>
         <div className="sidebar-header">
-          <span className="sidebar-logo">merTM.S</span>
+          <div className="sidebar-branding">
+            <span className="brand-icon">🚚</span>
+            <span className="sidebar-logo">merTM.S</span>
+          </div>
           <button 
             className="menu-toggle"
             onClick={() => setSidebarExpanded(!sidebarExpanded)}
+            title={sidebarExpanded ? "Collapse sidebar" : "Expand sidebar"}
           >
-            ☰
+            {sidebarExpanded ? '◀' : '▶'}
           </button>
         </div>
         
@@ -46,12 +95,23 @@ function App() {
               key={item.id}
               className={`nav-item ${activeTab === item.id ? 'active' : ''}`}
               onClick={() => setActiveTab(item.id)}
+              title={!sidebarExpanded ? item.label : ''}
             >
               <span className="nav-icon">{item.icon}</span>
-              <span className="nav-label">{item.label}</span>
+              <div className="nav-content">
+                <span className="nav-label">{item.label}</span>
+                <span className="nav-description">{item.description}</span>
+              </div>
             </button>
           ))}
         </nav>
+        
+        <div className="sidebar-footer">
+          <div className="sidebar-version">
+            <span className="version-icon">ℹ️</span>
+            <span className="version-text">v1.0.0</span>
+          </div>
+        </div>
       </div>
 
       <div className="main-content">

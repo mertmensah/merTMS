@@ -4,6 +4,7 @@ Supabase Database Client
 from supabase import create_client, Client
 import sys
 import os
+import time
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from config.settings import SUPABASE_URL, SUPABASE_KEY
@@ -14,7 +15,23 @@ class SupabaseClient:
     """
     
     def __init__(self):
-        self.client: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
+        # Add retry logic for Render deployment
+        max_retries = 3
+        retry_delay = 2
+        
+        for attempt in range(max_retries):
+            try:
+                self.client: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
+                # Test connection
+                self.client.table('facilities').select('id').limit(1).execute()
+                break
+            except Exception as e:
+                if attempt < max_retries - 1:
+                    print(f"[SUPABASE] Connection attempt {attempt + 1} failed, retrying in {retry_delay}s...")
+                    time.sleep(retry_delay)
+                else:
+                    print(f"[SUPABASE] Failed to connect after {max_retries} attempts")
+                    raise
     
     # Facilities Operations
     def get_all_facilities(self):

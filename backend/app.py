@@ -119,13 +119,18 @@ def facility_location_analysis():
                     'lon': lon,
                     'total_weight': 0,
                     'customer_name': customer,
-                    'city': coords['city'],
-                    'state': coords['state'],
+                    'city': coords.get('city', ''),
+                    'state': coords.get('state', ''),
                     'order_count': 0
                 }
             
             location_dict[location_key]['total_weight'] += wgt
             location_dict[location_key]['order_count'] += 1
+            # Update city/state if this location has better info
+            if not location_dict[location_key]['state'] and coords.get('state'):
+                location_dict[location_key]['state'] = coords.get('state', '')
+            if not location_dict[location_key]['city'] and coords.get('city'):
+                location_dict[location_key]['city'] = coords.get('city', '')
         
         # Step 2: Convert aggregated locations to list
         customer_locations = list(location_dict.values())

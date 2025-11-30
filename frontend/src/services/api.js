@@ -69,6 +69,9 @@ export const tmsAPI = {
     question,
     conversation_history: conversationHistory
   }),
+  
+  // Network Engineering
+  analyzeFacilityLocation: (k) => api.post('/network/facility-location', { k }),
 };
 
 export default api;

@@ -32,6 +32,113 @@ CORS(app, resources={
 def health_check():
     return jsonify({"status": "healthy", "service": "TMS Backend"}), 200
 
+# Network Engineering - Facility Location endpoint
+@app.route('/api/network/facility-location', methods=['POST'])
+def facility_location_analysis():
+    try:
+        data = request.get_json()
+        k = data.get('k', 3)  # Number of facilities/centers
+        
+        # Get orders from database
+        orders = supabase_client.get_all_orders()
+        
+        if not orders or len(orders) == 0:
+            return jsonify({"error": "No orders available for analysis"}), 400
+        
+        # Prepare data for clustering
+        # Extract customer locations and weights
+        customer_data = []
+        for order in orders:
+            if order.get('delivery_lat') and order.get('delivery_lon') and order.get('weight'):
+                customer_data.append({
+                    'lat': float(order['delivery_lat']),
+                    'lon': float(order['delivery_lon']),
+                    'weight': float(order['weight']),
+                    'customer': order.get('customer_name', 'Unknown'),
+                    'city': order.get('delivery_city', ''),
+                    'state': order.get('delivery_state', '')
+                })
+        
+        if len(customer_data) < k:
+            return jsonify({"error": f"Not enough unique locations for {k} facilities"}), 400
+        
+        # Perform K-means clustering
+        import numpy as np
+        from sklearn.cluster import KMeans
+        
+        # Create coordinate matrix
+        coords = np.array([[d['lat'], d['lon']] for d in customer_data])
+        weights = np.array([d['weight'] for d in customer_data])
+        
+        # Weighted K-means using sample_weight
+        kmeans = KMeans(n_clusters=k, random_state=42, n_init=10)
+        labels = kmeans.fit_predict(coords, sample_weight=weights)
+        centers = kmeans.cluster_centers_
+        
+        # Calculate metrics for each facility
+        facilities = []
+        for i, center in enumerate(centers):
+            facility_lat, facility_lon = center[0], center[1]
+            
+            # Get customers assigned to this facility
+            cluster_customers = [customer_data[j] for j in range(len(customer_data)) if labels[j] == i]
+            
+            # Calculate average distance to customers
+            from math import radians, sin, cos, sqrt, atan2
+            def haversine_distance(lat1, lon1, lat2, lon2):
+                R = 3959  # Earth radius in miles
+                lat1, lon1, lat2, lon2 = map(radians, [lat1, lon1, lat2, lon2])
+                dlat = lat2 - lat1
+                dlon = lon2 - lon1
+                a = sin(dlat/2)**2 + cos(lat1) * cos(lat2) * sin(dlon/2)**2
+                c = 2 * atan2(sqrt(a), sqrt(1-a))
+                return R * c
+            
+            distances = [haversine_distance(facility_lat, facility_lon, c['lat'], c['lon']) for c in cluster_customers]
+            avg_distance = sum(distances) / len(distances) if distances else 0
+            total_volume = sum([c['weight'] for c in cluster_customers])
+            
+            # Find nearest city using reverse geocoding approximation
+            # For now, find the closest customer city as proxy
+            closest_customer = min(cluster_customers, key=lambda c: haversine_distance(facility_lat, facility_lon, c['lat'], c['lon']))
+            
+            facilities.append({
+                'facility_id': i + 1,
+                'latitude': float(facility_lat),
+                'longitude': float(facility_lon),
+                'nearest_city': closest_customer['city'] or 'Unknown',
+                'nearest_state': closest_customer['state'] or 'Unknown',
+                'avg_customer_distance': round(avg_distance, 1),
+                'total_volume': round(total_volume, 0),
+                'num_customers': len(cluster_customers),
+                'cluster_label': i
+            })
+        
+        # Prepare customer demand points
+        demand_points = []
+        for i, customer in enumerate(customer_data):
+            demand_points.append({
+                'latitude': customer['lat'],
+                'longitude': customer['lon'],
+                'weight': customer['weight'],
+                'customer': customer['customer'],
+                'assigned_facility': int(labels[i]) + 1
+            })
+        
+        return jsonify({
+            'facilities': facilities,
+            'demand_points': demand_points,
+            'k': k,
+            'total_demand': sum(weights),
+            'analysis_date': pd.Timestamp.now().isoformat()
+        }), 200
+        
+    except Exception as e:
+        print(f"Facility location analysis error: {str(e)}")
+        import traceback
+        traceback.print_exc()
+        return jsonify({"error": str(e)}), 500
+
 # Orders API
 @app.route('/api/orders', methods=['GET'])
 def get_orders():

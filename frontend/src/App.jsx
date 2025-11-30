@@ -9,6 +9,7 @@ import Products from './components/Products'
 import Settings from './components/Settings'
 import AIAssistant from './components/AIAssistant'
 import MertsightsAI from './components/MertsightsAI'
+import NetworkEngineering from './components/NetworkEngineering'
 import './App.css'
 
 function App() {
@@ -130,7 +131,7 @@ function App() {
           {activeTab === 'facilities' && <Facilities />}
           {activeTab === 'products' && <Products />}
           {activeTab === 'mertsights-ai' && <MertsightsAI />}
-          {activeTab === 'network-engineering' && <div className="placeholder-module"><h2>Network Engineering Suite</h2><p>Coming soon...</p></div>}
+          {activeTab === 'network-engineering' && <NetworkEngineering />}
           {activeTab === 'settings' && <Settings />}
         </main>
       </div>

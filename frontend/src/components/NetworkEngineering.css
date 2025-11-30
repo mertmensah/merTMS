@@ -1,0 +1,99 @@
+.network-engineering {
+  padding: 20px;
+  background: linear-gradient(135deg, #0a0e27 0%, #1a1f3a 100%);
+  min-height: 100vh;
+  color: #ffffff;
+}
+
+.network-header {
+  margin-bottom: 30px;
+  padding: 20px;
+  background: rgba(23, 107, 145, 0.1);
+  border-left: 4px solid #176B91;
+  border-radius: 8px;
+}
+
+.network-header h1 {
+  margin: 0 0 10px 0;
+  color: #46B1E1;
+  font-size: 32px;
+  font-weight: 700;
+}
+
+.network-subtitle {
+  margin: 0;
+  color: #a0aec0;
+  font-size: 16px;
+}
+
+.network-tabs {
+  display: flex;
+  gap: 15px;
+  margin-bottom: 30px;
+  flex-wrap: wrap;
+}
+
+.tab-button {
+  flex: 1;
+  min-width: 200px;
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  padding: 20px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 2px solid rgba(70, 177, 225, 0.3);
+  border-radius: 12px;
+  color: #ffffff;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.tab-button:hover:not(.disabled) {
+  background: rgba(70, 177, 225, 0.1);
+  border-color: #46B1E1;
+  transform: translateY(-2px);
+}
+
+.tab-button.active {
+  background: linear-gradient(135deg, #176B91 0%, #46B1E1 100%);
+  border-color: #46B1E1;
+  box-shadow: 0 4px 15px rgba(70, 177, 225, 0.3);
+}
+
+.tab-button.disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.tab-icon {
+  font-size: 32px;
+  line-height: 1;
+}
+
+.tab-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  text-align: left;
+}
+
+.tab-title {
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.tab-desc {
+  font-size: 12px;
+  color: #a0aec0;
+}
+
+.tab-button.active .tab-desc {
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.network-content {
+  background: rgba(255, 255, 255, 0.02);
+  border-radius: 12px;
+  padding: 30px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+}

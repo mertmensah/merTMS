@@ -1084,6 +1084,263 @@ def mertsights_query():
             "error": f"mertsightsAI error: {error_msg}"
         }), 500
 
+# AI Docuscan - Document OCR and Classification
+@app.route('/api/docuscan/analyze', methods=['POST'])
+def analyze_document():
+    """
+    Analyze uploaded document using Gemini Vision for OCR and classification.
+    Two-stage process:
+    1. Extract text and make initial classification
+    2. Verify classification and extract document-specific fields
+    """
+    import google.generativeai as genai
+    import os
+    from werkzeug.utils import secure_filename
+    import base64
+    from PIL import Image
+    import io
+    
+    try:
+        # Check if file is present in request
+        if 'file' not in request.files:
+            return jsonify({'error': 'No file provided'}), 400
+        
+        file = request.files['file']
+        if file.filename == '':
+            return jsonify({'error': 'Empty filename'}), 400
+        
+        # Validate file type
+        allowed_extensions = {'pdf', 'png', 'jpg', 'jpeg'}
+        file_ext = file.filename.rsplit('.', 1)[1].lower() if '.' in file.filename else ''
+        if file_ext not in allowed_extensions:
+            return jsonify({'error': 'Invalid file type. Allowed: PDF, PNG, JPG, JPEG'}), 400
+        
+        # Read file into memory
+        file_bytes = file.read()
+        
+        # Configure Gemini
+        genai.configure(api_key=os.getenv('GOOGLE_API_KEY'))
+        model = genai.GenerativeModel('gemini-2.0-flash-exp')
+        
+        # Document classification options
+        document_types = [
+            'Bill of Lading',
+            'Signed Bill of Lading',
+            'Commercial Invoice',
+            'Packing List',
+            'Carrier Invoice',
+            'Communication Records'
+        ]
+        
+        # Stage 1: Initial OCR and Classification
+        print("[Docuscan] Stage 1: Extracting text and initial classification...")
+        
+        # Prepare image for Gemini
+        if file_ext == 'pdf':
+            # For PDFs, we'll use the first page (Gemini supports PDF)
+            image_parts = [{
+                'mime_type': 'application/pdf',
+                'data': file_bytes
+            }]
+        else:
+            # For images
+            image_parts = [{
+                'mime_type': f'image/{file_ext}',
+                'data': file_bytes
+            }]
+        
+        stage1_prompt = f"""Analyze this document image and perform two tasks:
+
+1. EXTRACT ALL TEXT: Extract every piece of text visible in the document. Include headers, labels, values, dates, numbers, addresses, signatures, stamps - everything readable.
+
+2. CLASSIFY DOCUMENT: Based on the extracted text, classify this document into ONE of these categories:
+{chr(10).join(f'   - {doc_type}' for doc_type in document_types)}
+
+Respond in this EXACT JSON format:
+{{
+    "raw_text": "Complete extracted text from the document",
+    "initial_classification": "One of the document types listed above",
+    "confidence": 85,
+    "reasoning": "Brief explanation of why you classified it this way"
+}}"""
+
+        response1 = model.generate_content([stage1_prompt] + image_parts)
+        stage1_result = response1.text
+        
+        # Parse Stage 1 response
+        import json
+        import re
+        
+        # Extract JSON from markdown code blocks if present
+        json_match = re.search(r'```(?:json)?\s*(\{.*?\})\s*```', stage1_result, re.DOTALL)
+        if json_match:
+            stage1_data = json.loads(json_match.group(1))
+        else:
+            # Try to parse as direct JSON
+            stage1_data = json.loads(stage1_result)
+        
+        raw_text = stage1_data.get('raw_text', '')
+        initial_classification = stage1_data.get('initial_classification', '')
+        confidence = stage1_data.get('confidence', 0)
+        reasoning = stage1_data.get('reasoning', '')
+        
+        print(f"[Docuscan] Initial classification: {initial_classification} ({confidence}% confidence)")
+        
+        # Stage 2: Verification and Field Extraction
+        print("[Docuscan] Stage 2: Verifying classification and extracting structured fields...")
+        
+        # Define document-specific fields to extract
+        field_templates = {
+            'Bill of Lading': {
+                'bol_number': 'Bill of Lading number',
+                'carrier': 'Carrier name',
+                'shipper': 'Shipper name and address',
+                'consignee': 'Consignee name and address',
+                'origin': 'Origin location',
+                'destination': 'Destination location',
+                'date': 'Date of shipment',
+                'weight': 'Total weight',
+                'pieces': 'Number of pieces/packages',
+                'description': 'Goods description'
+            },
+            'Signed Bill of Lading': {
+                'bol_number': 'Bill of Lading number',
+                'carrier': 'Carrier name',
+                'shipper': 'Shipper name and address',
+                'consignee': 'Consignee name and address',
+                'origin': 'Origin location',
+                'destination': 'Destination location',
+                'date': 'Date of shipment',
+                'weight': 'Total weight',
+                'signature': 'Signature present (Yes/No)',
+                'signed_by': 'Name of signatory',
+                'signature_date': 'Date of signature'
+            },
+            'Commercial Invoice': {
+                'invoice_number': 'Invoice number',
+                'invoice_date': 'Invoice date',
+                'seller': 'Seller/Exporter name and address',
+                'buyer': 'Buyer/Importer name and address',
+                'total_amount': 'Total invoice amount',
+                'currency': 'Currency',
+                'payment_terms': 'Payment terms',
+                'items': 'List of items/products',
+                'quantities': 'Quantities',
+                'unit_prices': 'Unit prices'
+            },
+            'Packing List': {
+                'packing_list_number': 'Packing list number',
+                'date': 'Date',
+                'shipper': 'Shipper name',
+                'consignee': 'Consignee name',
+                'total_packages': 'Total number of packages',
+                'total_weight': 'Total weight',
+                'total_volume': 'Total volume',
+                'items': 'List of items',
+                'package_numbers': 'Package/carton numbers',
+                'dimensions': 'Package dimensions'
+            },
+            'Carrier Invoice': {
+                'invoice_number': 'Carrier invoice number',
+                'invoice_date': 'Invoice date',
+                'carrier_name': 'Carrier company name',
+                'customer_name': 'Customer/Shipper name',
+                'shipment_reference': 'Shipment or BOL reference',
+                'service_date': 'Service date',
+                'origin': 'Origin location',
+                'destination': 'Destination location',
+                'charges': 'Breakdown of charges',
+                'total_amount': 'Total amount due',
+                'payment_terms': 'Payment terms'
+            },
+            'Communication Records': {
+                'date': 'Date of communication',
+                'sender': 'Sender name/email',
+                'recipient': 'Recipient name/email',
+                'subject': 'Subject line',
+                'reference_number': 'Any reference numbers mentioned',
+                'key_points': 'Main points discussed',
+                'action_items': 'Action items or follow-ups',
+                'attachments': 'Any attachments mentioned'
+            }
+        }
+        
+        fields_to_extract = field_templates.get(initial_classification, {})
+        
+        stage2_prompt = f"""You previously classified this document as: {initial_classification}
+
+Now perform two tasks:
+
+1. VERIFY CLASSIFICATION: Review the document again carefully. Is "{initial_classification}" still the best match from this list?
+{chr(10).join(f'   - {doc_type}' for doc_type in document_types)}
+
+2. EXTRACT STRUCTURED FIELDS: If the classification is correct, extract these specific fields from the document:
+{chr(10).join(f'   - {field}: {description}' for field, description in fields_to_extract.items())}
+
+For each field:
+- Extract the EXACT value from the document if present
+- If not found or not visible, return "Not found"
+- Be precise with numbers, dates, and names
+
+Respond in this EXACT JSON format:
+{{
+    "final_classification": "Confirmed document type",
+    "confidence": 90,
+    "verification_notes": "Brief note on verification (e.g., 'Confirmed based on presence of BOL number and carrier details' or 'Changed from X to Y because...')",
+    "extracted_fields": {{
+        "field_name": "extracted value or 'Not found'"
+    }}
+}}"""
+
+        response2 = model.generate_content([stage2_prompt] + image_parts)
+        stage2_result = response2.text
+        
+        # Parse Stage 2 response
+        json_match = re.search(r'```(?:json)?\s*(\{.*?\})\s*```', stage2_result, re.DOTALL)
+        if json_match:
+            stage2_data = json.loads(json_match.group(1))
+        else:
+            stage2_data = json.loads(stage2_result)
+        
+        final_classification = stage2_data.get('final_classification', initial_classification)
+        final_confidence = stage2_data.get('confidence', confidence)
+        verification_notes = stage2_data.get('verification_notes', '')
+        extracted_fields = stage2_data.get('extracted_fields', {})
+        
+        print(f"[Docuscan] Final classification: {final_classification} ({final_confidence}% confidence)")
+        print(f"[Docuscan] Extracted {len(extracted_fields)} fields")
+        
+        # Return comprehensive results
+        return jsonify({
+            'classification': final_classification,
+            'confidence': final_confidence,
+            'verification_notes': verification_notes,
+            'extracted_data': extracted_fields,
+            'raw_text': raw_text,
+            'processing_stages': {
+                'stage1_classification': initial_classification,
+                'stage1_confidence': confidence,
+                'stage1_reasoning': reasoning,
+                'stage2_classification': final_classification,
+                'stage2_confidence': final_confidence
+            }
+        }), 200
+        
+    except json.JSONDecodeError as e:
+        print(f"[Docuscan] JSON parsing error: {str(e)}")
+        return jsonify({
+            'error': 'Failed to parse AI response',
+            'details': str(e)
+        }), 500
+    except Exception as e:
+        print(f"[Docuscan] Error: {str(e)}")
+        import traceback
+        traceback.print_exc()
+        return jsonify({
+            'error': 'Document analysis failed',
+            'details': str(e)
+        }), 500
+
 if __name__ == '__main__':
     print(f"[merTM.S] Backend starting on port {PORT}...")
     print(f"[API] Available at: http://localhost:{PORT}")

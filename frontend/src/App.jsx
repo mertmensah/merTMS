@@ -10,6 +10,7 @@ import Settings from './components/Settings'
 import AIAssistant from './components/AIAssistant'
 import MertsightsAI from './components/MertsightsAI'
 import NetworkEngineering from './components/NetworkEngineering'
+import AIDocuscan from './components/AIDocuscan'
 import './App.css'
 
 function App() {
@@ -64,6 +65,12 @@ function App() {
       label: 'Network Engineering', 
       icon: '🌐',
       description: 'Network design and optimization tools'
+    },
+    { 
+      id: 'ai-docuscan', 
+      label: 'AI Docuscan', 
+      icon: '🔍',
+      description: 'Use Agentic AI to scan and classify your documents'
     },
     { 
       id: 'settings', 
@@ -132,6 +139,7 @@ function App() {
           {activeTab === 'products' && <Products />}
           {activeTab === 'mertsights-ai' && <MertsightsAI />}
           {activeTab === 'network-engineering' && <NetworkEngineering />}
+          {activeTab === 'ai-docuscan' && <AIDocuscan />}
           {activeTab === 'settings' && <Settings />}
         </main>
       </div>

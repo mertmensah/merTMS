@@ -72,6 +72,16 @@ export const tmsAPI = {
   
   // Network Engineering
   analyzeFacilityLocation: (k) => api.post('/network/facility-location', { k }),
+  
+  // AI Docuscan - Document OCR and Classification
+  uploadDocumentForAnalysis: (formData) => {
+    return api.post('/docuscan/analyze', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+      timeout: 300000, // 5 minutes for document processing
+    });
+  },
 };
 
 export default api;

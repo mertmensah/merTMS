@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import './AIDocuscan.css';
-import * as api from '../services/api';
+import { tmsAPI } from '../services/api';
 
 const AIDocuscan = () => {
   const [selectedFile, setSelectedFile] = useState(null);
@@ -46,7 +46,7 @@ const AIDocuscan = () => {
       const formData = new FormData();
       formData.append('file', selectedFile);
 
-      const response = await api.uploadDocumentForAnalysis(formData);
+      const response = await tmsAPI.uploadDocumentForAnalysis(formData);
       setResult(response);
     } catch (err) {
       setError(err.message || 'Failed to analyze document. Please try again.');

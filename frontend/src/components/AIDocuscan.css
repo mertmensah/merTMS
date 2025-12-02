@@ -22,6 +22,77 @@
   font-size: 1.1rem;
 }
 
+.instructions-banner {
+  background: linear-gradient(135deg, #e6f4ff 0%, #f0f8ff 100%);
+  border: 2px solid #176B91;
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+  box-shadow: 0 2px 8px rgba(23, 107, 145, 0.1);
+}
+
+.instructions-header {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+  color: #176B91;
+}
+
+.instructions-header svg {
+  stroke: #176B91;
+  flex-shrink: 0;
+}
+
+.instructions-header h3 {
+  margin: 0;
+  font-size: 1.3rem;
+  font-weight: 600;
+}
+
+.instructions-content {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.instruction-item {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid rgba(23, 107, 145, 0.1);
+}
+
+.instruction-item:last-of-type {
+  border-bottom: none;
+}
+
+.instruction-label {
+  font-weight: 600;
+  color: #176B91;
+  min-width: 150px;
+}
+
+.instruction-value {
+  color: #555;
+  flex: 1;
+}
+
+.instruction-tip {
+  margin-top: 0.5rem;
+  padding: 1rem;
+  background: #fffbf0;
+  border-left: 4px solid #ffd700;
+  border-radius: 4px;
+  color: #666;
+  line-height: 1.5;
+}
+
+.instruction-tip strong {
+  color: #176B91;
+}
+
 .upload-section {
   background: white;
   border-radius: 12px;
@@ -336,6 +407,23 @@
 
   .docuscan-header h1 {
     font-size: 2rem;
+  }
+
+  .instructions-banner {
+    padding: 1rem;
+  }
+
+  .instructions-header h3 {
+    font-size: 1.1rem;
+  }
+
+  .instruction-item {
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+
+  .instruction-label {
+    min-width: auto;
   }
 
   .classification-card {

@@ -20,11 +20,21 @@ const AIDocuscan = () => {
   const handleFileSelect = (e) => {
     const file = e.target.files[0];
     if (file) {
+      // Validate file size (10 MB limit)
+      const maxSize = 10 * 1024 * 1024; // 10 MB in bytes
+      if (file.size > maxSize) {
+        setError('File size exceeds 10 MB limit. Please upload a smaller file.');
+        setSelectedFile(null);
+        e.target.value = ''; // Reset input
+        return;
+      }
+
       // Validate file type (images and PDFs)
       const validTypes = ['image/jpeg', 'image/png', 'image/jpg', 'application/pdf'];
       if (!validTypes.includes(file.type)) {
         setError('Please upload a valid image (JPG, PNG) or PDF file');
         setSelectedFile(null);
+        e.target.value = ''; // Reset input
         return;
       }
       setSelectedFile(file);
@@ -79,6 +89,38 @@ const AIDocuscan = () => {
       <div className="docuscan-header">
         <h1>AI Docuscan</h1>
         <p className="subtitle">Use Agentic AI to scan and classify your documents</p>
+      </div>
+
+      <div className="instructions-banner">
+        <div className="instructions-header">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <circle cx="12" cy="12" r="10" strokeWidth="2"/>
+            <line x1="12" y1="16" x2="12" y2="12" strokeWidth="2" strokeLinecap="round"/>
+            <line x1="12" y1="8" x2="12.01" y2="8" strokeWidth="2" strokeLinecap="round"/>
+          </svg>
+          <h3>Upload Instructions</h3>
+        </div>
+        <div className="instructions-content">
+          <div className="instruction-item">
+            <span className="instruction-label">Accepted Formats:</span>
+            <span className="instruction-value">PDF, JPG, JPEG, PNG</span>
+          </div>
+          <div className="instruction-item">
+            <span className="instruction-label">File Size:</span>
+            <span className="instruction-value">Maximum 10 MB</span>
+          </div>
+          <div className="instruction-item">
+            <span className="instruction-label">Document Types:</span>
+            <span className="instruction-value">Bill of Lading, Commercial Invoice, Packing List, Carrier Invoice, Communication Records</span>
+          </div>
+          <div className="instruction-item">
+            <span className="instruction-label">Processing Time:</span>
+            <span className="instruction-value">5-10 seconds per document</span>
+          </div>
+          <div className="instruction-tip">
+            <strong>💡 Tip:</strong> For best results, ensure text is clearly visible and document is well-lit (for photos)
+          </div>
+        </div>
       </div>
 
       <div className="upload-section">

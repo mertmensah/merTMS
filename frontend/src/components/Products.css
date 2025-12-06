@@ -6,96 +6,96 @@
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  margin-bottom: 2rem;
+  margin-bottom: var(--space-3xl);
 }
 
 .products-header h2 {
-  font-size: 2rem;
-  margin: 0 0 0.5rem 0;
-  color: #000;
+  font-size: var(--font-size-3xl);
+  margin: 0 0 var(--space-s) 0;
+  color: var(--text-primary);
 }
 
 .products-header p {
-  color: #666;
+  color: var(--text-secondary);
   margin: 0;
 }
 
 .products-stats {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 1.5rem;
-  margin-bottom: 2rem;
+  gap: var(--space-xl);
+  margin-bottom: var(--space-3xl);
 }
 
 .products-list {
   display: flex;
   flex-direction: column;
-  gap: 1rem;
+  gap: var(--space-l);
 }
 
 .product-card {
-  background: #fff;
-  border: 1px solid #ddd;
-  border-radius: 8px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-m);
   overflow: hidden;
 }
 
 .product-header {
-  padding: 1.5rem;
+  padding: var(--space-xl);
   display: flex;
   justify-content: space-between;
   align-items: center;
   cursor: pointer;
-  transition: background 0.2s;
+  transition: background var(--transition-base);
 }
 
 .product-header:hover {
-  background: #f9f9f9;
+  background: var(--bg-subtle);
 }
 
 .product-info {
   display: flex;
   align-items: center;
-  gap: 1rem;
+  gap: var(--space-l);
   flex-wrap: wrap;
 }
 
 .product-info h3 {
   margin: 0;
-  font-size: 1.1rem;
-  color: #176B91;
-  font-weight: 600;
+  font-size: var(--font-size-l);
+  color: var(--color-primary-80);
+  font-weight: var(--font-weight-semibold);
 }
 
 .product-name {
   margin: 0;
-  font-size: 1rem;
-  color: #000;
-  font-weight: 500;
+  font-size: var(--font-size-m);
+  color: var(--text-primary);
+  font-weight: var(--font-weight-medium);
 }
 
 .hazmat-badge {
-  background: #dc3545;
-  color: #fff;
-  padding: 0.25rem 0.75rem;
-  border-radius: 12px;
-  font-size: 0.75rem;
-  font-weight: 600;
+  background: var(--color-error-80);
+  color: var(--text-button-primary);
+  padding: var(--space-2xs) var(--space-m);
+  border-radius: var(--radius-l);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
 }
 
 .expand-icon {
-  font-size: 1.2rem;
-  color: #666;
+  font-size: var(--font-size-l);
+  color: var(--text-secondary);
 }
 
 .product-details {
-  padding: 1.5rem;
-  border-top: 1px solid #eee;
-  background: #fafafa;
+  padding: var(--space-xl);
+  border-top: 1px solid var(--border-subtle);
+  background: var(--bg-subtle);
 }
 
 .detail-section {
-  margin-bottom: 1.5rem;
+  margin-bottom: var(--space-xl);
 }
 
 .detail-section:last-child {
@@ -103,71 +103,71 @@
 }
 
 .detail-section h4 {
-  font-size: 0.9rem;
-  color: #666;
-  margin: 0 0 0.75rem 0;
-  font-weight: 600;
+  font-size: var(--font-size-s);
+  color: var(--text-secondary);
+  margin: 0 0 var(--space-m) 0;
+  font-weight: var(--font-weight-semibold);
   text-transform: uppercase;
   letter-spacing: 0.5px;
 }
 
 .detail-section p {
   margin: 0;
-  color: #333;
-  line-height: 1.6;
+  color: var(--text-secondary);
+  line-height: var(--line-height-relaxed);
 }
 
 .dimensions-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-  gap: 0.75rem;
+  gap: var(--space-m);
 }
 
 .dimension-item, .info-item {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 0.5rem;
-  background: #fff;
-  border-radius: 4px;
-  border: 1px solid #e0e0e0;
+  padding: var(--space-s);
+  background: var(--bg-surface);
+  border-radius: var(--radius-s);
+  border: 1px solid var(--border-default);
 }
 
 .dimension-item .label, .info-item .label {
-  color: #666;
-  font-size: 0.9rem;
+  color: var(--text-secondary);
+  font-size: var(--font-size-s);
 }
 
 .dimension-item .value, .info-item .value {
-  color: #000;
-  font-weight: 600;
-  font-size: 0.95rem;
+  color: var(--text-primary);
+  font-weight: var(--font-weight-semibold);
+  font-size: var(--font-size-s);
 }
 
 .pallet-info, .compliance-info {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 0.75rem;
+  gap: var(--space-m);
 }
 
 .info-item .value.hazmat {
-  color: #dc3545;
+  color: var(--color-error-80);
 }
 
 .info-item .value.safe {
-  color: #28a745;
+  color: var(--color-success-80);
 }
 
 .empty-state {
-  background: #fff;
-  border: 2px dashed #ddd;
-  border-radius: 8px;
-  padding: 3rem 2rem;
+  background: var(--bg-surface);
+  border: 2px dashed var(--border-default);
+  border-radius: var(--radius-m);
+  padding: var(--space-6xl) var(--space-3xl);
   text-align: center;
 }
 
 .empty-state p {
-  color: #999;
-  font-size: 1rem;
+  color: var(--text-tertiary);
+  font-size: var(--font-size-m);
   margin: 0;
 }

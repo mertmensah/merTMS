@@ -2,10 +2,10 @@
   position: relative;
   width: 100%;
   height: 500px;
-  border-radius: 4px;
+  border-radius: var(--radius-s);
   overflow: hidden;
-  border: 1px solid #e0e0e0;
-  margin-bottom: 2rem;
+  border: 1px solid var(--border-default);
+  margin-bottom: var(--space-3xl);
 }
 
 .map-container {
@@ -19,24 +19,24 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #fafafa;
-  border: 1px solid #e0e0e0;
-  border-radius: 4px;
-  color: #666666;
-  font-size: 1.1rem;
-  margin-bottom: 2rem;
+  background: var(--bg-subtle);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-s);
+  color: var(--text-secondary);
+  font-size: var(--font-size-l);
+  margin-bottom: var(--space-3xl);
 }
 
 .map-legend {
   position: absolute;
   bottom: 10px;
   left: 10px;
-  background: rgba(255, 255, 255, 0.95);
-  padding: 8px 12px;
-  border-radius: 6px;
-  border: 1px solid #e0e0e0;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
-  z-index: 1000;
+  background: var(--bg-surface-translucent);
+  padding: var(--space-s) var(--space-m);
+  border-radius: var(--radius-m);
+  border: 1px solid var(--border-default);
+  box-shadow: var(--shadow-m);
+  z-index: var(--z-index-dropdown);
   width: auto;
   max-width: min(200px, 30vw);
 }
@@ -45,7 +45,7 @@
   .map-legend {
     bottom: 5px;
     left: 5px;
-    padding: 6px 10px;
+    padding: var(--space-xs) var(--space-s);
     max-width: 150px;
   }
 }
@@ -53,10 +53,10 @@
 .legend-item {
   display: flex;
   align-items: center;
-  gap: 6px;
-  margin-bottom: 6px;
-  font-size: 11px;
-  color: #000000;
+  gap: var(--space-xs);
+  margin-bottom: var(--space-xs);
+  font-size: var(--font-size-xs);
+  color: var(--text-primary);
   white-space: nowrap;
 }
 
@@ -67,22 +67,22 @@
 .legend-marker {
   width: 12px;
   height: 12px;
-  border-radius: 50%;
+  border-radius: var(--radius-full);
   display: inline-block;
 }
 
 .legend-marker.origin {
-  background: #176B91;
+  background: var(--color-primary-80);
 }
 
 .legend-marker.destination {
-  background: #000000;
+  background: var(--text-primary);
 }
 
 .legend-line {
   width: 30px;
   height: 2px;
-  background: #176B91;
+  background: var(--color-primary-80);
   display: inline-block;
 }
 
@@ -90,7 +90,7 @@
 .map-marker {
   font-size: 20px;
   cursor: pointer;
-  transition: transform 0.2s ease;
+  transition: transform var(--transition-base);
 }
 
 .map-marker:hover {
@@ -98,21 +98,21 @@
 }
 
 .origin-marker {
-  color: #176B91;
+  color: var(--color-primary-80);
 }
 
 .destination-marker {
-  color: #000000;
+  color: var(--text-primary);
 }
 
 /* Mapbox popup customization */
 .mapboxgl-popup-content {
-  padding: 0.75rem;
-  border-radius: 4px;
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+  padding: var(--space-m);
+  border-radius: var(--radius-s);
+  font-family: var(--font-primary);
 }
 
 .mapboxgl-popup-content strong {
-  color: #000000;
-  font-weight: 600;
+  color: var(--text-primary);
+  font-weight: var(--font-weight-semibold);
 }

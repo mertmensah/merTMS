@@ -3,148 +3,132 @@
 }
 
 .tower-header {
-  margin-bottom: 2rem;
+  margin-bottom: var(--space-3xl);
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  gap: 1rem;
+  gap: var(--space-l);
 }
 
 .tower-header h2 {
-  font-size: 2rem;
-  margin: 0 0 0.5rem 0;
-  color: #000;
+  font-size: var(--font-size-3xl);
+  margin: 0 0 var(--space-s) 0;
+  color: var(--text-primary);
 }
 
 .btn-secondary {
-  background: white;
-  color: #000;
-  border: 1px solid #e0e0e0;
-  padding: 0.5rem 1rem;
-  border-radius: 4px;
+  background: var(--bg-surface);
+  color: var(--text-primary);
+  border: 1px solid var(--border-default);
+  padding: var(--space-s) var(--space-l);
+  border-radius: var(--radius-s);
   cursor: pointer;
-  font-weight: 500;
-  transition: all 0.2s;
+  font-weight: var(--font-weight-medium);
+  transition: all var(--transition-base);
 }
 
 .btn-secondary:hover {
-  background: #f5f5f5;
-  border-color: #176B91;
+  background: var(--bg-muted);
+  border-color: var(--border-primary);
 }
 
 .tower-date {
-  color: #666;
-  font-size: 1rem;
+  color: var(--text-secondary);
+  font-size: var(--font-size-m);
   margin: 0;
-}
-
-.btn-secondary {
-  background: white;
-  color: #000;
-  border: 1px solid #e0e0e0;
-  padding: 0.5rem 1rem;
-  border-radius: 4px;
-  cursor: pointer;
-  font-weight: 500;
-  transition: all 0.2s;
-}
-
-.btn-secondary:hover {
-  background: #f5f5f5;
-  border-color: #176B91;
 }
 
 .tower-summary {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 1.5rem;
-  margin-bottom: 2rem;
+  gap: var(--space-xl);
+  margin-bottom: var(--space-3xl);
 }
 
 .summary-card {
-  background: #fff;
-  border: 2px solid #ddd;
-  border-radius: 8px;
-  padding: 1.5rem;
+  background: var(--bg-surface);
+  border: 2px solid var(--border-default);
+  border-radius: var(--radius-m);
+  padding: var(--space-xl);
   text-align: center;
 }
 
 .summary-card.success {
-  border-color: #28a745;
+  border-color: var(--color-success-80);
 }
 
 .summary-card.warning {
-  border-color: #ffc107;
+  border-color: var(--color-warning-80);
 }
 
 .summary-card.danger {
-  border-color: #dc3545;
+  border-color: var(--color-error-80);
 }
 
 .summary-card h3 {
-  font-size: 0.9rem;
-  color: #666;
-  margin: 0 0 0.5rem 0;
-  font-weight: 500;
+  font-size: var(--font-size-s);
+  color: var(--text-secondary);
+  margin: 0 0 var(--space-s) 0;
+  font-weight: var(--font-weight-medium);
 }
 
 .summary-value {
-  font-size: 2.5rem;
-  font-weight: 700;
+  font-size: var(--font-size-4xl);
+  font-weight: var(--font-weight-bold);
   margin: 0;
-  color: #000;
+  color: var(--text-primary);
 }
 
 .tower-buckets {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-  gap: 1.5rem;
+  gap: var(--space-xl);
 }
 
 .bucket {
-  background: #fff;
-  border-radius: 8px;
+  background: var(--bg-surface);
+  border-radius: var(--radius-m);
   overflow: hidden;
 }
 
 .bucket h3 {
-  padding: 1rem;
+  padding: var(--space-l);
   margin: 0;
-  font-size: 1.1rem;
-  background: #f5f5f5;
-  border-bottom: 2px solid #ddd;
+  font-size: var(--font-size-l);
+  background: var(--bg-muted);
+  border-bottom: 2px solid var(--border-default);
 }
 
 .delivered-bucket h3 {
-  background: #d4edda;
-  border-bottom-color: #28a745;
-  color: #155724;
+  background: var(--bg-success-subtle);
+  border-bottom-color: var(--color-success-80);
+  color: var(--color-success-100);
 }
 
 .ontime-bucket h3 {
-  background: #fff3cd;
-  border-bottom-color: #ffc107;
-  color: #856404;
+  background: var(--bg-warning-subtle);
+  border-bottom-color: var(--color-warning-80);
+  color: var(--color-warning-100);
 }
 
 .pastdue-bucket h3 {
-  background: #f8d7da;
-  border-bottom-color: #dc3545;
-  color: #721c24;
+  background: var(--bg-error-subtle);
+  border-bottom-color: var(--color-error-80);
+  color: var(--color-error-100);
 }
 
 .bucket-list {
   max-height: 500px;
   overflow-y: auto;
-  padding: 1rem;
+  padding: var(--space-l);
 }
 
 .bucket-item {
-  padding: 1rem;
-  border: 1px solid #ddd;
-  border-radius: 6px;
-  margin-bottom: 0.75rem;
-  background: #fafafa;
+  padding: var(--space-l);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-m);
+  margin-bottom: var(--space-m);
+  background: var(--bg-subtle);
 }
 
 .bucket-item:last-child {
@@ -155,85 +139,85 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 0.5rem;
+  margin-bottom: var(--space-s);
 }
 
 .item-header strong {
-  font-size: 1rem;
-  color: #000;
+  font-size: var(--font-size-m);
+  color: var(--text-primary);
 }
 
 .status-badge {
-  padding: 0.25rem 0.75rem;
-  border-radius: 12px;
-  font-size: 0.75rem;
-  font-weight: 600;
+  padding: var(--space-2xs) var(--space-m);
+  border-radius: var(--radius-l);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
 }
 
 .status-badge.delivered {
-  background: #28a745;
-  color: #fff;
+  background: var(--color-success-80);
+  color: var(--text-button-primary);
 }
 
 .status-badge.in-transit {
-  background: #ffc107;
-  color: #000;
+  background: var(--color-warning-80);
+  color: var(--text-primary);
 }
 
 .status-badge.past-due {
-  background: #dc3545;
-  color: #fff;
+  background: var(--color-error-80);
+  color: var(--text-button-primary);
 }
 
 .bucket-item p {
-  margin: 0.25rem 0;
-  font-size: 0.9rem;
-  color: #333;
+  margin: var(--space-2xs) 0;
+  font-size: var(--font-size-s);
+  color: var(--text-secondary);
 }
 
 .item-route {
-  color: #666;
+  color: var(--text-secondary);
   font-style: italic;
 }
 
 .item-weight, .item-priority {
-  color: #666;
-  font-size: 0.85rem;
+  color: var(--text-secondary);
+  font-size: var(--font-size-s);
 }
 
 .empty-message {
   text-align: center;
-  color: #999;
-  padding: 2rem;
+  color: var(--text-tertiary);
+  padding: var(--space-3xl);
   font-style: italic;
 }
 
 .empty-message.success {
-  color: #28a745;
-  font-weight: 500;
+  color: var(--color-success-80);
+  font-weight: var(--font-weight-medium);
 }
 
 /* Map Section */
 .tower-map-section {
-  margin-top: 2rem;
-  background: #fff;
-  padding: 1.5rem;
-  border-radius: 8px;
-  border: 1px solid #ddd;
+  margin-top: var(--space-3xl);
+  background: var(--bg-surface);
+  padding: var(--space-xl);
+  border-radius: var(--radius-m);
+  border: 1px solid var(--border-default);
   position: relative;
-  z-index: 1;
+  z-index: var(--z-index-base);
 }
 
 .tower-map-section h3 {
-  margin: 0 0 0.5rem 0;
-  font-size: 1.5rem;
-  color: #000;
+  margin: 0 0 var(--space-s) 0;
+  font-size: var(--font-size-xl);
+  color: var(--text-primary);
 }
 
 .map-description {
-  color: #666;
-  margin: 0 0 1rem 0;
-  font-size: 0.9rem;
+  color: var(--text-secondary);
+  margin: 0 0 var(--space-l) 0;
+  font-size: var(--font-size-s);
 }
 
 /* Fix for leaflet popup artifacts */
@@ -249,48 +233,48 @@
   display: flex;
   justify-content: center;
   flex-wrap: wrap;
-  gap: 1rem;
-  margin-top: 0.75rem;
-  padding: 0.75rem;
-  background: rgba(245, 245, 245, 0.95);
-  border-radius: 6px;
+  gap: var(--space-l);
+  margin-top: var(--space-m);
+  padding: var(--space-m);
+  background: var(--bg-subtle-translucent);
+  border-radius: var(--radius-m);
   position: relative;
-  z-index: 1;
+  z-index: var(--z-index-base);
   width: auto;
 }
 
 @media (max-width: 768px) {
   .map-legend {
-    gap: 0.5rem;
-    padding: 0.5rem;
+    gap: var(--space-s);
+    padding: var(--space-s);
   }
 }
 
 .legend-item {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-  font-size: 0.85rem;
+  gap: var(--space-s);
+  font-size: var(--font-size-s);
   white-space: nowrap;
 }
 
 .legend-marker {
   width: 16px;
   height: 16px;
-  border-radius: 50%;
-  border: 2px solid #fff;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+  border-radius: var(--radius-full);
+  border: 2px solid var(--bg-surface);
+  box-shadow: var(--shadow-s);
   flex-shrink: 0;
 }
 
 .legend-marker.green {
-  background: #28a745;
+  background: var(--color-success-80);
 }
 
 .legend-marker.yellow {
-  background: #ffc107;
+  background: var(--color-warning-80);
 }
 
 .legend-marker.red {
-  background: #dc3545;
+  background: var(--color-error-80);
 }

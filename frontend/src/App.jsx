@@ -214,7 +214,6 @@ function App() {
              navItems.find(item => item.children?.some(child => child.id === activeTab))?.children?.find(child => child.id === activeTab)?.label || 
              'merTMS'}
           </h1>
-          <p className="subtitle">Transportation Management System by optisc</p>
         </header>
 
         <main className="app-content">

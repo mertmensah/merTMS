@@ -83,6 +83,7 @@ function ControlTower() {
     pastDue: []
   })
   const [loading, setLoading] = useState(false)
+  const [generating, setGenerating] = useState(false)
   const [mapMarkers, setMapMarkers] = useState([])
 
   useEffect(() => {
@@ -219,6 +220,21 @@ function ControlTower() {
     }
   }
 
+  const handleGenerateOrders = async () => {
+    try {
+      setGenerating(true)
+      const response = await tmsAPI.generateOrders(50)
+      console.log('Generate orders response:', response.data)
+      alert(`Successfully generated 50 new orders! Total orders: ${response.data.count || 50}`)
+      // No need to refresh Control Tower as it doesn't display orders directly
+    } catch (error) {
+      console.error('Error generating orders:', error)
+      alert(`Failed to generate orders: ${error.response?.data?.error || error.message}`)
+    } finally {
+      setGenerating(false)
+    }
+  }
+
   if (loading) {
     return <div className="control-tower"><p>Loading Control Tower...</p></div>
   }
@@ -237,14 +253,24 @@ function ControlTower() {
             day: 'numeric' 
           })}</p>
         </div>
-        <button 
-          className="btn-secondary" 
-          onClick={handleSimulateLoads}
-          title="Create test loads for today's delivery"
-          style={{ alignSelf: 'flex-start', marginTop: '10px' }}
-        >
-          🎬 Simulate Loads
-        </button>
+        <div style={{ display: 'flex', gap: '10px', alignSelf: 'flex-start', marginTop: '10px' }}>
+          <button 
+            className="btn-secondary" 
+            onClick={handleGenerateOrders}
+            disabled={generating || loading}
+            title="Generate 50 sample orders for testing"
+          >
+            {generating ? 'Generating...' : '📦 Simulate Orders'}
+          </button>
+          <button 
+            className="btn-secondary" 
+            onClick={handleSimulateLoads}
+            disabled={generating || loading}
+            title="Create test loads for today's delivery"
+          >
+            🎬 Simulate Loads
+          </button>
+        </div>
       </div>
 
       <div className="tower-summary">

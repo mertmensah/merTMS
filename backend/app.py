@@ -733,6 +733,65 @@ def get_loads():
         traceback.print_exc()
         return jsonify({"error": str(e)}), 500
 
+def generate_fallback_simulation_plan(available_orders, existing_loads, today_str):
+    """
+    Fallback simulation plan generator when AI is not available
+    Creates a simple but realistic simulation plan without AI
+    """
+    from datetime import datetime, timedelta
+    import random
+    
+    today = datetime.strptime(today_str, '%Y-%m-%d').date()
+    tomorrow = today + timedelta(days=1)
+    
+    # Get next CT load number
+    ct_loads = [l for l in existing_loads if l.get('load_number', '').startswith('CT-')]
+    next_ct_num = len(ct_loads) + 1
+    
+    # Create 8 simple load configurations
+    loads = []
+    orders_per_load = len(available_orders) // 8
+    
+    scenarios = [
+        ('delivered', 'Delivered', today_str, today_str),
+        ('delivered', 'Delivered', today_str, today_str),
+        ('on-time', 'In Transit', today_str, today_str),
+        ('on-time', 'In Transit', today_str, today_str),
+        ('on-time', 'In Transit', today_str, today_str),
+        ('at-risk', 'In Transit', today_str, str(tomorrow)),
+        ('at-risk', 'In Transit', today_str, str(tomorrow)),
+        ('at-risk', 'In Transit', today_str, str(tomorrow)),
+    ]
+    
+    for i, (scenario, status, ced, edd) in enumerate(scenarios):
+        start_idx = i * orders_per_load
+        end_idx = start_idx + orders_per_load if i < 7 else len(available_orders)
+        
+        loads.append({
+            'load_number': f'CT-{next_ct_num + i:05d}',
+            'truck_type': random.choice(['DRY_VAN', 'REEFER']),
+            'origin': 'Dallas, TX',
+            'status': status,
+            'estimated_delivery_date': edd,
+            'scenario': scenario,
+            'order_indices': list(range(start_idx, end_idx)),
+            'orders_config': {
+                'status': status,
+                'customer_expected_delivery_date': ced,
+                'delivery_window_start': '08:00:00',
+                'delivery_window_end': '17:00:00'
+            }
+        })
+    
+    return {
+        'loads': loads,
+        'summary': {
+            'delivered': 2,
+            'on_time': 3,
+            'at_risk': 3
+        }
+    }
+
 @app.route('/api/loads/simulate-today', methods=['POST'])
 def simulate_today_loads():
     """Generate simulated loads for today's delivery using AI agent (for Control Tower testing)"""
@@ -741,15 +800,25 @@ def simulate_today_loads():
     print("="*80)
     
     from database.supabase_client import SupabaseClient
-    from agents.control_tower_simulator import ControlTowerSimulatorAgent
     from datetime import datetime
     import random
     
     try:
-        print("[SIMULATE-002] ✓ Initializing database client and AI agent...")
+        print("[SIMULATE-002] ✓ Initializing database client...")
         client = SupabaseClient()
-        agent = ControlTowerSimulatorAgent()
-        print("[SIMULATE-003] ✓ Client and agent initialized successfully")
+        print("[SIMULATE-003] ✓ Database client initialized successfully")
+        
+        # Try to import AI agent, but fallback to manual logic if unavailable
+        try:
+            from agents.control_tower_simulator import ControlTowerSimulatorAgent
+            agent = ControlTowerSimulatorAgent()
+            use_ai = True
+            print("[SIMULATE-003a] ✓ AI agent initialized successfully")
+        except Exception as ai_error:
+            print(f"[SIMULATE-003b] ⚠ AI agent unavailable: {str(ai_error)}")
+            print("[SIMULATE-003c] ℹ Will use fallback simulation logic")
+            agent = None
+            use_ai = False
         
         # Get today's date
         today = datetime.now().date()
@@ -774,10 +843,15 @@ def simulate_today_loads():
         existing_loads = client.get_all_loads()
         print(f"[SIMULATE-010] ✓ Found {len(existing_loads)} existing loads in database")
         
-        # Generate simulation plan using AI agent
-        print(f"[SIMULATE-011] Requesting AI-generated simulation plan for {today_str}...")
-        plan = agent.generate_simulation_plan(available_orders, existing_loads, today_str)
-        print(f"[SIMULATE-012] ✓ AI plan received with {len(plan.get('loads', []))} load configurations")
+        # Generate simulation plan
+        if use_ai:
+            print(f"[SIMULATE-011] Requesting AI-generated simulation plan for {today_str}...")
+            plan = agent.generate_simulation_plan(available_orders, existing_loads, today_str)
+            print(f"[SIMULATE-012] ✓ AI plan received with {len(plan.get('loads', []))} load configurations")
+        else:
+            print(f"[SIMULATE-011] Generating fallback simulation plan for {today_str}...")
+            plan = generate_fallback_simulation_plan(available_orders, existing_loads, today_str)
+            print(f"[SIMULATE-012] ✓ Fallback plan created with {len(plan.get('loads', []))} load configurations")
         
         # Execute the plan
         loads_created = []

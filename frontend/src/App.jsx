@@ -17,6 +17,7 @@ import './App.css'
 function App() {
   const [activeTab, setActiveTab] = useState('control-tower')
   const [sidebarExpanded, setSidebarExpanded] = useState(true)
+  const [expandedSections, setExpandedSections] = useState({ database: true })
 
   const navItems = [
     { 
@@ -26,34 +27,43 @@ function App() {
       description: 'Real-time shipment visibility and monitoring'
     },
     { 
-      id: 'orders', 
-      label: 'Orders', 
-      icon: '📋',
-      description: 'Manage customer orders and shipments'
+      id: 'database',
+      label: 'Database',
+      icon: '🗄️',
+      description: 'Core data management modules',
+      isSection: true,
+      children: [
+        { 
+          id: 'orders', 
+          label: 'Orders', 
+          icon: '📋',
+          description: 'Manage customer orders and shipments'
+        },
+        { 
+          id: 'loads', 
+          label: 'Loads', 
+          icon: '🚛',
+          description: 'View and track all truck loads'
+        },
+        { 
+          id: 'facilities', 
+          label: 'Facilities', 
+          icon: '🏭',
+          description: 'Warehouse and distribution center network'
+        },
+        { 
+          id: 'products', 
+          label: 'Products', 
+          icon: '📦',
+          description: 'Product catalog and specifications'
+        }
+      ]
     },
     { 
       id: 'load-builder', 
       label: 'Load Builder', 
       icon: '🔧',
       description: 'Optimize truck loads with AI assistance'
-    },
-    { 
-      id: 'loads', 
-      label: 'Loads', 
-      icon: '🚛',
-      description: 'View and track all truck loads'
-    },
-    { 
-      id: 'facilities', 
-      label: 'Facilities', 
-      icon: '🏭',
-      description: 'Warehouse and distribution center network'
-    },
-    { 
-      id: 'products', 
-      label: 'Products', 
-      icon: '📦',
-      description: 'Product catalog and specifications'
     },
     { 
       id: 'mertsights-ai', 
@@ -87,6 +97,13 @@ function App() {
     }
   ]
 
+  const toggleSection = (sectionId) => {
+    setExpandedSections(prev => ({
+      ...prev,
+      [sectionId]: !prev[sectionId]
+    }))
+  }
+
   return (
     <div className="app">
       <div className={`sidebar ${sidebarExpanded ? 'expanded' : ''}`}>
@@ -106,18 +123,54 @@ function App() {
         
         <nav className="sidebar-nav">
           {navItems.map(item => (
-            <button
-              key={item.id}
-              className={`nav-item ${activeTab === item.id ? 'active' : ''}`}
-              onClick={() => setActiveTab(item.id)}
-              title={!sidebarExpanded ? item.label : ''}
-            >
-              <span className="nav-icon">{item.icon}</span>
-              <div className="nav-content">
-                <span className="nav-label">{item.label}</span>
-                <span className="nav-description">{item.description}</span>
-              </div>
-            </button>
+            <div key={item.id}>
+              {item.isSection ? (
+                <>
+                  <button
+                    className={`nav-item section-header ${expandedSections[item.id] ? 'expanded' : ''}`}
+                    onClick={() => toggleSection(item.id)}
+                    title={!sidebarExpanded ? item.label : ''}
+                  >
+                    <span className="nav-icon">{item.icon}</span>
+                    <div className="nav-content">
+                      <span className="nav-label">{item.label}</span>
+                      <span className="nav-description">{item.description}</span>
+                    </div>
+                    <span className="section-toggle">{expandedSections[item.id] ? '▼' : '▶'}</span>
+                  </button>
+                  {expandedSections[item.id] && item.children && (
+                    <div className="nav-children">
+                      {item.children.map(child => (
+                        <button
+                          key={child.id}
+                          className={`nav-item child-item ${activeTab === child.id ? 'active' : ''}`}
+                          onClick={() => setActiveTab(child.id)}
+                          title={!sidebarExpanded ? child.label : ''}
+                        >
+                          <span className="nav-icon">{child.icon}</span>
+                          <div className="nav-content">
+                            <span className="nav-label">{child.label}</span>
+                            <span className="nav-description">{child.description}</span>
+                          </div>
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </>
+              ) : (
+                <button
+                  className={`nav-item ${activeTab === item.id ? 'active' : ''}`}
+                  onClick={() => setActiveTab(item.id)}
+                  title={!sidebarExpanded ? item.label : ''}
+                >
+                  <span className="nav-icon">{item.icon}</span>
+                  <div className="nav-content">
+                    <span className="nav-label">{item.label}</span>
+                    <span className="nav-description">{item.description}</span>
+                  </div>
+                </button>
+              )}
+            </div>
           ))}
         </nav>
         
@@ -132,7 +185,9 @@ function App() {
       <div className="main-content">
         <header className="app-header">
           <h1>
-            {navItems.find(item => item.id === activeTab)?.label || 'merTM.S'}
+            {navItems.find(item => item.id === activeTab)?.label || 
+             navItems.find(item => item.children?.some(child => child.id === activeTab))?.children?.find(child => child.id === activeTab)?.label || 
+             'merTM.S'}
           </h1>
           <p className="subtitle">merTM.S Transportation Management System</p>
         </header>

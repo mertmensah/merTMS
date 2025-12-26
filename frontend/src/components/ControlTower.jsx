@@ -408,21 +408,6 @@ function ControlTower() {
               </Marker>
             ))}
           </MapContainer>
-          
-          <div className="map-legend">
-            <div className="legend-item">
-              <span className="legend-marker green"></span>
-              <span>Delivered ({deliveries.delivered.length})</span>
-            </div>
-            <div className="legend-item">
-              <span className="legend-marker yellow"></span>
-              <span>On Time / In Transit ({deliveries.onTime.length})</span>
-            </div>
-            <div className="legend-item">
-              <span className="legend-marker red"></span>
-              <span>Past Due ({deliveries.pastDue.length})</span>
-            </div>
-          </div>
         </div>
       )}
     </div>

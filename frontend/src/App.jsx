@@ -81,6 +81,12 @@ function App() {
           label: 'AI Docuscan', 
           icon: '🔍',
           description: 'Use Agentic AI to scan and classify your documents'
+        },
+        { 
+          id: 'automation-hub', 
+          label: 'Automation Hub', 
+          icon: '⚙️',
+          description: 'Scheduled scripts and automated workflows'
         }
       ]
     },
@@ -106,12 +112,6 @@ function App() {
       ]
     },
     { 
-      id: 'automation-hub', 
-      label: 'Automation Hub', 
-      icon: '⚙️',
-      description: 'Scheduled scripts and automated workflows'
-    },
-    { 
       id: 'settings', 
       label: 'Settings', 
       icon: '🔧',
@@ -132,7 +132,10 @@ function App() {
         <div className="sidebar-header">
           <div className="sidebar-branding">
             <span className="brand-icon">🚚</span>
-            <span className="sidebar-logo">merTM.S</span>
+            <div className="sidebar-logo">
+              <span className="brand-main">merTMS</span>
+              <span className="brand-sub">by optisc</span>
+            </div>
           </div>
           <button 
             className="menu-toggle"
@@ -197,9 +200,9 @@ function App() {
         </nav>
         
         <div className="sidebar-footer">
-          <div className="sidebar-version">
-            <span className="version-icon">ℹ️</span>
-            <span className="version-text">v1.0.0</span>
+          <div className="sidebar-copyright">
+            <span className="copyright-icon">©</span>
+            <span className="copyright-text">2025 optisc</span>
           </div>
         </div>
       </div>
@@ -209,9 +212,9 @@ function App() {
           <h1>
             {navItems.find(item => item.id === activeTab)?.label || 
              navItems.find(item => item.children?.some(child => child.id === activeTab))?.children?.find(child => child.id === activeTab)?.label || 
-             'merTM.S'}
+             'merTMS'}
           </h1>
-          <p className="subtitle">merTM.S Transportation Management System</p>
+          <p className="subtitle">Transportation Management System by optisc</p>
         </header>
 
         <main className="app-content">

@@ -48,16 +48,29 @@
 }
 
 .sidebar-logo {
-  font-size: var(--font-size-xl);
-  font-weight: var(--font-weight-bold);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3xs);
   white-space: nowrap;
   opacity: 0;
   transition: opacity var(--transition-slow) 0.1s;
-  letter-spacing: var(--letter-spacing-wide);
 }
 
 .sidebar.expanded .sidebar-logo {
   opacity: 1;
+}
+
+.brand-main {
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-bold);
+  letter-spacing: var(--letter-spacing-wide);
+}
+
+.brand-sub {
+  font-size: var(--font-size-s);
+  font-weight: var(--font-weight-medium);
+  color: rgba(255, 255, 255, 0.8);
+  letter-spacing: var(--letter-spacing-normal);
 }
 
 .menu-toggle {
@@ -227,7 +240,7 @@
   flex-shrink: 0;
 }
 
-.sidebar-version {
+.sidebar-copyright {
   display: flex;
   align-items: center;
   gap: var(--space-s);
@@ -235,18 +248,18 @@
   font-size: var(--font-size-s);
 }
 
-.version-icon {
-  font-size: var(--font-size-xl);
+.copyright-icon {
+  font-size: var(--font-size-m);
   flex-shrink: 0;
 }
 
-.version-text {
+.copyright-text {
   opacity: 0;
   transition: opacity var(--transition-slow) 0.1s;
   white-space: nowrap;
 }
 
-.sidebar.expanded .version-text {
+.sidebar.expanded .copyright-text {
   opacity: 1;
 }
 

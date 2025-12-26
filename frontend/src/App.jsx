@@ -17,7 +17,11 @@ import './App.css'
 function App() {
   const [activeTab, setActiveTab] = useState('control-tower')
   const [sidebarExpanded, setSidebarExpanded] = useState(true)
-  const [expandedSections, setExpandedSections] = useState({ database: true })
+  const [expandedSections, setExpandedSections] = useState({ 
+    database: true,
+    innovation: true,
+    operational: true
+  })
 
   const navItems = [
     { 
@@ -60,28 +64,46 @@ function App() {
       ]
     },
     { 
-      id: 'load-builder', 
-      label: 'Load Builder', 
-      icon: '🔧',
-      description: 'Optimize truck loads with AI assistance'
+      id: 'operational',
+      label: 'Operational Execution',
+      icon: '⚡',
+      description: 'Day-to-day operational tools',
+      isSection: true,
+      children: [
+        { 
+          id: 'load-builder', 
+          label: 'Load Builder', 
+          icon: '🔧',
+          description: 'Optimize truck loads with AI assistance'
+        },
+        { 
+          id: 'ai-docuscan', 
+          label: 'AI Docuscan', 
+          icon: '🔍',
+          description: 'Use Agentic AI to scan and classify your documents'
+        }
+      ]
     },
     { 
-      id: 'mertsights-ai', 
-      label: 'mertsightsAI', 
-      icon: '📊',
-      description: 'AI-powered analytics and insights'
-    },
-    { 
-      id: 'network-engineering', 
-      label: 'Network Engineering', 
-      icon: '🌐',
-      description: 'Network design and optimization tools'
-    },
-    { 
-      id: 'ai-docuscan', 
-      label: 'AI Docuscan', 
-      icon: '🔍',
-      description: 'Use Agentic AI to scan and classify your documents'
+      id: 'innovation',
+      label: 'Innovation Hub',
+      icon: '💡',
+      description: 'Advanced analytics and engineering',
+      isSection: true,
+      children: [
+        { 
+          id: 'mertsights-ai', 
+          label: 'mertsightsAI', 
+          icon: '📊',
+          description: 'AI-powered analytics and insights'
+        },
+        { 
+          id: 'network-engineering', 
+          label: 'Network Engineering', 
+          icon: '🌐',
+          description: 'Network design and optimization tools'
+        }
+      ]
     },
     { 
       id: 'automation-hub', 

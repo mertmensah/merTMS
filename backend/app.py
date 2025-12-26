@@ -765,7 +765,10 @@ def simulate_today_loads():
         print(f"[SIMULATE-007] ✓ Found {len(available_orders)} available orders (Pending/Assigned)")
         
         if len(available_orders) < 40:
-            error_msg = f"[SIMULATE-ERROR-008] Not enough available orders. Need at least 40, found {len(available_orders)}"
+            error_msg = f"Not enough available orders. Need at least 40, found {len(available_orders)}"
+            print(f"[SIMULATE-ERROR-008] {error_msg}")
+            return jsonify({"error": error_msg, "debug_code": "SIMULATE-ERROR-008"}), 400
+        
         # Get existing loads for numbering
         print("[SIMULATE-009] Querying existing loads for numbering...")
         existing_loads = client.get_all_loads()
@@ -776,14 +779,10 @@ def simulate_today_loads():
         plan = agent.generate_simulation_plan(available_orders, existing_loads, today_str)
         print(f"[SIMULATE-012] ✓ AI plan received with {len(plan.get('loads', []))} load configurations")
         
-        # Get existing loads for numbering
-        existing_loads = client.get_all_loads()
-        
-        # Generate simulation plan using AI agent
+        # Execute the plan
         loads_created = []
         orders_used = 0
         
-        # Execute the plan
         print(f"[SIMULATE-013] Beginning execution of {len(plan['loads'])} loads...")
         for idx, load_config in enumerate(plan['loads'], 1):
             print(f"\n[SIMULATE-014-{idx}] Processing load {load_config['load_number']}...")

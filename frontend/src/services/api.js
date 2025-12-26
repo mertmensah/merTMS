@@ -3,7 +3,7 @@ import axios from 'axios';
 // Use environment variable if available, otherwise detect based on build mode
 const API_URL = import.meta.env.VITE_API_URL || (
   import.meta.env.PROD 
-    ? 'https://your-render-app.onrender.com/api'
+    ? 'https://mertms-nwh7.onrender.com/api'
     : 'http://localhost:5000/api'
 );
 

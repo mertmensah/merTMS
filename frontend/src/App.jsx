@@ -11,6 +11,7 @@ import AIAssistant from './components/AIAssistant'
 import MertsightsAI from './components/MertsightsAI'
 import NetworkEngineering from './components/NetworkEngineering'
 import AIDocuscan from './components/AIDocuscan'
+import AutomationHub from './components/AutomationHub'
 import './App.css'
 
 function App() {
@@ -73,9 +74,15 @@ function App() {
       description: 'Use Agentic AI to scan and classify your documents'
     },
     { 
+      id: 'automation-hub', 
+      label: 'Automation Hub', 
+      icon: '⚙️',
+      description: 'Scheduled scripts and automated workflows'
+    },
+    { 
       id: 'settings', 
       label: 'Settings', 
-      icon: '⚙️',
+      icon: '🔧',
       description: 'System configuration and preferences'
     }
   ]
@@ -140,6 +147,7 @@ function App() {
           {activeTab === 'mertsights-ai' && <MertsightsAI />}
           {activeTab === 'network-engineering' && <NetworkEngineering />}
           {activeTab === 'ai-docuscan' && <AIDocuscan />}
+          {activeTab === 'automation-hub' && <AutomationHub />}
           {activeTab === 'settings' && <Settings />}
         </main>
       </div>

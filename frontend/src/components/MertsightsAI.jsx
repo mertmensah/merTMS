@@ -54,26 +54,37 @@ const MertsightsAI = () => {
       const result = response.data;
 
       if (result.success) {
-        // Add assistant response with data visualization
-        const assistantMessage = {
-          type: 'assistant',
-          text: result.insight || 'Here are the results:',
-          data: result.data,
-          visualization: result.visualization,
-          sql: result.sql,
-          timestamp: new Date()
-        };
-        setMessages(prev => [...prev, assistantMessage]);
-
-        // Update conversation history
-        setConversationHistory(prev => [
-          ...prev,
-          {
-            question: userMessage,
+        // Check if this is a conversational response (no data query needed)
+        if (result.conversational) {
+          const conversationalMessage = {
+            type: 'assistant',
+            text: result.response,
+            conversational: true,
+            timestamp: new Date()
+          };
+          setMessages(prev => [...prev, conversationalMessage]);
+        } else {
+          // Add assistant response with data visualization
+          const assistantMessage = {
+            type: 'assistant',
+            text: result.insight || 'Here are the results:',
+            data: result.data,
+            visualization: result.visualization,
             sql: result.sql,
-            rows: result.data?.length || 0
-          }
-        ]);
+            timestamp: new Date()
+          };
+          setMessages(prev => [...prev, assistantMessage]);
+
+          // Update conversation history (only for data queries)
+          setConversationHistory(prev => [
+            ...prev,
+            {
+              question: userMessage,
+              sql: result.sql,
+              rows: result.data?.length || 0
+            }
+          ]);
+        }
       } else {
         // Error response
         const errorMessage = {

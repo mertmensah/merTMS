@@ -79,6 +79,143 @@ COMMON QUERIES:
 - Aggregations: COUNT, SUM, AVG, MAX, MIN with GROUP BY
 """
     
+    def _classify_intent(self, user_question):
+        """
+        Classify user intent: conversational vs data query
+        Returns: {
+            "intent": "conversational" | "data_query",
+            "confidence": float (0-1),
+            "reasoning": str,
+            "response": str (if conversational)
+        }
+        """
+        
+        # Quick pattern matching for obvious conversational phrases
+        conversational_patterns = [
+            r'^(hi|hello|hey|greetings|good morning|good afternoon|good evening)',
+            r'^(thanks|thank you|thx|ty|appreciate)',
+            r'^(bye|goodbye|see you|later|cya)',
+            r'^(ok|okay|got it|understood|i see)',
+            r'^(yes|yeah|yep|no|nope|nah)',
+            r'(how are you|what\'s up|nice to meet)',
+            r'^(sorry|excuse me|pardon)',
+            r'(can you help|what can you do|who are you|what are you)',
+        ]
+        
+        question_lower = user_question.lower().strip()
+        
+        # Check for conversational patterns
+        for pattern in conversational_patterns:
+            if re.search(pattern, question_lower):
+                return {
+                    "intent": "conversational",
+                    "confidence": 0.95,
+                    "reasoning": "Matched conversational pattern",
+                    "response": self._generate_conversational_response(user_question)
+                }
+        
+        # Use LLM for ambiguous cases
+        prompt = f"""You are an intent classifier for a Transportation Management System analytics assistant.
+
+Analyze this user message and determine if it requires DATABASE QUERY or is CONVERSATIONAL.
+
+USER MESSAGE: "{user_question}"
+
+CLASSIFICATION RULES:
+
+DATA_QUERY indicators:
+- Asks about orders, loads, shipments, carriers, facilities, costs
+- Requests specific metrics, counts, totals, averages
+- Asks for historical data, trends, comparisons
+- Wants to see data, charts, tables, reports
+- Questions with "how many", "what is", "show me", "list", "find"
+- Analytical questions requiring calculations
+Examples: "How many orders?", "Show pending loads", "Average delivery time", "Top customers"
+
+CONVERSATIONAL indicators:
+- Greetings (hi, hello, hey)
+- Gratitude (thanks, thank you)
+- Goodbyes (bye, see you)
+- Confirmations (ok, got it, yes, no)
+- Small talk (how are you, what's up)
+- Help requests about capabilities (what can you do, how does this work)
+- Apologies (sorry, excuse me)
+Examples: "Hello!", "Thanks!", "What can you help with?", "Got it", "Who made you?"
+
+Respond with ONLY this JSON (no markdown):
+{{
+    "intent": "conversational" or "data_query",
+    "confidence": 0.0 to 1.0,
+    "reasoning": "brief explanation"
+}}"""
+
+        try:
+            response = self.model.generate_content(prompt)
+            result_text = response.text.strip()
+            
+            # Clean markdown if present
+            result_text = re.sub(r'^```json\s*', '', result_text)
+            result_text = re.sub(r'^```\s*', '', result_text)
+            result_text = re.sub(r'\s*```$', '', result_text)
+            
+            result = json.loads(result_text)
+            
+            # If conversational, generate a friendly response
+            if result['intent'] == 'conversational':
+                result['response'] = self._generate_conversational_response(user_question)
+            
+            return result
+            
+        except Exception as e:
+            print(f"[INTENT CLASSIFIER ERROR] {str(e)}")
+            # Default to data query if classification fails (safe fallback)
+            return {
+                "intent": "data_query",
+                "confidence": 0.5,
+                "reasoning": "Classification failed, defaulting to data query"
+            }
+    
+    def _generate_conversational_response(self, user_question):
+        """Generate friendly conversational response"""
+        
+        question_lower = user_question.lower().strip()
+        
+        # Pattern-based responses for common phrases
+        if re.search(r'^(hi|hello|hey)', question_lower):
+            return "Hello! I'm MertsightsAI, your transportation analytics assistant. I can help you analyze orders, loads, shipments, costs, and more. What would you like to know?"
+        
+        if re.search(r'(thank|thx|ty)', question_lower):
+            return "You're welcome! Let me know if you need anything else."
+        
+        if re.search(r'(bye|goodbye|see you)', question_lower):
+            return "Goodbye! Come back anytime you need insights from your TMS data."
+        
+        if re.search(r'(what can you do|how can you help|what do you do)', question_lower):
+            return """I'm your AI analytics assistant for transportation data. I can help you:
+
+• Analyze orders and shipments (volumes, trends, status)
+• Review load utilization and efficiency
+• Track carrier performance and costs
+• Monitor facility operations
+• Generate charts and visualizations
+• Answer questions about your TMS data
+
+Just ask me a question in plain English! For example:
+- "How many pending orders do we have?"
+- "Show me top carriers by volume"
+- "What's the average load utilization this month?"
+"""
+        
+        if re.search(r'(who are you|who made you|what are you)', question_lower):
+            return "I'm MertsightsAI, an AI-powered analytics assistant built for your Transportation Management System. I use natural language processing to turn your questions into data insights."
+        
+        if re.search(r'(ok|okay|got it|understood)', question_lower):
+            return "Great! What else can I help you with?"
+        
+        # Generic fallback
+        return "I'm here to help you analyze your transportation data. What would you like to know?"
+
+    
     def analyze_query(self, user_question, conversation_history=None):
         """
         Main entry point: analyze question, generate SQL, execute, format response
@@ -88,10 +225,24 @@ COMMON QUERIES:
             "data": list,
             "visualization": {"type": "table|bar|line|pie", "config": {}},
             "insight": str,
-            "error": str (optional)
+            "error": str (optional),
+            "conversational": bool (if true, no data retrieval needed)
         }
         """
         try:
+            # Step 0: Classify intent - conversational vs data query
+            intent = self._classify_intent(user_question)
+            print(f"[MERTSIGHTS INTENT] {intent['intent']} - Confidence: {intent['confidence']}")
+            
+            # If conversational, return friendly response without data query
+            if intent['intent'] == 'conversational':
+                return {
+                    "success": True,
+                    "conversational": True,
+                    "response": intent['response'],
+                    "intent_reasoning": intent['reasoning']
+                }
+            
             # Step 1: Generate SQL from natural language
             sql_result = self._generate_sql(user_question, conversation_history)
             if not sql_result["success"]:

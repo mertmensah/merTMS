@@ -373,8 +373,8 @@ function ControlTower() {
       {/* Map Visualization */}
       {mapMarkers.length > 0 && (
         <div className="tower-map-section">
-          <h3>Delivery Map</h3>
-          <p className="map-description">Destination locations color-coded by status</p>
+          <h3>Today's Overview</h3>
+          <p className="map-description">Load status' for today's deliveries</p>
           <MapContainer 
             center={[39.8283, -98.5795]} 
             zoom={4} 

@@ -62,7 +62,7 @@ function ControlTower() {
   const [loading, setLoading] = useState(false)
   const [generating, setGenerating] = useState(false)
   const [mapMarkers, setMapMarkers] = useState([])
-  const [mapStyle, setMapStyle] = useState('satellite-streets-v12')
+  const [mapStyle, setMapStyle] = useState('mapbox://styles/mertmensah/clyd3o0s8011901qj1x8s02np')
 
   // Initialize map only when container is available and we have markers
   useEffect(() => {
@@ -75,9 +75,9 @@ function ControlTower() {
     try {
       map.current = new mapboxgl.Map({
         container: mapContainer.current,
-        style: `mapbox://styles/mapbox/${mapStyle}`,
-        center: [-98.5795, 39.8283],
-        zoom: 3.5,
+        style: mapStyle,
+        center: [-97.7, 37.7],
+        zoom: 4.8,
         projection: 'mercator'
       })
 
@@ -447,22 +447,29 @@ function ControlTower() {
             </div>
             <div style={{ display: 'flex', gap: '10px' }}>
               <button 
-                className={`btn-map-style ${mapStyle === 'satellite-streets-v12' ? 'active' : ''}`}
-                onClick={() => setMapStyle('satellite-streets-v12')}
+                className={`btn-map-style ${mapStyle === 'mapbox://styles/mertmensah/clyd3o0s8011901qj1x8s02np' ? 'active' : ''}`}
+                onClick={() => setMapStyle('mapbox://styles/mertmensah/clyd3o0s8011901qj1x8s02np')}
+                title="Custom satellite view"
+              >
+                🛰️ Custom
+              </button>
+              <button 
+                className={`btn-map-style ${mapStyle === 'mapbox://styles/mapbox/satellite-streets-v12' ? 'active' : ''}`}
+                onClick={() => setMapStyle('mapbox://styles/mapbox/satellite-streets-v12')}
                 title="Satellite view with street labels"
               >
                 🛰️ Satellite
               </button>
               <button 
-                className={`btn-map-style ${mapStyle === 'streets-v12' ? 'active' : ''}`}
-                onClick={() => setMapStyle('streets-v12')}
+                className={`btn-map-style ${mapStyle === 'mapbox://styles/mapbox/streets-v12' ? 'active' : ''}`}
+                onClick={() => setMapStyle('mapbox://styles/mapbox/streets-v12')}
                 title="Standard street map"
               >
                 🗺️ Streets
               </button>
               <button 
-                className={`btn-map-style ${mapStyle === 'dark-v11' ? 'active' : ''}`}
-                onClick={() => setMapStyle('dark-v11')}
+                className={`btn-map-style ${mapStyle === 'mapbox://styles/mapbox/dark-v11' ? 'active' : ''}`}
+                onClick={() => setMapStyle('mapbox://styles/mapbox/dark-v11')}
                 title="Dark theme map"
               >
                 🌙 Dark

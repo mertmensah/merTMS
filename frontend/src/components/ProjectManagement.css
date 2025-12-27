@@ -1,0 +1,563 @@
+.project-management {
+  padding: 2rem;
+  background: var(--color-background);
+  min-height: 100vh;
+}
+
+.pm-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 2rem;
+}
+
+.pm-header h2 {
+  font-size: 2rem;
+  color: var(--color-text-primary);
+  margin: 0 0 0.5rem 0;
+  font-weight: 600;
+}
+
+.pm-subtitle {
+  color: var(--color-text-secondary);
+  font-size: 0.9rem;
+  margin: 0;
+}
+
+.pm-actions {
+  display: flex;
+  gap: 1rem;
+}
+
+.btn-primary, .btn-secondary {
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  border: none;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-size: 0.95rem;
+}
+
+.btn-primary {
+  background: var(--color-primary);
+  color: white;
+}
+
+.btn-primary:hover {
+  background: var(--color-primary-dark);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.btn-secondary {
+  background: var(--color-surface);
+  color: var(--color-text-primary);
+  border: 1px solid var(--color-border);
+}
+
+.btn-secondary:hover {
+  background: var(--color-surface-hover);
+  border-color: var(--color-primary);
+}
+
+/* Project Overview */
+.pm-overview {
+  background: var(--color-surface);
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+  border: 1px solid var(--color-border);
+}
+
+.project-selector {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.project-select {
+  flex: 1;
+  max-width: 400px;
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+  border: 1px solid var(--color-border);
+  background: var(--color-background);
+  color: var(--color-text-primary);
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.project-type {
+  padding: 0.5rem 1rem;
+  background: var(--color-info-light);
+  color: var(--color-info);
+  border-radius: 6px;
+  font-size: 0.85rem;
+  font-weight: 500;
+}
+
+.project-status {
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  font-weight: 500;
+}
+
+.status-in-progress {
+  background: var(--color-warning-light);
+  color: var(--color-warning);
+}
+
+.status-done, .status-completed {
+  background: var(--color-success-light);
+  color: var(--color-success);
+}
+
+.status-blocked {
+  background: var(--color-danger-light);
+  color: var(--color-danger);
+}
+
+/* Metrics Grid */
+.metrics-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 1rem;
+}
+
+.metric-card {
+  padding: 1rem;
+  background: var(--color-background);
+  border-radius: 8px;
+  border: 1px solid var(--color-border);
+  transition: all 0.2s;
+}
+
+.metric-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  border-color: var(--color-primary);
+}
+
+.metric-label {
+  font-size: 0.85rem;
+  color: var(--color-text-secondary);
+  margin-bottom: 0.5rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.metric-value {
+  font-size: 1.75rem;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  margin-bottom: 0.25rem;
+}
+
+.metric-subtitle {
+  font-size: 0.8rem;
+  color: var(--color-text-tertiary);
+}
+
+/* View Tabs */
+.view-tabs {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 2rem;
+  border-bottom: 2px solid var(--color-border);
+}
+
+.tab {
+  padding: 1rem 1.5rem;
+  background: none;
+  border: none;
+  color: var(--color-text-secondary);
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  border-bottom: 3px solid transparent;
+  margin-bottom: -2px;
+  transition: all 0.2s;
+}
+
+.tab:hover {
+  color: var(--color-text-primary);
+}
+
+.tab.active {
+  color: var(--color-primary);
+  border-bottom-color: var(--color-primary);
+}
+
+/* Kanban Board */
+.kanban-board {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.5rem;
+  margin-top: 2rem;
+}
+
+.kanban-column {
+  background: var(--color-surface);
+  border-radius: 12px;
+  padding: 1.5rem;
+  border: 1px solid var(--color-border);
+  min-height: 500px;
+}
+
+.column-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 2px solid var(--color-border);
+}
+
+.column-header h3 {
+  font-size: 1.1rem;
+  color: var(--color-text-primary);
+  margin: 0;
+  font-weight: 600;
+}
+
+.story-count {
+  padding: 0.25rem 0.75rem;
+  background: var(--color-background);
+  border-radius: 12px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--color-text-secondary);
+}
+
+.story-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.story-card {
+  background: var(--color-background);
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  padding: 1rem;
+  cursor: move;
+  transition: all 0.2s;
+}
+
+.story-card:hover {
+  border-color: var(--color-primary);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  transform: translateY(-2px);
+}
+
+.story-card.in-progress {
+  border-left: 4px solid var(--color-warning);
+}
+
+.story-card.done {
+  border-left: 4px solid var(--color-success);
+  opacity: 0.8;
+}
+
+.story-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.75rem;
+}
+
+.priority {
+  padding: 0.25rem 0.75rem;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.priority-high {
+  background: var(--color-danger-light);
+  color: var(--color-danger);
+}
+
+.priority-medium {
+  background: var(--color-warning-light);
+  color: var(--color-warning);
+}
+
+.priority-low {
+  background: var(--color-info-light);
+  color: var(--color-info);
+}
+
+.story-points {
+  padding: 0.25rem 0.5rem;
+  background: var(--color-surface);
+  border-radius: 4px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--color-text-secondary);
+}
+
+.story-title {
+  font-size: 0.95rem;
+  color: var(--color-text-primary);
+  margin-bottom: 0.75rem;
+  line-height: 1.4;
+}
+
+.story-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.assignee {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.85rem;
+  color: var(--color-text-secondary);
+}
+
+.unassigned {
+  font-size: 0.85rem;
+  color: var(--color-text-tertiary);
+  font-style: italic;
+}
+
+/* Backlog View */
+.backlog-view {
+  background: var(--color-surface);
+  border-radius: 12px;
+  padding: 1.5rem;
+  border: 1px solid var(--color-border);
+}
+
+.backlog-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.backlog-header h3 {
+  font-size: 1.25rem;
+  color: var(--color-text-primary);
+  margin: 0;
+  font-weight: 600;
+}
+
+.backlog-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.backlog-table thead {
+  background: var(--color-background);
+  border-bottom: 2px solid var(--color-border);
+}
+
+.backlog-table th {
+  padding: 1rem;
+  text-align: left;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--color-text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.backlog-table td {
+  padding: 1rem;
+  border-bottom: 1px solid var(--color-border);
+  color: var(--color-text-primary);
+}
+
+.backlog-table tbody tr:hover {
+  background: var(--color-background);
+}
+
+.story-title-cell {
+  font-weight: 500;
+}
+
+.status-badge {
+  padding: 0.35rem 0.75rem;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  font-weight: 500;
+  display: inline-block;
+}
+
+.status-to-do {
+  background: var(--color-surface);
+  color: var(--color-text-secondary);
+  border: 1px solid var(--color-border);
+}
+
+.btn-icon {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 1.1rem;
+  padding: 0.25rem 0.5rem;
+  transition: transform 0.2s;
+}
+
+.btn-icon:hover {
+  transform: scale(1.2);
+}
+
+/* People View */
+.people-view {
+  background: var(--color-surface);
+  border-radius: 12px;
+  padding: 1.5rem;
+  border: 1px solid var(--color-border);
+}
+
+.people-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+}
+
+.people-header h3 {
+  font-size: 1.25rem;
+  color: var(--color-text-primary);
+  margin: 0;
+  font-weight: 600;
+}
+
+.people-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1.5rem;
+}
+
+.person-card {
+  background: var(--color-background);
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  padding: 1.5rem;
+  transition: all 0.2s;
+}
+
+.person-card:hover {
+  border-color: var(--color-primary);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+  transform: translateY(-4px);
+}
+
+.person-avatar {
+  font-size: 3rem;
+  text-align: center;
+  margin-bottom: 1rem;
+}
+
+.person-info {
+  text-align: center;
+  margin-bottom: 1.5rem;
+}
+
+.person-name {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  margin-bottom: 0.25rem;
+}
+
+.person-role {
+  font-size: 0.9rem;
+  color: var(--color-primary);
+  font-weight: 500;
+  margin-bottom: 0.5rem;
+}
+
+.person-email {
+  font-size: 0.85rem;
+  color: var(--color-text-secondary);
+}
+
+.person-stats {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  padding: 1rem 0;
+  border-top: 1px solid var(--color-border);
+  border-bottom: 1px solid var(--color-border);
+  margin-bottom: 1rem;
+}
+
+.stat {
+  text-align: center;
+}
+
+.stat-label {
+  display: block;
+  font-size: 0.75rem;
+  color: var(--color-text-tertiary);
+  margin-bottom: 0.25rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.stat-value {
+  display: block;
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.person-actions {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+}
+
+/* Responsive Design */
+@media (max-width: 1200px) {
+  .kanban-board {
+    grid-template-columns: 1fr;
+  }
+  
+  .metrics-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .pm-header {
+    flex-direction: column;
+    gap: 1rem;
+  }
+  
+  .pm-actions {
+    width: 100%;
+    flex-direction: column;
+  }
+  
+  .metrics-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .people-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .project-selector {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .project-select {
+    max-width: 100%;
+  }
+}

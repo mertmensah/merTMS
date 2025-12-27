@@ -12,6 +12,7 @@ import MertsightsAI from './components/MertsightsAI'
 import NetworkEngineering from './components/NetworkEngineering'
 import AIDocuscan from './components/AIDocuscan'
 import AutomationHub from './components/AutomationHub'
+import ProjectManagement from './components/ProjectManagement'
 import './App.css'
 
 function App() {
@@ -87,6 +88,12 @@ function App() {
           label: 'Automation Hub', 
           icon: '⚙️',
           description: 'Scheduled scripts and automated workflows'
+        },
+        { 
+          id: 'project-management', 
+          label: 'Project Management', 
+          icon: '🎯',
+          description: 'Lean Six Sigma Scrum framework for project tracking'
         }
       ]
     },
@@ -227,6 +234,7 @@ function App() {
           {activeTab === 'network-engineering' && <NetworkEngineering />}
           {activeTab === 'ai-docuscan' && <AIDocuscan />}
           {activeTab === 'automation-hub' && <AutomationHub />}
+          {activeTab === 'project-management' && <ProjectManagement />}
           {activeTab === 'settings' && <Settings />}
         </main>
       </div>

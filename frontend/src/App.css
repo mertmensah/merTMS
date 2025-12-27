@@ -232,6 +232,35 @@
   color: rgba(255, 255, 255, 0.7);
   line-height: var(--line-height-tight);
   font-weight: var(--font-weight-regular);
+  overflow: hidden;
+  white-space: nowrap;
+  max-width: 100%;
+}
+
+/* Scrolling animation for active item description */
+.nav-item.active .nav-description {
+  animation: scrollText 8s linear infinite;
+  animation-delay: 1s;
+}
+
+@keyframes scrollText {
+  0% {
+    transform: translateX(0);
+  }
+  25% {
+    transform: translateX(0);
+  }
+  75% {
+    transform: translateX(calc(-100% + 220px));
+  }
+  100% {
+    transform: translateX(calc(-100% + 220px));
+  }
+}
+
+/* Pause animation on hover */
+.nav-item.active:hover .nav-description {
+  animation-play-state: paused;
 }
 
 .sidebar-footer {

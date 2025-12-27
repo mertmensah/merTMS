@@ -115,10 +115,10 @@ function ControlTower() {
 
   // Update map style when changed
   useEffect(() => {
-    if (map.current) {
-      map.current.setStyle(`mapbox://styles/mapbox/${mapStyle}`)
+    if (map.current && mapReady) {
+      map.current.setStyle(mapStyle)
     }
-  }, [mapStyle])
+  }, [mapStyle, mapReady])
 
   // Update markers when mapMarkers change
   useEffect(() => {

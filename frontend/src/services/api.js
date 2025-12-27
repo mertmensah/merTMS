@@ -82,6 +82,19 @@ export const tmsAPI = {
       timeout: 300000, // 5 minutes for document processing
     });
   },
+  
+  // People Management
+  getPeople: () => api.get('/people'),
+  createPerson: (personData) => api.post('/people', personData),
+  updatePerson: (personId, personData) => api.put(`/people/${personId}`, personData),
+  deletePerson: (personId) => api.delete(`/people/${personId}`),
+  
+  // Project Management
+  getProjects: () => api.get('/projects'),
+  createProject: (projectData) => api.post('/projects', projectData),
+  getProjectStories: (projectId) => api.get(`/projects/${projectId}/stories`),
+  createStory: (storyData) => api.post('/stories', storyData),
+  updateStory: (storyId, storyData) => api.put(`/stories/${storyId}`, storyData),
 };
 
 export default api;

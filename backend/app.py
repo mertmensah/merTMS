@@ -648,6 +648,130 @@ def seed_products():
         traceback.print_exc()
         return jsonify({"error": str(e)}), 500
 
+# People Management API
+@app.route('/api/people', methods=['GET'])
+def get_people():
+    """Get all people from database"""
+    from database.supabase_client import SupabaseClient
+    try:
+        client = SupabaseClient()
+        people = client.supabase.table('people').select('*').order('name').execute()
+        return jsonify({"data": people.data}), 200
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
+        return jsonify({"error": str(e)}), 500
+
+@app.route('/api/people', methods=['POST'])
+def create_person():
+    """Create new person"""
+    from database.supabase_client import SupabaseClient
+    try:
+        data = request.json
+        client = SupabaseClient()
+        result = client.supabase.table('people').insert(data).execute()
+        return jsonify({"message": "Person created", "person": result.data[0]}), 201
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
+        return jsonify({"error": str(e)}), 500
+
+@app.route('/api/people/<person_id>', methods=['PUT'])
+def update_person(person_id):
+    """Update person by ID"""
+    from database.supabase_client import SupabaseClient
+    try:
+        data = request.json
+        client = SupabaseClient()
+        result = client.supabase.table('people').update(data).eq('id', person_id).execute()
+        return jsonify({"message": "Person updated", "person": result.data[0]}), 200
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
+        return jsonify({"error": str(e)}), 500
+
+@app.route('/api/people/<person_id>', methods=['DELETE'])
+def delete_person(person_id):
+    """Delete person by ID"""
+    from database.supabase_client import SupabaseClient
+    try:
+        client = SupabaseClient()
+        client.supabase.table('people').delete().eq('id', person_id).execute()
+        return jsonify({"message": "Person deleted"}), 200
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
+        return jsonify({"error": str(e)}), 500
+
+# Projects API
+@app.route('/api/projects', methods=['GET'])
+def get_projects():
+    """Get all projects from database"""
+    from database.supabase_client import SupabaseClient
+    try:
+        client = SupabaseClient()
+        projects = client.supabase.table('projects').select('*, owner:people!owner_id(*)').order('created_at', desc=True).execute()
+        return jsonify({"data": projects.data}), 200
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
+        return jsonify({"error": str(e)}), 500
+
+@app.route('/api/projects', methods=['POST'])
+def create_project():
+    """Create new project"""
+    from database.supabase_client import SupabaseClient
+    try:
+        data = request.json
+        client = SupabaseClient()
+        result = client.supabase.table('projects').insert(data).execute()
+        return jsonify({"message": "Project created", "project": result.data[0]}), 201
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
+        return jsonify({"error": str(e)}), 500
+
+@app.route('/api/projects/<project_id>/stories', methods=['GET'])
+def get_project_stories(project_id):
+    """Get all stories for a project"""
+    from database.supabase_client import SupabaseClient
+    try:
+        client = SupabaseClient()
+        stories = client.supabase.table('stories').select('*, assignee:people!assignee_id(*)').eq('project_id', project_id).order('created_at').execute()
+        return jsonify({"data": stories.data}), 200
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
+        return jsonify({"error": str(e)}), 500
+
+@app.route('/api/stories', methods=['POST'])
+def create_story():
+    """Create new story"""
+    from database.supabase_client import SupabaseClient
+    try:
+        data = request.json
+        client = SupabaseClient()
+        result = client.supabase.table('stories').insert(data).execute()
+        return jsonify({"message": "Story created", "story": result.data[0]}), 201
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
+        return jsonify({"error": str(e)}), 500
+
+@app.route('/api/stories/<story_id>', methods=['PUT'])
+def update_story(story_id):
+    """Update story by ID"""
+    from database.supabase_client import SupabaseClient
+    try:
+        data = request.json
+        client = SupabaseClient()
+        result = client.supabase.table('stories').update(data).eq('id', story_id).execute()
+        return jsonify({"message": "Story updated", "story": result.data[0]}), 200
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
+        return jsonify({"error": str(e)}), 500
+
 # Carrier Management API
 @app.route('/api/carriers', methods=['GET'])
 def get_carriers():

@@ -8,6 +8,7 @@ function ProjectManagement() {
   const [activeView, setActiveView] = useState('kanban') // kanban, backlog, people
   const [showNewProjectModal, setShowNewProjectModal] = useState(false)
   const [showNewPersonModal, setShowNewPersonModal] = useState(false)
+  const [draggedStory, setDraggedStory] = useState(null)
 
   // Mock data for initial state
   useEffect(() => {
@@ -71,6 +72,48 @@ function ProjectManagement() {
       .filter(s => s.status === 'Done')
       .reduce((sum, s) => sum + s.points, 0)
     return { remaining: total - completed, total }
+  }
+
+  // Drag and Drop handlers
+  const handleDragStart = (e, story) => {
+    setDraggedStory(story)
+    e.dataTransfer.effectAllowed = 'move'
+  }
+
+  const handleDragOver = (e) => {
+    e.preventDefault()
+    e.dataTransfer.dropEffect = 'move'
+  }
+
+  const handleDrop = (e, newStatus) => {
+    e.preventDefault()
+    
+    if (!draggedStory || draggedStory.status === newStatus) {
+      setDraggedStory(null)
+      return
+    }
+
+    // Update the story status in the selected project
+    const updatedStories = selectedProject.stories.map(story => 
+      story.id === draggedStory.id 
+        ? { ...story, status: newStatus, completed_at: newStatus === 'Done' ? new Date().toISOString() : null }
+        : story
+    )
+
+    // Update the selected project with new stories
+    const updatedProject = { ...selectedProject, stories: updatedStories }
+    setSelectedProject(updatedProject)
+
+    // Update the projects array
+    const updatedProjects = projects.map(p => 
+      p.id === selectedProject.id ? updatedProject : p
+    )
+    setProjects(updatedProjects)
+
+    setDraggedStory(null)
+    
+    // TODO: Make API call to update story status in backend
+    // tmsAPI.updateStory(draggedStory.id, { status: newStatus })
   }
 
   return (
@@ -169,14 +212,23 @@ function ProjectManagement() {
       {/* Kanban Board View */}
       {activeView === 'kanban' && selectedProject && (
         <div className="kanban-board">
-          <div className="kanban-column">
+          <div 
+            className="kanban-column"
+            onDragOver={handleDragOver}
+            onDrop={(e) => handleDrop(e, 'To Do')}
+          >
             <div className="column-header">
               <h3>📝 To Do</h3>
               <span className="story-count">{getStoriesByStatus('To Do').length}</span>
             </div>
             <div className="story-list">
               {getStoriesByStatus('To Do').map(story => (
-                <div key={story.id} className="story-card">
+                <div 
+                  key={story.id} 
+                  className="story-card"
+                  draggable
+                  onDragStart={(e) => handleDragStart(e, story)}
+                >
                   <div className="story-header">
                     <span className={`priority priority-${story.priority.toLowerCase()}`}>
                       {story.priority}
@@ -198,14 +250,23 @@ function ProjectManagement() {
             </div>
           </div>
 
-          <div className="kanban-column">
+          <div 
+            className="kanban-column"
+            onDragOver={handleDragOver}
+            onDrop={(e) => handleDrop(e, 'In Progress')}
+          >
             <div className="column-header">
               <h3>🔄 In Progress</h3>
               <span className="story-count">{getStoriesByStatus('In Progress').length}</span>
             </div>
             <div className="story-list">
               {getStoriesByStatus('In Progress').map(story => (
-                <div key={story.id} className="story-card in-progress">
+                <div 
+                  key={story.id} 
+                  className="story-card in-progress"
+                  draggable
+                  onDragStart={(e) => handleDragStart(e, story)}
+                >
                   <div className="story-header">
                     <span className={`priority priority-${story.priority.toLowerCase()}`}>
                       {story.priority}
@@ -227,14 +288,23 @@ function ProjectManagement() {
             </div>
           </div>
 
-          <div className="kanban-column">
+          <div 
+            className="kanban-column"
+            onDragOver={handleDragOver}
+            onDrop={(e) => handleDrop(e, 'Done')}
+          >
             <div className="column-header">
               <h3>✅ Done</h3>
               <span className="story-count">{getStoriesByStatus('Done').length}</span>
             </div>
             <div className="story-list">
               {getStoriesByStatus('Done').map(story => (
-                <div key={story.id} className="story-card done">
+                <div 
+                  key={story.id} 
+                  className="story-card done"
+                  draggable
+                  onDragStart={(e) => handleDragStart(e, story)}
+                >
                   <div className="story-header">
                     <span className={`priority priority-${story.priority.toLowerCase()}`}>
                       {story.priority}

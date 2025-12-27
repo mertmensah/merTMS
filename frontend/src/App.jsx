@@ -166,7 +166,7 @@ function App() {
                     <span className="nav-icon">{item.icon}</span>
                     <div className="nav-content">
                       <span className="nav-label">{item.label}</span>
-                      <span className="nav-description">{item.description}</span>
+                      <span className="nav-description"><span>{item.description}</span></span>
                     </div>
                     <span className="section-toggle">{expandedSections[item.id] ? '▼' : '▶'}</span>
                   </button>
@@ -182,7 +182,7 @@ function App() {
                           <span className="nav-icon">{child.icon}</span>
                           <div className="nav-content">
                             <span className="nav-label">{child.label}</span>
-                            <span className="nav-description">{child.description}</span>
+                            <span className="nav-description"><span>{child.description}</span></span>
                           </div>
                         </button>
                       ))}
@@ -198,7 +198,7 @@ function App() {
                   <span className="nav-icon">{item.icon}</span>
                   <div className="nav-content">
                     <span className="nav-label">{item.label}</span>
-                    <span className="nav-description">{item.description}</span>
+                    <span className="nav-description"><span>{item.description}</span></span>
                   </div>
                 </button>
               )}

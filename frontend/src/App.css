@@ -237,24 +237,15 @@
   white-space: nowrap;
   overflow: hidden;
   position: relative;
-  max-width: 100%;
-}
-
-.nav-description::before {
-  content: '';
-  position: absolute;
-  left: 0;
-  top: 0;
-  bottom: 0;
-  width: 100%;
-  pointer-events: none;
-  z-index: 1;
+  width: 220px;
+  display: block;
 }
 
 /* Scrolling animation for active item description */
-.nav-item.active .nav-description {
+.nav-item.active .nav-description span {
   display: inline-block;
   animation: scrollText 12s linear infinite;
+  min-width: 100%;
 }
 
 @keyframes scrollText {

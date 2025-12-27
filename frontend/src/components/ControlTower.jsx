@@ -498,7 +498,13 @@ function ControlTower() {
           <div 
             ref={mapContainer} 
             className="mapbox-container"
-            style={{ height: '600px', width: '100%', borderRadius: '8px' }}
+            style={{ 
+              height: '600px', 
+              width: '100%', 
+              borderRadius: '8px',
+              backgroundColor: '#1a1a1a',
+              position: 'relative'
+            }}
           />
         </div>
     </div>

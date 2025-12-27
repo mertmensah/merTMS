@@ -62,32 +62,38 @@ function ControlTower() {
   const [loading, setLoading] = useState(false)
   const [generating, setGenerating] = useState(false)
   const [mapMarkers, setMapMarkers] = useState([])
-  const [mapStyle, setMapStyle] = useState('satellite-streets-v12') // Default to satellite view
+  const [mapStyle, setMapStyle] = useState('satellite-streets-v12')
 
-  // Initialize map
+  // Initialize map only when container is available and we have markers
   useEffect(() => {
-    if (map.current) return // Initialize map only once
+    // Don't initialize if no markers or already initialized
+    if (mapMarkers.length === 0 || map.current) return
     
-    map.current = new mapboxgl.Map({
-      container: mapContainer.current,
-      style: `mapbox://styles/mapbox/${mapStyle}`,
-      center: [-98.5795, 39.8283], // Center of USA
-      zoom: 3.5,
-      projection: 'mercator'
-    })
+    // Wait for container to be in DOM
+    if (!mapContainer.current) return
+    
+    try {
+      map.current = new mapboxgl.Map({
+        container: mapContainer.current,
+        style: `mapbox://styles/mapbox/${mapStyle}`,
+        center: [-98.5795, 39.8283],
+        zoom: 3.5,
+        projection: 'mercator'
+      })
 
-    // Add navigation controls
-    map.current.addControl(new mapboxgl.NavigationControl(), 'top-right')
-    
-    // Add fullscreen control
-    map.current.addControl(new mapboxgl.FullscreenControl(), 'top-right')
+      map.current.addControl(new mapboxgl.NavigationControl(), 'top-right')
+      map.current.addControl(new mapboxgl.FullscreenControl(), 'top-right')
+    } catch (error) {
+      console.error('Error initializing Mapbox:', error)
+    }
 
     return () => {
       if (map.current) {
         map.current.remove()
+        map.current = null
       }
     }
-  }, [])
+  }, [mapMarkers.length])
 
   // Update map style when changed
   useEffect(() => {

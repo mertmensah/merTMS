@@ -4,8 +4,8 @@ import mapboxgl from 'mapbox-gl'
 import 'mapbox-gl/dist/mapbox-gl.css'
 import './ControlTower.css'
 
-// Mapbox access token - get yours at https://account.mapbox.com/access-tokens/
-mapboxgl.accessToken = import.meta.env.VITE_MAPBOX_TOKEN || 'pk.YOUR_MAPBOX_TOKEN_HERE'
+// Mapbox access token
+mapboxgl.accessToken = import.meta.env.VITE_MAPBOX_TOKEN || 'pk.eyJ1IjoibWVydG1lbnNhaCIsImEiOiJjbHlhZThxeHQxMGozMmpxNmxucXV3OHBsIn0.qww7_SmWmLkXjVlM_JUQ0g'
 
 // Marker colors by status
 const MARKER_COLORS = {
@@ -64,13 +64,10 @@ function ControlTower() {
   const [mapMarkers, setMapMarkers] = useState([])
   const [mapStyle, setMapStyle] = useState('mapbox://styles/mertmensah/clyd3o0s8011901qj1x8s02np')
 
-  // Initialize map only when container is available and we have markers
+  // Initialize map only when container is available
   useEffect(() => {
-    // Don't initialize if no markers or already initialized
-    if (mapMarkers.length === 0 || map.current) return
-    
-    // Wait for container to be in DOM
-    if (!mapContainer.current) return
+    // Don't initialize if already initialized or container not ready
+    if (map.current || !mapContainer.current) return
     
     try {
       map.current = new mapboxgl.Map({
@@ -93,7 +90,7 @@ function ControlTower() {
         map.current = null
       }
     }
-  }, [mapMarkers.length])
+  }, [])
 
   // Update map style when changed
   useEffect(() => {
@@ -438,14 +435,13 @@ function ControlTower() {
       </div>
 
       {/* Map Visualization */}
-      {mapMarkers.length > 0 && (
-        <div className="tower-map-section">
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 'var(--space-m)' }}>
-            <div>
-              <h3>Today's Overview</h3>
-              <p className="map-description">Load status' for today's deliveries</p>
-            </div>
-            <div style={{ display: 'flex', gap: '10px' }}>
+      <div className="tower-map-section">
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 'var(--space-m)' }}>
+          <div>
+            <h3>Today's Overview</h3>
+            <p className="map-description">Load status' for today's deliveries</p>
+          </div>
+          <div style={{ display: 'flex', gap: '10px' }}>
               <button 
                 className={`btn-map-style ${mapStyle === 'mapbox://styles/mertmensah/clyd3o0s8011901qj1x8s02np' ? 'active' : ''}`}
                 onClick={() => setMapStyle('mapbox://styles/mertmensah/clyd3o0s8011901qj1x8s02np')}
@@ -482,7 +478,6 @@ function ControlTower() {
             style={{ height: '600px', width: '100%', borderRadius: '8px' }}
           />
         </div>
-      )}
     </div>
   )
 }

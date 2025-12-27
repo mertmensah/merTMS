@@ -481,20 +481,6 @@ function ControlTower() {
             className="mapbox-container"
             style={{ height: '600px', width: '100%', borderRadius: '8px' }}
           />
-          <div className="map-legend">
-            <div className="legend-item">
-              <span className="legend-dot" style={{ backgroundColor: MARKER_COLORS.delivered }}></span>
-              <span>Delivered</span>
-            </div>
-            <div className="legend-item">
-              <span className="legend-dot" style={{ backgroundColor: MARKER_COLORS.onTime }}></span>
-              <span>On Time</span>
-            </div>
-            <div className="legend-item">
-              <span className="legend-dot" style={{ backgroundColor: MARKER_COLORS.pastDue }}></span>
-              <span>Past Due</span>
-            </div>
-          </div>
         </div>
       )}
     </div>

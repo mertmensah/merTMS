@@ -1,45 +1,18 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { tmsAPI } from '../services/api'
-import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet'
-import L from 'leaflet'
-import 'leaflet/dist/leaflet.css'
+import mapboxgl from 'mapbox-gl'
+import 'mapbox-gl/dist/mapbox-gl.css'
 import './ControlTower.css'
 
-// Fix default marker icons
-delete L.Icon.Default.prototype._getIconUrl
-L.Icon.Default.mergeOptions({
-  iconRetinaUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png',
-  iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png',
-  shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
-})
+// Mapbox access token - get yours at https://account.mapbox.com/access-tokens/
+mapboxgl.accessToken = import.meta.env.VITE_MAPBOX_TOKEN || 'pk.YOUR_MAPBOX_TOKEN_HERE'
 
-// Custom marker icons
-const greenIcon = new L.Icon({
-  iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-green.png',
-  shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
-  iconSize: [25, 41],
-  iconAnchor: [12, 41],
-  popupAnchor: [1, -34],
-  shadowSize: [41, 41]
-})
-
-const yellowIcon = new L.Icon({
-  iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-yellow.png',
-  shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
-  iconSize: [25, 41],
-  iconAnchor: [12, 41],
-  popupAnchor: [1, -34],
-  shadowSize: [41, 41]
-})
-
-const redIcon = new L.Icon({
-  iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-red.png',
-  shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
-  iconSize: [25, 41],
-  iconAnchor: [12, 41],
-  popupAnchor: [1, -34],
-  shadowSize: [41, 41]
-})
+// Marker colors by status
+const MARKER_COLORS = {
+  delivered: '#4caf50',   // Green
+  onTime: '#ff9800',      // Orange
+  pastDue: '#f44336'      // Red
+}
 
 // Helper function for geocoding
 const getDestinationCoordinates = (destination) => {
@@ -77,6 +50,10 @@ const getDestinationCoordinates = (destination) => {
 }
 
 function ControlTower() {
+  const mapContainer = useRef(null)
+  const map = useRef(null)
+  const markersRef = useRef([])
+  
   const [deliveries, setDeliveries] = useState({
     delivered: [],
     onTime: [],
@@ -85,6 +62,93 @@ function ControlTower() {
   const [loading, setLoading] = useState(false)
   const [generating, setGenerating] = useState(false)
   const [mapMarkers, setMapMarkers] = useState([])
+  const [mapStyle, setMapStyle] = useState('satellite-streets-v12') // Default to satellite view
+
+  // Initialize map
+  useEffect(() => {
+    if (map.current) return // Initialize map only once
+    
+    map.current = new mapboxgl.Map({
+      container: mapContainer.current,
+      style: `mapbox://styles/mapbox/${mapStyle}`,
+      center: [-98.5795, 39.8283], // Center of USA
+      zoom: 3.5,
+      projection: 'mercator'
+    })
+
+    // Add navigation controls
+    map.current.addControl(new mapboxgl.NavigationControl(), 'top-right')
+    
+    // Add fullscreen control
+    map.current.addControl(new mapboxgl.FullscreenControl(), 'top-right')
+
+    return () => {
+      if (map.current) {
+        map.current.remove()
+      }
+    }
+  }, [])
+
+  // Update map style when changed
+  useEffect(() => {
+    if (map.current) {
+      map.current.setStyle(`mapbox://styles/mapbox/${mapStyle}`)
+    }
+  }, [mapStyle])
+
+  // Update markers when mapMarkers change
+  useEffect(() => {
+    if (!map.current) return
+
+    // Wait for map to load before adding markers
+    const addMarkers = () => {
+      // Remove existing markers
+      markersRef.current.forEach(marker => marker.remove())
+      markersRef.current = []
+
+      // Add new markers
+      mapMarkers.forEach(markerData => {
+        // Create custom marker element
+        const el = document.createElement('div')
+        el.className = 'custom-marker'
+        el.style.backgroundColor = MARKER_COLORS[markerData.status]
+        el.style.width = '24px'
+        el.style.height = '24px'
+        el.style.borderRadius = '50%'
+        el.style.border = '3px solid white'
+        el.style.boxShadow = '0 2px 4px rgba(0,0,0,0.3)'
+        el.style.cursor = 'pointer'
+
+        // Create popup
+        const popup = new mapboxgl.Popup({ offset: 25 }).setHTML(`
+          <div style="min-width: 200px; font-family: system-ui;">
+            <strong style="font-size: 14px; color: #1a1a1a;">${markerData.order.order_number}</strong>
+            <div style="margin-top: 8px; font-size: 13px; line-height: 1.6;">
+              <div><strong>Status:</strong> ${markerData.order.status}</div>
+              <div><strong>Customer:</strong> ${markerData.order.customer}</div>
+              <div><strong>Destination:</strong> ${markerData.order.destination}</div>
+              <div><strong>Weight:</strong> ${markerData.order.weight_lbs} lbs</div>
+              <div><strong>Volume:</strong> ${markerData.order.volume_cuft} cu.ft</div>
+            </div>
+          </div>
+        `)
+
+        // Create and add marker
+        const marker = new mapboxgl.Marker(el)
+          .setLngLat([markerData.lng, markerData.lat])
+          .setPopup(popup)
+          .addTo(map.current)
+
+        markersRef.current.push(marker)
+      })
+    }
+
+    if (map.current.isStyleLoaded()) {
+      addMarkers()
+    } else {
+      map.current.on('load', addMarkers)
+    }
+  }, [mapMarkers])
 
   useEffect(() => {
     fetchTodayDeliveries()
@@ -144,8 +208,7 @@ function ControlTower() {
               ...coords,
               order,
               load,
-              status: 'delivered',
-              icon: greenIcon
+              status: 'delivered'
             })
           })
         }
@@ -159,8 +222,7 @@ function ControlTower() {
               ...coords,
               order,
               load,
-              status: 'onTime',
-              icon: yellowIcon
+              status: 'onTime'
             })
           })
         }
@@ -174,8 +236,7 @@ function ControlTower() {
               ...coords,
               order,
               load,
-              status: 'pastDue',
-              icon: redIcon
+              status: 'pastDue'
             })
           })
         }
@@ -373,41 +434,54 @@ function ControlTower() {
       {/* Map Visualization */}
       {mapMarkers.length > 0 && (
         <div className="tower-map-section">
-          <h3>Today's Overview</h3>
-          <p className="map-description">Load status' for today's deliveries</p>
-          <MapContainer 
-            center={[39.8283, -98.5795]} 
-            zoom={4} 
-            style={{ height: '500px', width: '100%', borderRadius: '8px' }}
-          >
-            <TileLayer
-              attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-              url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-            />
-            {mapMarkers.map((marker, idx) => (
-              <Marker 
-                key={`${marker.order.id}-${idx}`}
-                position={[marker.lat, marker.lng]}
-                icon={marker.icon}
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 'var(--space-m)' }}>
+            <div>
+              <h3>Today's Overview</h3>
+              <p className="map-description">Load status' for today's deliveries</p>
+            </div>
+            <div style={{ display: 'flex', gap: '10px' }}>
+              <button 
+                className={`btn-map-style ${mapStyle === 'satellite-streets-v12' ? 'active' : ''}`}
+                onClick={() => setMapStyle('satellite-streets-v12')}
+                title="Satellite view with street labels"
               >
-                <Popup>
-                  <div style={{ minWidth: '200px' }}>
-                    <strong>{marker.order.order_number}</strong>
-                    <br />
-                    <strong>Status:</strong> {marker.order.status}
-                    <br />
-                    <strong>Customer:</strong> {marker.order.customer}
-                    <br />
-                    <strong>Destination:</strong> {marker.order.destination}
-                    <br />
-                    <strong>Weight:</strong> {marker.order.weight_lbs} lbs
-                    <br />
-                    <strong>Volume:</strong> {marker.order.volume_cuft} cu.ft
-                  </div>
-                </Popup>
-              </Marker>
-            ))}
-          </MapContainer>
+                🛰️ Satellite
+              </button>
+              <button 
+                className={`btn-map-style ${mapStyle === 'streets-v12' ? 'active' : ''}`}
+                onClick={() => setMapStyle('streets-v12')}
+                title="Standard street map"
+              >
+                🗺️ Streets
+              </button>
+              <button 
+                className={`btn-map-style ${mapStyle === 'dark-v11' ? 'active' : ''}`}
+                onClick={() => setMapStyle('dark-v11')}
+                title="Dark theme map"
+              >
+                🌙 Dark
+              </button>
+            </div>
+          </div>
+          <div 
+            ref={mapContainer} 
+            className="mapbox-container"
+            style={{ height: '600px', width: '100%', borderRadius: '8px' }}
+          />
+          <div className="map-legend">
+            <div className="legend-item">
+              <span className="legend-dot" style={{ backgroundColor: MARKER_COLORS.delivered }}></span>
+              <span>Delivered</span>
+            </div>
+            <div className="legend-item">
+              <span className="legend-dot" style={{ backgroundColor: MARKER_COLORS.onTime }}></span>
+              <span>On Time</span>
+            </div>
+            <div className="legend-item">
+              <span className="legend-dot" style={{ backgroundColor: MARKER_COLORS.pastDue }}></span>
+              <span>Past Due</span>
+            </div>
+          </div>
         </div>
       )}
     </div>

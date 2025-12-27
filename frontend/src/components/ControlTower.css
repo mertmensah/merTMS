@@ -220,13 +220,34 @@
   font-size: var(--font-size-s);
 }
 
-/* Fix for leaflet popup artifacts */
-.leaflet-popup-pane {
-  z-index: 700 !important;
+/* Mapbox container */
+.mapbox-container {
+  position: relative;
+  z-index: 0;
 }
 
-.leaflet-container {
-  z-index: 0 !important;
+/* Map style toggle buttons */
+.btn-map-style {
+  background: var(--bg-surface);
+  color: var(--text-primary);
+  border: 1px solid var(--border-default);
+  padding: var(--space-s) var(--space-m);
+  border-radius: var(--radius-s);
+  cursor: pointer;
+  font-weight: var(--font-weight-medium);
+  font-size: var(--font-size-s);
+  transition: all var(--transition-base);
+}
+
+.btn-map-style:hover {
+  background: var(--bg-muted);
+  border-color: var(--border-primary);
+}
+
+.btn-map-style.active {
+  background: var(--color-primary-80);
+  color: white;
+  border-color: var(--color-primary-80);
 }
 
 .map-legend {
@@ -234,7 +255,7 @@
   justify-content: center;
   flex-wrap: wrap;
   gap: var(--space-l);
-  margin-top: var(--space-m);
+  margin-top: var(--space-l);
   padding: var(--space-m);
   background: var(--bg-subtle-translucent);
   border-radius: var(--radius-m);
@@ -256,6 +277,16 @@
   gap: var(--space-s);
   font-size: var(--font-size-s);
   white-space: nowrap;
+  color: var(--text-primary);
+}
+
+.legend-dot {
+  width: 14px;
+  height: 14px;
+  border-radius: var(--radius-full);
+  border: 2px solid white;
+  box-shadow: var(--shadow-s);
+  flex-shrink: 0;
 }
 
 .legend-marker {

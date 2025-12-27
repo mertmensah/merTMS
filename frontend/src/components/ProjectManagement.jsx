@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { tmsAPI } from '../services/api'
 import './ProjectManagement.css'
 
 function ProjectManagement() {
@@ -10,6 +11,8 @@ function ProjectManagement() {
   const [showNewPersonModal, setShowNewPersonModal] = useState(false)
   const [showNewStoryModal, setShowNewStoryModal] = useState(false)
   const [draggedStory, setDraggedStory] = useState(null)
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(null)
   const [newStoryForm, setNewStoryForm] = useState({
     title: '',
     description: '',
@@ -25,9 +28,68 @@ function ProjectManagement() {
     avatar: '👤'
   })
 
-  // Mock data for initial state
+  // Fetch data from API
   useEffect(() => {
-    // Initialize with sample data
+    loadData()
+    
+    // Auto-refresh every 30 seconds for real-time updates
+    const refreshInterval = setInterval(loadData, 30000)
+    
+    return () => clearInterval(refreshInterval)
+  }, [])
+
+  const loadData = async () => {
+    try {
+      setLoading(true)
+      setError(null)
+      
+      // Fetch people and projects in parallel
+      const [peopleResponse, projectsResponse] = await Promise.all([
+        tmsAPI.getPeople(),
+        tmsAPI.getProjects()
+      ])
+      
+      setPeople(peopleResponse.data.data || [])
+      const projectsData = projectsResponse.data.data || []
+      
+      // Fetch stories for each project
+      if (projectsData.length > 0) {
+        const projectsWithStories = await Promise.all(
+          projectsData.map(async (project) => {
+            try {
+              const storiesResponse = await tmsAPI.getProjectStories(project.id)
+              return { ...project, stories: storiesResponse.data.data || [] }
+            } catch (err) {
+              console.error(`Error fetching stories for project ${project.id}:`, err)
+              return { ...project, stories: [] }
+            }
+          })
+        )
+        
+        setProjects(projectsWithStories)
+        
+        if (!selectedProject && projectsWithStories.length > 0) {
+          setSelectedProject(projectsWithStories[0])
+        } else if (selectedProject) {
+          // Update selected project with latest data
+          const updated = projectsWithStories.find(p => p.id === selectedProject.id)
+          if (updated) setSelectedProject(updated)
+        }
+      } else {
+        // Use mock data if no projects in database
+        initializeMockData()
+      }
+      
+      setLoading(false)
+    } catch (err) {
+      console.error('Error loading data:', err)
+      setError('Failed to load data. Using sample data.')
+      initializeMockData()
+      setLoading(false)
+    }
+  }
+
+  const initializeMockData = () => {
     const samplePeople = [
       { id: 1, name: 'John Smith', role: 'Scrum Master', email: 'john@optisc.com', avatar: '👨‍💼' },
       { id: 2, name: 'Sarah Johnson', role: 'Product Owner', email: 'sarah@optisc.com', avatar: '👩‍💼' },
@@ -63,7 +125,7 @@ function ProjectManagement() {
     if (sampleProjects.length > 0) {
       setSelectedProject(sampleProjects[0])
     }
-  }, [])
+  }
 
   const getPersonById = (id) => people.find(p => p.id === id)
 
@@ -127,54 +189,65 @@ function ProjectManagement() {
 
     setDraggedStory(null)
     
-    // TODO: Make API call to update story status in backend
-    // tmsAPI.updateStory(draggedStory.id, { status: newStatus })
+    // Make API call to update story status in backend
+    tmsAPI.updateStory(draggedStory.id, { status: newStatus })
+      .then(() => {
+        console.log('Story status updated successfully')
+        // Optionally reload data to ensure sync
+        // loadData()
+      })
+      .catch(err => {
+        console.error('Error updating story:', err)
+        // Revert on error
+        loadData()
+      })
   }
 
   // Form handlers
-  const handleCreateStory = () => {
+  const handleCreateStory = async () => {
     if (!newStoryForm.title.trim() || !selectedProject) return
 
-    const newStory = {
-      id: Date.now(),
-      ...newStoryForm,
-      created_at: new Date().toISOString()
+    try {
+      const storyData = {
+        project_id: selectedProject.id,
+        title: newStoryForm.title,
+        description: newStoryForm.description,
+        story_points: newStoryForm.points,
+        priority: newStoryForm.priority,
+        assignee_id: newStoryForm.assignee,
+        status: newStoryForm.status
+      }
+
+      await tmsAPI.createStory(storyData)
+
+      // Reset form and close modal
+      setNewStoryForm({ title: '', description: '', points: 5, priority: 'Medium', assignee: null, status: 'To Do' })
+      setShowNewStoryModal(false)
+
+      // Reload data to get the new story
+      await loadData()
+    } catch (err) {
+      console.error('Error creating story:', err)
+      alert('Failed to create story. Please try again.')
     }
-
-    const updatedStories = [...selectedProject.stories, newStory]
-    const updatedProject = { ...selectedProject, stories: updatedStories }
-    setSelectedProject(updatedProject)
-
-    const updatedProjects = projects.map(p => 
-      p.id === selectedProject.id ? updatedProject : p
-    )
-    setProjects(updatedProjects)
-
-    // Reset form and close modal
-    setNewStoryForm({ title: '', description: '', points: 5, priority: 'Medium', assignee: null, status: 'To Do' })
-    setShowNewStoryModal(false)
-
-    // TODO: Make API call to create story in backend
-    // tmsAPI.createStory({ ...newStory, project_id: selectedProject.id })
   }
 
-  const handleCreatePerson = () => {
+  const handleCreatePerson = async () => {
     if (!newPersonForm.name.trim() || !newPersonForm.email.trim()) return
 
-    const newPerson = {
-      id: Date.now(),
-      ...newPersonForm,
-      created_at: new Date().toISOString()
+    try {
+      await tmsAPI.createPerson(newPersonForm)
+
+      // Reset form and close modal
+      setNewPersonForm({ name: '', email: '', role: 'Developer', avatar: '👤' })
+      setShowNewPersonModal(false)
+
+      // Reload data to get the new person
+      await loadData()
+    } catch (err) {
+      console.error('Error creating person:', err)
+      alert('Failed to create team member. Please try again.')
     }
-
-    setPeople([...people, newPerson])
-
-    // Reset form and close modal
-    setNewPersonForm({ name: '', email: '', role: 'Developer', avatar: '👤' })
-    setShowNewPersonModal(false)
-
-    // TODO: Make API call to create person in backend
-    // tmsAPI.createPerson(newPerson)
   }
 
   return (
@@ -182,7 +255,10 @@ function ProjectManagement() {
       <div className="pm-header">
         <div>
           <h2>🎯 Project Management</h2>
-          <p className="pm-subtitle">Lean Six Sigma × Scrum Framework</p>
+          <p className="pm-subtitle">
+            Lean Six Sigma × Scrum Framework
+            {loading && <span className="loading-indicator"> • Syncing...</span>}
+          </p>
         </div>
         <div className="pm-actions">
           <button className="btn-secondary" onClick={() => setShowNewPersonModal(true)}>
@@ -193,6 +269,13 @@ function ProjectManagement() {
           </button>
         </div>
       </div>
+
+      {/* Error Message */}
+      {error && (
+        <div className="error-banner">
+          ⚠️ {error}
+        </div>
+      )}
 
       {/* Project Selector & Metrics */}
       {selectedProject && (

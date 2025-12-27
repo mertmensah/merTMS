@@ -66,25 +66,48 @@ function ControlTower() {
 
   // Initialize map only when container is available
   useEffect(() => {
-    // Don't initialize if already initialized or container not ready
-    if (map.current || !mapContainer.current) return
+    // Don't initialize if already initialized
+    if (map.current) return
     
-    try {
-      map.current = new mapboxgl.Map({
-        container: mapContainer.current,
-        style: mapStyle,
-        center: [-97.7, 37.7],
-        zoom: 4.8,
-        projection: 'mercator'
-      })
+    // Wait for container to be ready
+    const initMap = () => {
+      if (!mapContainer.current) {
+        console.log('Map container not ready yet')
+        return
+      }
+      
+      try {
+        console.log('Initializing Mapbox with token:', mapboxgl.accessToken?.substring(0, 20) + '...')
+        console.log('Using style:', mapStyle)
+        
+        map.current = new mapboxgl.Map({
+          container: mapContainer.current,
+          style: mapStyle,
+          center: [-97.7, 37.7],
+          zoom: 4.8,
+          projection: 'mercator'
+        })
 
-      map.current.addControl(new mapboxgl.NavigationControl(), 'top-right')
-      map.current.addControl(new mapboxgl.FullscreenControl(), 'top-right')
-    } catch (error) {
-      console.error('Error initializing Mapbox:', error)
+        map.current.on('load', () => {
+          console.log('Map loaded successfully!')
+        })
+
+        map.current.on('error', (e) => {
+          console.error('Map error:', e)
+        })
+
+        map.current.addControl(new mapboxgl.NavigationControl(), 'top-right')
+        map.current.addControl(new mapboxgl.FullscreenControl(), 'top-right')
+      } catch (error) {
+        console.error('Error initializing Mapbox:', error)
+      }
     }
 
+    // Try to initialize after a small delay to ensure DOM is ready
+    const timer = setTimeout(initMap, 100)
+
     return () => {
+      clearTimeout(timer)
       if (map.current) {
         map.current.remove()
         map.current = null

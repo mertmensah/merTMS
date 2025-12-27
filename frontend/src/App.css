@@ -235,8 +235,20 @@
   line-height: var(--line-height-tight);
   font-weight: var(--font-weight-regular);
   white-space: nowrap;
-  overflow: visible;
-  width: max-content;
+  overflow: hidden;
+  position: relative;
+  max-width: 100%;
+}
+
+.nav-description::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 100%;
+  pointer-events: none;
+  z-index: 1;
 }
 
 /* Scrolling animation for active item description */

@@ -4,8 +4,9 @@ import mapboxgl from 'mapbox-gl'
 import 'mapbox-gl/dist/mapbox-gl.css'
 import './ControlTower.css'
 
-// Mapbox access token
-mapboxgl.accessToken = import.meta.env.VITE_MAPBOX_TOKEN || 'pk.eyJ1IjoibWVydG1lbnNhaCIsImEiOiJjbHlhZThxeHQxMGozMmpxNmxucXV3OHBsIn0.qww7_SmWmLkXjVlM_JUQ0g'
+// Mapbox access token - MUST be set before creating any maps
+const MAPBOX_TOKEN = 'pk.eyJ1IjoibWVydG1lbnNhaCIsImEiOiJjbHlhZThxeHQxMGozMmpxNmxucXV3OHBsIn0.qww7_SmWmLkXjVlM_JUQ0g'
+mapboxgl.accessToken = MAPBOX_TOKEN
 
 // Marker colors by status
 const MARKER_COLORS = {
@@ -62,7 +63,7 @@ function ControlTower() {
   const [loading, setLoading] = useState(false)
   const [generating, setGenerating] = useState(false)
   const [mapMarkers, setMapMarkers] = useState([])
-  const [mapStyle, setMapStyle] = useState('mapbox://styles/mertmensah/clyd3o0s8011901qj1x8s02np')
+  const [mapStyle, setMapStyle] = useState('mapbox://styles/mapbox/satellite-streets-v12')
 
   // Initialize map only when container is available
   useEffect(() => {
@@ -77,29 +78,35 @@ function ControlTower() {
       }
       
       try {
-        console.log('Initializing Mapbox with token:', mapboxgl.accessToken?.substring(0, 20) + '...')
-        console.log('Using style:', mapStyle)
+        console.log('Initializing Mapbox...')
+        console.log('Token:', MAPBOX_TOKEN.substring(0, 30) + '...')
+        console.log('Style:', mapStyle)
+        console.log('Container:', mapContainer.current)
         
         map.current = new mapboxgl.Map({
           container: mapContainer.current,
           style: mapStyle,
           center: [-97.7, 37.7],
           zoom: 4.8,
-          projection: 'mercator'
+          projection: 'mercator',
+          accessToken: MAPBOX_TOKEN
         })
 
         map.current.on('load', () => {
-          console.log('Map loaded successfully!')
+          console.log('✅ Map loaded successfully!')
+          mapContainer.current.style.backgroundColor = 'transparent'
         })
 
         map.current.on('error', (e) => {
-          console.error('Map error:', e)
+          console.error('❌ Map error:', e)
+          alert('Map failed to load. Check console for details.')
         })
 
         map.current.addControl(new mapboxgl.NavigationControl(), 'top-right')
         map.current.addControl(new mapboxgl.FullscreenControl(), 'top-right')
       } catch (error) {
-        console.error('Error initializing Mapbox:', error)
+        console.error('❌ Error initializing Mapbox:', error)
+        alert('Failed to initialize map: ' + error.message)
       }
     }
 

@@ -64,63 +64,54 @@ function ControlTower() {
   const [generating, setGenerating] = useState(false)
   const [mapMarkers, setMapMarkers] = useState([])
   const [mapStyle, setMapStyle] = useState('mapbox://styles/mapbox/satellite-streets-v12')
+  const [mapReady, setMapReady] = useState(false)
 
-  // Initialize map only when container is available
+  // Initialize map when container becomes available
   useEffect(() => {
-    // Don't initialize if already initialized
-    if (map.current) return
+    if (map.current || !mapContainer.current) return
     
-    // Wait for container to be ready
-    const initMap = () => {
-      if (!mapContainer.current) {
-        console.log('Map container not ready yet')
-        return
-      }
-      
-      try {
-        console.log('Initializing Mapbox...')
-        console.log('Token:', MAPBOX_TOKEN.substring(0, 30) + '...')
-        console.log('Style:', mapStyle)
-        console.log('Container:', mapContainer.current)
-        
-        map.current = new mapboxgl.Map({
-          container: mapContainer.current,
-          style: mapStyle,
-          center: [-97.7, 37.7],
-          zoom: 4.8,
-          projection: 'mercator',
-          accessToken: MAPBOX_TOKEN
-        })
+    console.log('Initializing Mapbox...')
+    console.log('Token:', MAPBOX_TOKEN.substring(0, 30) + '...')
+    console.log('Style:', mapStyle)
+    console.log('Container:', mapContainer.current)
+    
+    try {
+      map.current = new mapboxgl.Map({
+        container: mapContainer.current,
+        style: mapStyle,
+        center: [-97.7, 37.7],
+        zoom: 4.8,
+        projection: 'mercator',
+        accessToken: MAPBOX_TOKEN
+      })
 
-        map.current.on('load', () => {
-          console.log('✅ Map loaded successfully!')
+      map.current.on('load', () => {
+        console.log('✅ Map loaded successfully!')
+        setMapReady(true)
+        if (mapContainer.current) {
           mapContainer.current.style.backgroundColor = 'transparent'
-        })
+        }
+      })
 
-        map.current.on('error', (e) => {
-          console.error('❌ Map error:', e)
-          alert('Map failed to load. Check console for details.')
-        })
+      map.current.on('error', (e) => {
+        console.error('❌ Map error:', e)
+        alert('Map failed to load: ' + JSON.stringify(e.error || e))
+      })
 
-        map.current.addControl(new mapboxgl.NavigationControl(), 'top-right')
-        map.current.addControl(new mapboxgl.FullscreenControl(), 'top-right')
-      } catch (error) {
-        console.error('❌ Error initializing Mapbox:', error)
-        alert('Failed to initialize map: ' + error.message)
-      }
+      map.current.addControl(new mapboxgl.NavigationControl(), 'top-right')
+      map.current.addControl(new mapboxgl.FullscreenControl(), 'top-right')
+    } catch (error) {
+      console.error('❌ Error initializing Mapbox:', error)
+      alert('Failed to initialize map: ' + error.message)
     }
 
-    // Try to initialize after a small delay to ensure DOM is ready
-    const timer = setTimeout(initMap, 100)
-
     return () => {
-      clearTimeout(timer)
       if (map.current) {
         map.current.remove()
         map.current = null
       }
     }
-  }, [])
+  }, [mapContainer.current, mapStyle])
 
   // Update map style when changed
   useEffect(() => {

@@ -232,29 +232,6 @@
   color: rgba(255, 255, 255, 0.7);
   line-height: var(--line-height-tight);
   font-weight: var(--font-weight-regular);
-  overflow: hidden;
-  white-space: nowrap;
-  display: block;
-}
-
-/* Scrolling animation for active item description */
-.nav-item.active .nav-description {
-  display: inline-block;
-  animation: scrollText 12s linear infinite;
-}
-
-@keyframes scrollText {
-  0% {
-    transform: translateX(0);
-  }
-  100% {
-    transform: translateX(-100%);
-  }
-}
-
-/* Pause animation on hover */
-.nav-item.active:hover .nav-description {
-  animation-play-state: paused;
 }
 
 .sidebar-footer {

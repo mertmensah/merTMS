@@ -8,7 +8,22 @@ function ProjectManagement() {
   const [activeView, setActiveView] = useState('kanban') // kanban, backlog, people
   const [showNewProjectModal, setShowNewProjectModal] = useState(false)
   const [showNewPersonModal, setShowNewPersonModal] = useState(false)
+  const [showNewStoryModal, setShowNewStoryModal] = useState(false)
   const [draggedStory, setDraggedStory] = useState(null)
+  const [newStoryForm, setNewStoryForm] = useState({
+    title: '',
+    description: '',
+    points: 5,
+    priority: 'Medium',
+    assignee: null,
+    status: 'To Do'
+  })
+  const [newPersonForm, setNewPersonForm] = useState({
+    name: '',
+    email: '',
+    role: 'Developer',
+    avatar: '👤'
+  })
 
   // Mock data for initial state
   useEffect(() => {
@@ -114,6 +129,52 @@ function ProjectManagement() {
     
     // TODO: Make API call to update story status in backend
     // tmsAPI.updateStory(draggedStory.id, { status: newStatus })
+  }
+
+  // Form handlers
+  const handleCreateStory = () => {
+    if (!newStoryForm.title.trim() || !selectedProject) return
+
+    const newStory = {
+      id: Date.now(),
+      ...newStoryForm,
+      created_at: new Date().toISOString()
+    }
+
+    const updatedStories = [...selectedProject.stories, newStory]
+    const updatedProject = { ...selectedProject, stories: updatedStories }
+    setSelectedProject(updatedProject)
+
+    const updatedProjects = projects.map(p => 
+      p.id === selectedProject.id ? updatedProject : p
+    )
+    setProjects(updatedProjects)
+
+    // Reset form and close modal
+    setNewStoryForm({ title: '', description: '', points: 5, priority: 'Medium', assignee: null, status: 'To Do' })
+    setShowNewStoryModal(false)
+
+    // TODO: Make API call to create story in backend
+    // tmsAPI.createStory({ ...newStory, project_id: selectedProject.id })
+  }
+
+  const handleCreatePerson = () => {
+    if (!newPersonForm.name.trim() || !newPersonForm.email.trim()) return
+
+    const newPerson = {
+      id: Date.now(),
+      ...newPersonForm,
+      created_at: new Date().toISOString()
+    }
+
+    setPeople([...people, newPerson])
+
+    // Reset form and close modal
+    setNewPersonForm({ name: '', email: '', role: 'Developer', avatar: '👤' })
+    setShowNewPersonModal(false)
+
+    // TODO: Make API call to create person in backend
+    // tmsAPI.createPerson(newPerson)
   }
 
   return (
@@ -333,7 +394,7 @@ function ProjectManagement() {
         <div className="backlog-view">
           <div className="backlog-header">
             <h3>Product Backlog</h3>
-            <button className="btn-secondary">➕ Add User Story</button>
+            <button className="btn-secondary" onClick={() => setShowNewStoryModal(true)}>➕ Add User Story</button>
           </div>
           <table className="backlog-table">
             <thead>
@@ -424,6 +485,160 @@ function ProjectManagement() {
                 </div>
               </div>
             ))}
+          </div>
+        </div>
+      )}
+
+      {/* New Story Modal */}
+      {showNewStoryModal && (
+        <div className="modal-overlay" onClick={() => setShowNewStoryModal(false)}>
+          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header">
+              <h3>➕ Add New User Story</h3>
+              <button className="modal-close" onClick={() => setShowNewStoryModal(false)}>✕</button>
+            </div>
+            <div className="modal-body">
+              <div className="form-group">
+                <label>Story Title *</label>
+                <input
+                  type="text"
+                  className="form-input"
+                  placeholder="As a user, I want to..."
+                  value={newStoryForm.title}
+                  onChange={(e) => setNewStoryForm({ ...newStoryForm, title: e.target.value })}
+                />
+              </div>
+              <div className="form-group">
+                <label>Description</label>
+                <textarea
+                  className="form-textarea"
+                  placeholder="Additional details and acceptance criteria..."
+                  rows="4"
+                  value={newStoryForm.description}
+                  onChange={(e) => setNewStoryForm({ ...newStoryForm, description: e.target.value })}
+                />
+              </div>
+              <div className="form-row">
+                <div className="form-group">
+                  <label>Story Points</label>
+                  <select
+                    className="form-select"
+                    value={newStoryForm.points}
+                    onChange={(e) => setNewStoryForm({ ...newStoryForm, points: parseInt(e.target.value) })}
+                  >
+                    <option value="1">1</option>
+                    <option value="2">2</option>
+                    <option value="3">3</option>
+                    <option value="5">5</option>
+                    <option value="8">8</option>
+                    <option value="13">13</option>
+                    <option value="21">21</option>
+                  </select>
+                </div>
+                <div className="form-group">
+                  <label>Priority</label>
+                  <select
+                    className="form-select"
+                    value={newStoryForm.priority}
+                    onChange={(e) => setNewStoryForm({ ...newStoryForm, priority: e.target.value })}
+                  >
+                    <option value="High">High</option>
+                    <option value="Medium">Medium</option>
+                    <option value="Low">Low</option>
+                  </select>
+                </div>
+                <div className="form-group">
+                  <label>Assignee</label>
+                  <select
+                    className="form-select"
+                    value={newStoryForm.assignee || ''}
+                    onChange={(e) => setNewStoryForm({ ...newStoryForm, assignee: e.target.value ? parseInt(e.target.value) : null })}
+                  >
+                    <option value="">Unassigned</option>
+                    {people.map(person => (
+                      <option key={person.id} value={person.id}>
+                        {person.avatar} {person.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+            </div>
+            <div className="modal-footer">
+              <button className="btn-secondary" onClick={() => setShowNewStoryModal(false)}>Cancel</button>
+              <button className="btn-primary" onClick={handleCreateStory}>Create Story</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* New Person Modal */}
+      {showNewPersonModal && (
+        <div className="modal-overlay" onClick={() => setShowNewPersonModal(false)}>
+          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header">
+              <h3>👥 Add Team Member</h3>
+              <button className="modal-close" onClick={() => setShowNewPersonModal(false)}>✕</button>
+            </div>
+            <div className="modal-body">
+              <div className="form-group">
+                <label>Name *</label>
+                <input
+                  type="text"
+                  className="form-input"
+                  placeholder="John Doe"
+                  value={newPersonForm.name}
+                  onChange={(e) => setNewPersonForm({ ...newPersonForm, name: e.target.value })}
+                />
+              </div>
+              <div className="form-group">
+                <label>Email *</label>
+                <input
+                  type="email"
+                  className="form-input"
+                  placeholder="john@optisc.com"
+                  value={newPersonForm.email}
+                  onChange={(e) => setNewPersonForm({ ...newPersonForm, email: e.target.value })}
+                />
+              </div>
+              <div className="form-row">
+                <div className="form-group">
+                  <label>Role</label>
+                  <select
+                    className="form-select"
+                    value={newPersonForm.role}
+                    onChange={(e) => setNewPersonForm({ ...newPersonForm, role: e.target.value })}
+                  >
+                    <option value="Developer">Developer</option>
+                    <option value="Scrum Master">Scrum Master</option>
+                    <option value="Product Owner">Product Owner</option>
+                    <option value="Six Sigma Black Belt">Six Sigma Black Belt</option>
+                    <option value="QA Engineer">QA Engineer</option>
+                    <option value="Business Analyst">Business Analyst</option>
+                  </select>
+                </div>
+                <div className="form-group">
+                  <label>Avatar</label>
+                  <select
+                    className="form-select"
+                    value={newPersonForm.avatar}
+                    onChange={(e) => setNewPersonForm({ ...newPersonForm, avatar: e.target.value })}
+                  >
+                    <option value="👤">👤 Default</option>
+                    <option value="👨‍💼">👨‍💼 Man Business</option>
+                    <option value="👩‍💼">👩‍💼 Woman Business</option>
+                    <option value="👨‍💻">👨‍💻 Man Tech</option>
+                    <option value="👩‍💻">👩‍💻 Woman Tech</option>
+                    <option value="👨‍🔬">👨‍🔬 Man Science</option>
+                    <option value="👩‍🔬">👩‍🔬 Woman Science</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+            <div className="modal-footer">
+              <button className="btn-secondary" onClick={() => setShowNewPersonModal(false)}>Cancel</button>
+              <button className="btn-primary" onClick={handleCreatePerson}>Add Member</button>
+            </div>
           </div>
         </div>
       )}

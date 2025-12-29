@@ -20,6 +20,27 @@
   letter-spacing: -0.5px;
 }
 
+.header-section .btn-primary {
+  background: #176B91;
+  color: #ffffff;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  transition: all 0.2s;
+}
+
+.header-section .btn-primary:hover:not(:disabled) {
+  background: #4797bf;
+}
+
+.header-section .btn-primary:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
 .planning-info {
   background: var(--bg-subtle);
   padding: var(--space-l) var(--space-xl);

@@ -188,6 +188,12 @@
   --border-error: var(--color-error-80);
   --border-success: var(--color-success-80);
   --border-disabled: var(--color-neutral-16);
+  
+  /* Button Colors */
+  --bg-button-primary: var(--color-primary-80);
+  --bg-button-primary-hover: var(--color-primary-64);
+  --text-button-primary: var(--color-neutral-0);
+  --bg-muted: var(--color-neutral-8);
 
   /* ============================================
      SPACING SYSTEM

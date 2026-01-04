@@ -112,9 +112,9 @@ function App() {
         },
         { 
           id: 'network-engineering', 
-          label: 'Network Engineering', 
+          label: 'Network Design & Engineering', 
           icon: '🌐',
-          description: 'Network design and optimization tools'
+          description: 'Use AI to evaluate your current and optimal network layout based on your demand'
         }
       ]
     },

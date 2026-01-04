@@ -67,10 +67,7 @@ TMS-Project/
 - **orders**: Customer orders with origin/destination, weight, volume, priority
 - **loads**: Optimized truck loads with utilization tracking
 - **load_orders**: Many-to-many junction table
-- **routes**: Delivery routes with stops and metrics
-- **route_stops**: Individual stop details
 - **carriers**: Carrier management
-- **cost_analysis**: Cost breakdown storage
 - Indexes for performance
 - Row Level Security (RLS) enabled
 

@@ -296,7 +296,6 @@ See [DATABASE_SCHEMA.md](DATABASE_SCHEMA.md) for detailed entity-relationship di
 - **loads**: Consolidated shipments assigned to trucks
 - **load_orders**: Many-to-many junction table (orders ↔ loads)
 - **carriers**: Trucking companies and rate information
-- **cost_analysis**: Financial breakdown per load
 
 ### Project Management Tables (Lean Six Sigma)
 - **people**: Team members, roles, contact information

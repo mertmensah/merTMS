@@ -3,15 +3,86 @@
 > **AI-Powered Logistics Intelligence Platform**  
 > Comprehensive TMS combining freight optimization, project management, and intelligent automation for modern supply chain operations.
 
-## 🚀 Live Demo
+---
 
-**Frontend:** [https://mertmensah.github.io/merTMS/](https://mertmensah.github.io/merTMS/)
+## 🚀 **Try It Now - No Installation Required!**
 
-**Backend API:** [https://mertms-nwh7.onrender.com](https://mertms-nwh7.onrender.com) *(Click to wake up server after inactivity)*
+### **Live Platform:** [https://mertmensah.github.io/merTMS/](https://mertmensah.github.io/merTMS/)
 
-> **Note:** The Render free tier spins down after 15 minutes of inactivity. Click the backend link above to wake it up (may take 30-60 seconds). Allow 1-2 minutes for initial connection.
+**👉 Click the link above to start using the platform immediately in your browser**
 
-> **🔓 Open Access:** Currently, the platform is accessible without authentication to allow users to explore and experience the system. See roadmap below for planned authentication features.
+> **⚡ First-time users:** The backend server may take 30-60 seconds to wake up on first visit. If you see connection errors, wait a moment and refresh the page.
+
+---
+
+## 📖 **How to Use the Platform** (5-Minute Quick Start)
+
+### **Step 1: Wake Up the Backend** ⏰
+The platform uses a free hosting tier that sleeps after inactivity.
+- Click this link first: [Backend API](https://mertms-nwh7.onrender.com) 
+- Wait for the page to load (30-60 seconds)
+- You'll see a simple "TMS Backend is running" message
+- ✅ Backend is ready when you see this message
+
+### **Step 2: Open the Platform** 🌐
+- Go to: [https://mertmensah.github.io/merTMS/](https://mertmensah.github.io/merTMS/)
+- You'll see the Dashboard with navigation on the left
+- All features are ready to explore - **no login required!**
+
+### **Step 3: Generate Sample Data** 📦
+To see the platform in action:
+1. Click **"Order Management"** in the left sidebar
+2. Scroll down and click **"Generate Synthetic Orders"**
+3. Choose a quantity (start with **50 orders** recommended)
+4. Click **"Generate"** and wait ~10 seconds
+5. ✅ You'll see a table of orders appear
+
+### **Step 4: Optimize Loads with AI** 🤖
+Let AI consolidate orders into efficient truck loads:
+1. Click **"Load Builder"** in the left sidebar
+2. Review the pending orders shown
+3. Click the blue **"🤖 Optimize Loads"** button at the top
+4. AI will process for ~15 seconds
+5. ✅ See optimized loads with utilization metrics
+
+### **Step 5: View Live Tracking** 🗺️
+See loads on a satellite map:
+1. Click **"Control Tower"** in the left sidebar
+2. Click **"🎬 Simulate Loads"** button (generates test deliveries)
+3. ✅ Watch color-coded markers appear on the Mapbox satellite view:
+   - 🟢 **Green** = On Time
+   - 🟠 **Orange** = At Risk
+   - 🔴 **Red** = Delayed
+4. Click any marker for detailed information
+5. Switch map styles using the 4 buttons at the top
+
+### **What You Can Explore:**
+
+| Module | What It Does | Try This |
+|--------|-------------|----------|
+| 📊 **Dashboard** | Real-time KPIs and metrics | View active shipments and cost savings |
+| 📦 **Order Management** | Create and manage shipment requests | Generate synthetic orders, filter by status |
+| 🚛 **Load Builder** | AI-powered load consolidation | Optimize pending orders into efficient loads |
+| 🗺️ **Control Tower** | Live tracking with satellite imagery | Simulate loads, view on map, click markers |
+| 📈 **Project Management** | Lean Six Sigma Kanban boards | Create projects, add stories, drag between columns |
+| 🤖 **Automation Hub** | AI agent marketplace | View available agents, check status |
+| 💬 **MertSights AI** | Chat assistant for TMS operations | Ask questions about your data |
+| 🏭 **Facilities** | Manage warehouse locations | Browse origins and destinations |
+| 📦 **Products** | SKU catalog with dimensions | View product specifications |
+
+---
+
+## 🔓 **Open Access Mode**
+
+The platform is currently accessible **without authentication** to allow everyone to explore and test all features. 
+
+**What this means:**
+- ✅ No signup or login required
+- ✅ Full access to all modules
+- ⚠️ Data is shared across all users (public test environment)
+- ⚠️ Data may be reset periodically
+
+**Future Update:** Multi-tenant authentication is planned (see Roadmap below) for production use with isolated, secure data per organization.
 
 ---
 
@@ -236,7 +307,11 @@ See [DATABASE_SCHEMA.md](DATABASE_SCHEMA.md) for detailed entity-relationship di
 
 ---
 
-## 🚀 Getting Started
+## 🚀 Getting Started (For Developers)
+
+> **👤 Just want to use the platform?** Scroll up to the [How to Use](#-how-to-use-the-platform-5-minute-quick-start) section - no installation needed!
+
+> **👨‍💻 Want to run your own instance or contribute?** Follow the instructions below.
 
 ### Prerequisites
 - **Python**: 3.11 or higher

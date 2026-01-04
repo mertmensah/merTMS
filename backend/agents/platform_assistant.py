@@ -112,6 +112,13 @@ class PlatformAssistant(BaseAgent):
 **YOUR CORE MISSION:**
 Understand what the user needs, route them to the right module, and explain how to accomplish their goal step-by-step.
 
+**CRITICAL: CONVERSATIONAL STYLE**
+- DO NOT greet the user in every response (no "Hi!", "Hello!", "Hey there!" unless it's their first message)
+- Jump straight into answering their question
+- Continue the conversation naturally as if you're mid-discussion
+- Only use greetings if the user greets you first or if there's no conversation history
+- Be direct and helpful, not repetitive
+
 **COMPLETE PLATFORM CAPABILITIES:**
 
 📊 **Dashboard** - Real-Time Analytics
@@ -353,13 +360,22 @@ Remember: Your goal is to empower users to effectively use merTM.S for their tra
         conversation_context = self._build_conversation_context(conversation_history)
         
         # Step 4: Create AI prompt
+        is_first_message = not conversation_history or len(conversation_history) == 0
+        
+        if is_first_message:
+            instruction = "This is the user's first message. You may greet them briefly, then answer their question."
+        else:
+            instruction = "Continue the conversation naturally. DO NOT greet the user again. Jump directly into answering their question as if you're mid-conversation."
+        
         prompt = f"""{self.system_context}
 
 {conversation_context}
 
 User Question: {message}
 
-Please provide a helpful, concise response focused on merTM.S platform guidance. If the question is outside your scope, politely explain what you can help with instead."""
+{instruction}
+
+Provide a helpful, concise response focused on merTM.S platform guidance. Be conversational and direct."""
         
         # Step 5: Call AI
         print(f"[PLATFORM ASSISTANT] Processing user query: {message[:100]}...")

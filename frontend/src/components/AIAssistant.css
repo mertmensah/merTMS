@@ -151,6 +151,7 @@
 
 .message {
   max-width: 85%;
+  min-width: 150px;
   display: flex;
   flex-direction: column;
   gap: 0.25rem;
@@ -158,16 +159,22 @@
 
 .message.user {
   align-self: flex-end;
+  max-width: 75%; /* User messages can be slightly narrower */
 }
 
 .message.assistant {
   align-self: flex-start;
+  max-width: 90%; /* Assistant messages can use more width for detailed responses */
 }
 
 .message-content {
   padding: 0.75rem 1rem;
   border-radius: 12px;
   line-height: 1.5;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  word-break: break-word;
+  hyphens: auto;
 }
 
 .message.user .message-content {
@@ -181,6 +188,11 @@
   color: #333;
   border: 1px solid #e0e0e0;
   border-bottom-left-radius: 4px;
+}
+
+.message.assistant .message-content p {
+  margin: 0.5rem 0;
+  white-space: pre-wrap; /* Preserve formatting from AI responses */
 }
 
 .message.error .message-content {

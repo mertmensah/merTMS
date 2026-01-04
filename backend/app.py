@@ -11,6 +11,7 @@ import os
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
 from config.settings import PORT, DEBUG
+from utils.keep_alive import keep_alive, initialize_keep_alive
 
 app = Flask(__name__)
 
@@ -32,6 +33,35 @@ CORS(app, resources={
 @app.route('/health', methods=['GET'])
 def health_check():
     return jsonify({"status": "healthy", "service": "TMS Backend"}), 200
+
+# Supabase Keep-Alive endpoint
+@app.route('/api/keep-alive', methods=['GET'])
+def keep_alive_endpoint():
+    """
+    Endpoint to manually trigger Supabase keep-alive ping.
+    Can be called by external cron services (UptimeRobot, cron-job.org, etc.)
+    to ensure database stays active.
+    
+    Recommended: Ping this endpoint every 3-7 days as a backup.
+    """
+    try:
+        # Check if enough time has passed (prevents excessive pinging)
+        if keep_alive.should_ping(min_interval_seconds=3600):  # Max once per hour
+            result = keep_alive.ping_database()
+            return jsonify(result), 200
+        else:
+            # Return cached status if pinged too recently
+            return jsonify({
+                'success': True,
+                'message': 'Ping skipped - too soon since last ping',
+                'status': keep_alive.get_status()
+            }), 200
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'error': str(e),
+            'message': 'Keep-alive ping failed'
+        }), 500
 
 # Network Engineering - Facility Location endpoint
 @app.route('/api/network/facility-location', methods=['POST'])
@@ -1542,6 +1572,14 @@ if __name__ == '__main__':
     print(f"[merTM.S] Backend starting on port {PORT}...")
     print(f"[API] Available at: http://localhost:{PORT}")
     print(f"[HEALTH] Check endpoint: http://localhost:{PORT}/health")
+    
+    # Initialize Supabase keep-alive on startup
+    try:
+        initialize_keep_alive()
+    except Exception as e:
+        print(f"[KEEP-ALIVE] Warning: Failed to initialize keep-alive: {e}")
+        print(f"[KEEP-ALIVE] Continuing with app startup...")
+    
     # Disable debug mode to prevent watchdog crashes
     app.run(debug=False, port=PORT, host='0.0.0.0', use_reloader=False)
 

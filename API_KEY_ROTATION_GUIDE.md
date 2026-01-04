@@ -122,8 +122,7 @@ notepad .env
 
 **Replace this line:**
 ```env
-GEMINI_API_KEY=AIzaSyCC-ek23opg5elzvYrNhudWdk1GUY-LuQc  # OLD KEY
-```
+  GEMINI_API_KEY=your_old_key_here  # OLD KEY
 
 **With your new key:**
 ```env
@@ -192,8 +191,7 @@ git diff
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
 
 # Bad ❌ (NEVER do this)
-GEMINI_API_KEY = "AIzaSyCC-ek23opg5elzvYrNhudWdk1GUY-LuQc"
-```
+  GEMINI_API_KEY = "your_key_here"
 
 ### **4. Rotate Keys Periodically**
 

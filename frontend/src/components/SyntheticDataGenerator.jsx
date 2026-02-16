@@ -28,6 +28,7 @@ function SyntheticDataGenerator() {
   })
   
   // Load simulation state
+  const [loadCount, setLoadCount] = useState(10)
   const [loadSimulating, setLoadSimulating] = useState(false)
   const [loadHistory, setLoadHistory] = useState([])
   
@@ -39,8 +40,12 @@ function SyntheticDataGenerator() {
     status: 'Planning'
   })
   
-  // Facility/Product seed state
+  // Facility seed state
+  const [facilityCount, setFacilityCount] = useState(50)
   const [facilitiesSeeded, setFacilitiesSeeded] = useState(false)
+  
+  // Product seed state
+  const [productCount, setProductCount] = useState(20)
   const [productsSeeded, setProductsSeeded] = useState(false)
   
   // Individual Facility Form
@@ -712,26 +717,46 @@ function SyntheticDataGenerator() {
                     Create realistic load scenarios for Control Tower testing. Generates loads with various
                     statuses (delivered, on-time, at-risk) scheduled for today's delivery.
                   </p>
+                  
+                  <div className="control-group">
+                    <label htmlFor="loadCount">Number of Loads to Simulate:</label>
+                    <div className="input-with-buttons">
+                      <input 
+                        type="number" 
+                        id="loadCount"
+                        value={loadCount}
+                        onChange={(e) => setLoadCount(Math.max(1, parseInt(e.target.value) || 1))}
+                        min="1"
+                        max="50"
+                        disabled={loadSimulating}
+                      />
+                      <div className="quick-select">
+                        <button onClick={() => setLoadCount(5)} disabled={loadSimulating}>5</button>
+                        <button onClick={() => setLoadCount(10)} disabled={loadSimulating}>10</button>
+                        <button onClick={() => setLoadCount(20)} disabled={loadSimulating}>20</button>
+                      </div>
+                    </div>
+                  </div>
 
                   <div className="simulation-options">
                     <div className="option-card">
                       <h4>📍 Today's Delivery Loads</h4>
-                      <p>Creates 8-10 loads with mixed statuses for Control Tower monitoring</p>
+                      <p>Creates {loadCount} loads with mixed statuses for Control Tower monitoring</p>
                       <ul className="feature-list">
-                        <li>✅ 3 Delivered loads (green status)</li>
-                        <li>🟢 3 On-time loads (tracking normally)</li>
-                        <li>⚠️ 2 At-risk loads (yellow alerts)</li>
+                        <li>✅ Delivered loads (green status)</li>
+                        <li>🟢 On-time loads (tracking normally)</li>
+                        <li>⚠️ At-risk loads (yellow alerts)</li>
                         <li>📅 All scheduled for today's delivery</li>
                       </ul>
                       <button 
                         className="btn-primary"
                         onClick={handleSimulateLoads}
-                        disabled={loadSimulating || loading || stats.orders < 10}
+                        disabled={loadSimulating || loading || stats.orders < loadCount * 5}
                       >
-                        {loadSimulating ? '⏳ Simulating...' : '🎬 Simulate Today\'s Loads'}
+                        {loadSimulating ? '⏳ Simulating...' : `🎬 Simulate ${loadCount} Loads`}
                       </button>
-                      {stats.orders < 10 && (
-                        <p className="warning-text">⚠️ Need at least 10 pending orders to simulate loads</p>
+                      {stats.orders < loadCount * 5 && (
+                        <p className="warning-text">⚠️ Need at least {loadCount * 5} pending orders to simulate {loadCount} loads</p>
                       )}
                     </div>
                   </div>
@@ -861,6 +886,26 @@ function SyntheticDataGenerator() {
                   <p className="section-description">
                     Initialize facility network with realistic data. Run this once during setup.
                   </p>
+                  
+                  <div className="control-group">
+                    <label htmlFor="facilityCount">Number of Facilities to Seed:</label>
+                    <div className="input-with-buttons">
+                      <input 
+                        type="number" 
+                        id="facilityCount"
+                        value={facilityCount}
+                        onChange={(e) => setFacilityCount(Math.max(1, parseInt(e.target.value) || 1))}
+                        min="1"
+                        max="200"
+                        disabled={loading || facilitiesSeeded}
+                      />
+                      <div className="quick-select">
+                        <button onClick={() => setFacilityCount(20)} disabled={loading || facilitiesSeeded}>20</button>
+                        <button onClick={() => setFacilityCount(50)} disabled={loading || facilitiesSeeded}>50</button>
+                        <button onClick={() => setFacilityCount(100)} disabled={loading || facilitiesSeeded}>100</button>
+                      </div>
+                    </div>
+                  </div>
 
                   <div className="seed-options">
                     <div className="option-card">
@@ -871,7 +916,7 @@ function SyntheticDataGenerator() {
                         </span>
                       </div>
                       <p>
-                        Seeds {stats.facilities || '50+'} facilities including Toronto-area origins and US destinations
+                        Seeds {facilityCount} facilities including Toronto-area origins and US destinations
                         with accurate coordinates for mapping and routing.
                       </p>
                       <button 
@@ -1039,6 +1084,26 @@ function SyntheticDataGenerator() {
                   <p className="section-description">
                     Initialize product catalog with realistic SKUs. Run this once during setup.
                   </p>
+                  
+                  <div className="control-group">
+                    <label htmlFor="productCount">Number of Products to Seed:</label>
+                    <div className="input-with-buttons">
+                      <input 
+                        type="number" 
+                        id="productCount"
+                        value={productCount}
+                        onChange={(e) => setProductCount(Math.max(1, parseInt(e.target.value) || 1))}
+                        min="1"
+                        max="500"
+                        disabled={loading || productsSeeded}
+                      />
+                      <div className="quick-select">
+                        <button onClick={() => setProductCount(10)} disabled={loading || productsSeeded}>10</button>
+                        <button onClick={() => setProductCount(20)} disabled={loading || productsSeeded}>20</button>
+                        <button onClick={() => setProductCount(50)} disabled={loading || productsSeeded}>50</button>
+                      </div>
+                    </div>
+                  </div>
 
                   <div className="seed-options">
                     <div className="option-card">
@@ -1049,7 +1114,7 @@ function SyntheticDataGenerator() {
                         </span>
                       </div>
                       <p>
-                        Seeds {stats.products || '20+'} product SKUs with realistic dimensions, weights, 
+                        Seeds {productCount} product SKUs with realistic dimensions, weights, 
                         pallet configurations, and hazmat classifications.
                       </p>
                       <button 

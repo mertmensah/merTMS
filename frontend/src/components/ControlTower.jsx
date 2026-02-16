@@ -172,8 +172,11 @@ function ControlTower() {
         </div>
       `)
 
-      // Create and add marker
-      const marker = new mapboxgl.Marker(el)
+      // Create and add marker with center anchor
+      const marker = new mapboxgl.Marker({
+        element: el,
+        anchor: 'center'
+      })
         .setLngLat([markerData.lng, markerData.lat])
         .setPopup(popup)
         .addTo(map.current)

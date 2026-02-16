@@ -134,28 +134,91 @@ function ControlTower() {
       markersRef.current = []
 
       // Add new markers
-      mapMarkers.forEach(markerData => {
-        // Create custom marker element
+      mapMarkers.forEach((markerData, index) => {
+        // Create custom marker element with label
         const el = document.createElement('div')
-        el.className = 'custom-marker'
-        el.style.backgroundColor = MARKER_COLORS[markerData.status]
-        el.style.width = '24px'
-        el.style.height = '24px'
-        el.style.borderRadius = '50%'
-        el.style.border = '3px solid white'
-        el.style.boxShadow = '0 2px 4px rgba(0,0,0,0.3)'
+        el.className = 'custom-marker-container'
+        el.style.position = 'relative'
         el.style.cursor = 'pointer'
+        
+        // Create the pin
+        const pin = document.createElement('div')
+        pin.className = 'custom-marker'
+        pin.style.backgroundColor = MARKER_COLORS[markerData.status]
+        pin.style.width = '32px'
+        pin.style.height = '32px'
+        pin.style.borderRadius = '50%'
+        pin.style.border = '4px solid white'
+        pin.style.boxShadow = '0 4px 8px rgba(0,0,0,0.4)'
+        pin.style.position = 'relative'
+        pin.style.transition = 'transform 0.2s'
+        
+        // Create the label
+        const label = document.createElement('div')
+        label.className = 'marker-label'
+        label.textContent = markerData.load.load_number
+        label.style.position = 'absolute'
+        label.style.top = '-30px'
+        label.style.left = '50%'
+        label.style.transform = 'translateX(-50%)'
+        label.style.backgroundColor = 'rgba(0, 0, 0, 0.85)'
+        label.style.color = 'white'
+        label.style.padding = '4px 8px'
+        label.style.borderRadius = '4px'
+        label.style.fontSize = '11px'
+        label.style.fontWeight = 'bold'
+        label.style.whiteSpace = 'nowrap'
+        label.style.pointerEvents = 'none'
+        label.style.boxShadow = '0 2px 4px rgba(0,0,0,0.3)'
+        
+        pin.appendChild(label)
+        el.appendChild(pin)
+        
+        // Hover effect
+        el.addEventListener('mouseenter', () => {
+          pin.style.transform = 'scale(1.2)'
+          label.style.opacity = '1'
+        })
+        el.addEventListener('mouseleave', () => {
+          pin.style.transform = 'scale(1)'
+        })
 
-        // Create popup
+        // Create enhanced popup
+        const statusEmoji = markerData.status === 'delivered' ? '✅' : 
+                           markerData.status === 'onTime' ? '🚛' : '⚠️'
+        const statusText = markerData.status === 'delivered' ? 'Delivered' : 
+                          markerData.status === 'onTime' ? 'On Time / In Transit' : 'Past Due'
+        const statusColor = MARKER_COLORS[markerData.status]
+        
         const popup = new mapboxgl.Popup({ offset: 25 }).setHTML(`
-          <div style="min-width: 200px; font-family: system-ui;">
-            <strong style="font-size: 14px; color: #1a1a1a;">${markerData.order.order_number}</strong>
-            <div style="margin-top: 8px; font-size: 13px; line-height: 1.6;">
-              <div><strong>Status:</strong> ${markerData.order.status}</div>
-              <div><strong>Customer:</strong> ${markerData.order.customer}</div>
-              <div><strong>Destination:</strong> ${markerData.order.destination}</div>
-              <div><strong>Weight:</strong> ${markerData.order.weight_lbs} lbs</div>
-              <div><strong>Volume:</strong> ${markerData.order.volume_cuft} cu.ft</div>
+          <div style="min-width: 250px; font-family: system-ui;">
+            <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 12px;">
+              <strong style="font-size: 15px; color: #1a1a1a;">${markerData.load.load_number}</strong>
+              <span style="background: ${statusColor}; color: white; padding: 3px 8px; border-radius: 4px; font-size: 11px; font-weight: bold;">
+                ${statusEmoji} ${statusText}
+              </span>
+            </div>
+            <div style="font-size: 13px; line-height: 1.8; color: #333;">
+              <div style="margin-bottom: 8px; padding-bottom: 8px; border-bottom: 1px solid #eee;">
+                <strong>Order:</strong> ${markerData.order.order_number}<br/>
+                <strong>Customer:</strong> ${markerData.order.customer}
+              </div>
+              <div style="margin-bottom: 8px;">
+                <strong>📍 Destination:</strong><br/>
+                ${markerData.order.destination}
+              </div>
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; background: #f5f5f5; padding: 8px; border-radius: 4px;">
+                <div>
+                  <strong>Weight:</strong><br/>
+                  ${markerData.order.weight_lbs} lbs
+                </div>
+                <div>
+                  <strong>Volume:</strong><br/>
+                  ${markerData.order.volume_cuft} cu.ft
+                </div>
+              </div>
+              ${markerData.load.truck_type ? `<div style="margin-top: 8px;"><strong>🚚 Truck:</strong> ${markerData.load.truck_type}</div>` : ''}
+              ${markerData.load.utilization_percent ? `<div style="margin-top: 4px;"><strong>📊 Utilization:</strong> ${markerData.load.utilization_percent}%</div>` : ''}
             </div>
           </div>
         `)
@@ -397,12 +460,12 @@ function ControlTower() {
 
       {/* Map Visualization */}
       <div className="tower-map-section">
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 'var(--space-m)' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 'var(--space-m)', flexWrap: 'wrap', gap: 'var(--space-m)' }}>
           <div>
-            <h3>Today's Overview</h3>
-            <p className="map-description">Load status' for today's deliveries</p>
+            <h3>📍 Live Delivery Map</h3>
+            <p className="map-description">{mapMarkers.length} destination{mapMarkers.length !== 1 ? 's' : ''} across {totalToday} load{totalToday !== 1 ? 's' : ''}</p>
           </div>
-          <div style={{ display: 'flex', gap: '10px' }}>
+          <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
               <button 
                 className={`btn-map-style ${mapStyle === 'mapbox://styles/mertmensah/clyd3o0s8011901qj1x8s02np' ? 'active' : ''}`}
                 onClick={() => setMapStyle('mapbox://styles/mertmensah/clyd3o0s8011901qj1x8s02np')}
@@ -433,17 +496,68 @@ function ControlTower() {
               </button>
             </div>
           </div>
-          <div 
-            ref={mapContainer} 
-            className="mapbox-container"
-            style={{ 
-              height: '600px', 
-              width: '100%', 
+          <div style={{ position: 'relative' }}>
+            <div 
+              ref={mapContainer} 
+              className="mapbox-container"
+              style={{ 
+                height: '600px', 
+                width: '100%', 
+                borderRadius: '8px',
+                backgroundColor: '#1a1a1a',
+                position: 'relative'
+              }}
+            />
+            {/* Map Legend */}
+            <div style={{
+              position: 'absolute',
+              bottom: '20px',
+              left: '20px',
+              background: 'rgba(255, 255, 255, 0.95)',
+              padding: '12px 16px',
               borderRadius: '8px',
-              backgroundColor: '#1a1a1a',
-              position: 'relative'
-            }}
-          />
+              boxShadow: '0 2px 8px rgba(0,0,0,0.3)',
+              backdropFilter: 'blur(10px)',
+              zIndex: 1
+            }}>
+              <div style={{ fontWeight: 'bold', fontSize: '13px', marginBottom: '8px', color: '#1a1a1a' }}>Load Status</div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '12px' }}>
+                  <div style={{
+                    width: '16px',
+                    height: '16px',
+                    borderRadius: '50%',
+                    backgroundColor: '#4caf50',
+                    border: '2px solid white',
+                    boxShadow: '0 2px 4px rgba(0,0,0,0.2)'
+                  }} />
+                  <span style={{ color: '#1a1a1a' }}>✓ Delivered ({deliveries.delivered.length})</span>
+                </div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '12px' }}>
+                  <div style={{
+                    width: '16px',
+                    height: '16px',
+                    borderRadius: '50%',
+                    backgroundColor: '#ff9800',
+                    border: '2px solid white',
+                    boxShadow: '0 2px 4px rgba(0,0,0,0.2)'
+                  }} />
+                  <span style={{ color: '#1a1a1a' }}>🚛 In Transit ({deliveries.onTime.length})</span>
+                </div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '12px' }}>
+                  <div style={{
+                    width: '16px',
+                    height: '16px',
+                    borderRadius: '50%',
+                    backgroundColor: '#f44336',
+                    border: '2px solid white',
+                    boxShadow: '0 2px 4px rgba(0,0,0,0.2)'
+                  }} />
+                  <span style={{ color: '#1a1a1a' }}>⚠️ Past Due ({deliveries.pastDue.length})</span>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
     </div>
   )

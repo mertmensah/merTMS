@@ -77,6 +77,7 @@ function ControlTower() {
     }
     
     console.log('[MAP] Adding markers to map...')
+    console.log('[MAP] First marker coords:', mapMarkers[0])
     
     // Remove existing markers
     markersRef.current.forEach(marker => marker.remove())
@@ -84,11 +85,13 @@ function ControlTower() {
 
     // Add new markers
     mapMarkers.forEach((markerData, index) => {
+      // Log coordinates for debugging
+      console.log(`[MARKER ${index}] ${markerData.order.destination}: lng=${markerData.lng}, lat=${markerData.lat}`)
+
       // Create custom marker element with label
       const el = document.createElement('div')
       el.className = 'custom-marker-container'
-      el.style.cursor = 'pointer'
-      
+
       // Create the pin
       const pin = document.createElement('div')
       pin.className = 'custom-marker'
@@ -98,7 +101,6 @@ function ControlTower() {
       pin.style.borderRadius = '50%'
       pin.style.border = '4px solid white'
       pin.style.boxShadow = '0 4px 8px rgba(0,0,0,0.4)'
-      pin.style.position = 'relative'
       pin.style.transition = 'transform 0.2s'
       
       // Create the label
@@ -119,13 +121,12 @@ function ControlTower() {
       label.style.pointerEvents = 'none'
       label.style.boxShadow = '0 2px 4px rgba(0,0,0,0.3)'
       
-      pin.appendChild(label)
       el.appendChild(pin)
+      pin.appendChild(label)
       
       // Hover effect
       el.addEventListener('mouseenter', () => {
         pin.style.transform = 'scale(1.2)'
-        label.style.opacity = '1'
       })
       el.addEventListener('mouseleave', () => {
         pin.style.transform = 'scale(1)'
@@ -171,15 +172,15 @@ function ControlTower() {
         </div>
       `)
 
-      // Create and add marker with center anchor
+      // Create marker - use default marker for testing
       const marker = new mapboxgl.Marker({
-        element: el,
-        anchor: 'center'
+        color: MARKER_COLORS[markerData.status]
       })
         .setLngLat([markerData.lng, markerData.lat])
         .setPopup(popup)
         .addTo(map.current)
 
+      console.log(`[MARKER ${index}] Created at [${markerData.lng}, ${markerData.lat}]`)
       markersRef.current.push(marker)
     })
     

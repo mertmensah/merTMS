@@ -22,10 +22,12 @@ CORS(app, resources={
             "http://localhost:5173", 
             "http://localhost:5174", 
             "http://localhost:3000",
-            "https://mertmensah.github.io"
+            "https://mertmensah.github.io",
+            "https://mertmensah.github.io/merTMS"  # GitHub Pages full path
         ],
-        "methods": ["GET", "POST", "PUT", "DELETE"],
-        "allow_headers": ["Content-Type"]
+        "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+        "allow_headers": ["Content-Type", "Authorization"],
+        "supports_credentials": True
     }
 })
 
@@ -1138,8 +1140,28 @@ def simulate_today_loads():
         
     except Exception as e:
         import traceback
-        traceback.print_exc()
-        return jsonify({"error": str(e)}), 500
+        error_traceback = traceback.format_exc()
+        error_location = traceback.extract_tb(e.__traceback__)[-1]
+        
+        print(f"\n[SIMULATE-ERROR] ❌❌❌ EXCEPTION OCCURRED ❌❌❌")
+        print(f"[SIMULATE-ERROR] Error Type: {type(e).__name__}")
+        print(f"[SIMULATE-ERROR] Error Message: {str(e)}")
+        print(f"[SIMULATE-ERROR] Location: {error_location.filename}:{error_location.lineno} in {error_location.name}")
+        print(f"[SIMULATE-ERROR] Full Traceback:")
+        print(error_traceback)
+        print("="*80 + "\n")
+        
+        return jsonify({
+            "error": str(e),
+            "error_type": type(e).__name__,
+            "debug_code": "SIMULATE-ERROR-EXCEPTION",
+            "location": {
+                "file": error_location.filename.split('\\')[-1],  # Just filename
+                "line": error_location.lineno,
+                "function": error_location.name
+            },
+            "hint": "Check backend console for full stack trace. Common issues: Database connection, insufficient orders, or AI agent failure."
+        }), 500
 
 @app.route('/api/loads/<load_id>', methods=['GET'])
 def get_load_by_id(load_id):

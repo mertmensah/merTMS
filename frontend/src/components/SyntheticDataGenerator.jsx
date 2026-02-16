@@ -113,9 +113,13 @@ function SyntheticDataGenerator() {
   const handleGenerateOrders = async (monthly = false) => {
     try {
       setOrderGenerating(true)
+      console.log('[FRONTEND] Generating orders:', monthly ? 'Monthly' : orderCount)
+      
       const response = monthly 
         ? await tmsAPI.generateMonthlyOrders()
         : await tmsAPI.generateOrders(orderCount)
+      
+      console.log('[FRONTEND] ✓ Orders generated:', response.data)
       
       const timestamp = new Date().toLocaleString()
       const newEntry = {
@@ -129,8 +133,10 @@ function SyntheticDataGenerator() {
       
       alert(`✅ Successfully generated ${newEntry.count} orders!`)
     } catch (error) {
-      console.error('Error generating orders:', error)
-      alert(`❌ Failed to generate orders: ${error.response?.data?.error || error.message}`)
+      console.error('[FRONTEND] ❌ Order generation failed:', error)
+      const errorMsg = error.response?.data?.error || error.message
+      const debugCode = error.response?.data?.debug_code || 'NO_CODE'
+      alert(`❌ Failed to generate orders\n\nError: ${errorMsg}\nDebug Code: ${debugCode}`)
     } finally {
       setOrderGenerating(false)
     }
@@ -158,7 +164,11 @@ function SyntheticDataGenerator() {
   const handleSimulateLoads = async () => {
     try {
       setLoadSimulating(true)
+      console.log('[FRONTEND] Starting load simulation...')
+      console.log('[FRONTEND] API URL:', import.meta.env.VITE_API_URL || 'Using default')
+      
       const response = await tmsAPI.simulateTodayLoads()
+      console.log('[FRONTEND] ✓ Received response:', response.data)
       
       const timestamp = new Date().toLocaleString()
       const newEntry = {
@@ -172,8 +182,45 @@ function SyntheticDataGenerator() {
       
       alert(`✅ Successfully simulated ${newEntry.count} loads!`)
     } catch (error) {
-      console.error('Error simulating loads:', error)
-      alert(`❌ Failed to simulate loads: ${error.response?.data?.error || error.message}`)
+      console.error('[FRONTEND] ❌ Load simulation failed:', error)
+      
+      // Detailed error analysis
+      let errorMessage = ''
+      let debugInfo = ''
+      
+      if (error.code === 'ECONNABORTED' || error.message.includes('timeout')) {
+        errorMessage = '⏱️ Request timeout - Backend is taking too long to respond'
+        debugInfo = 'The simulation process exceeded 3 minutes. Backend may be overloaded or AI agent is slow.'
+      } else if (error.code === 'ERR_NETWORK' || error.message === 'Network Error') {
+        errorMessage = '🌐 Network Error - Cannot reach backend server'
+        debugInfo = `Backend URL: ${import.meta.env.VITE_API_URL || 'https://mertms-nwh7.onrender.com/api'}\n\nPossible causes:\n1. Backend server is not running\n2. CORS configuration issue\n3. Network connectivity problem\n4. SSL certificate issue`
+      } else if (error.response) {
+        // Server responded with error
+        const statusCode = error.response.status
+        const debugCode = error.response.data?.debug_code || 'NO_DEBUG_CODE'
+        
+        if (statusCode === 400) {
+          errorMessage = `⚠️ Bad Request: ${error.response.data?.error || 'Invalid input'}`
+          debugInfo = `Debug Code: ${debugCode}\nDetails: ${JSON.stringify(error.response.data, null, 2)}`
+        } else if (statusCode === 500) {
+          errorMessage = '💥 Backend Server Error'
+          debugInfo = `Debug Code: ${debugCode}\nError: ${error.response.data?.error || 'Unknown server error'}\n\nCheck backend console for stack trace.`
+        } else {
+          errorMessage = `HTTP ${statusCode}: ${error.response.data?.error || error.message}`
+          debugInfo = `Debug Code: ${debugCode}\nFull response: ${JSON.stringify(error.response.data, null, 2)}`
+        }
+      } else if (error.request) {
+        // Request made but no response
+        errorMessage = '📡 No Response from Server'
+        debugInfo = 'Request was sent but server did not respond. Backend may be down or unreachable.'
+      } else {
+        // Something else happened
+        errorMessage = `❌ Unexpected Error: ${error.message}`
+        debugInfo = `Error Type: ${error.constructor.name}\nStack: ${error.stack?.substring(0, 200)}`
+      }
+      
+      console.error('[FRONTEND] Error details:', debugInfo)
+      alert(`❌ Failed to simulate loads\n\n${errorMessage}\n\n${debugInfo}`)
     } finally {
       setLoadSimulating(false)
     }
@@ -182,12 +229,16 @@ function SyntheticDataGenerator() {
   const handleSeedFacilities = async () => {
     try {
       setLoading(true)
+      console.log('[FRONTEND] Seeding facilities...')
       const response = await tmsAPI.seedFacilities()
+      console.log('[FRONTEND] ✓ Facilities seeded:', response.data)
       await fetchStats()
       alert(`✅ Successfully seeded ${response.data.count || 0} facilities!`)
     } catch (error) {
-      console.error('Error seeding facilities:', error)
-      alert(`❌ Failed to seed facilities: ${error.response?.data?.error || error.message}`)
+      console.error('[FRONTEND] ❌ Facility seeding failed:', error)
+      const errorMsg = error.response?.data?.error || error.message
+      const debugCode = error.response?.data?.debug_code || 'NO_CODE'
+      alert(`❌ Failed to seed facilities\n\nError: ${errorMsg}\nDebug Code: ${debugCode}`)
     } finally {
       setLoading(false)
     }
@@ -196,12 +247,16 @@ function SyntheticDataGenerator() {
   const handleSeedProducts = async () => {
     try {
       setLoading(true)
+      console.log('[FRONTEND] Seeding products...')
       const response = await tmsAPI.seedProducts()
+      console.log('[FRONTEND] ✓ Products seeded:', response.data)
       await fetchStats()
       alert(`✅ Successfully seeded ${response.data.count || 0} products!`)
     } catch (error) {
-      console.error('Error seeding products:', error)
-      alert(`❌ Failed to seed products: ${error.response?.data?.error || error.message}`)
+      console.error('[FRONTEND] ❌ Product seeding failed:', error)
+      const errorMsg = error.response?.data?.error || error.message
+      const debugCode = error.response?.data?.debug_code || 'NO_CODE'
+      alert(`❌ Failed to seed products\n\nError: ${errorMsg}\nDebug Code: ${debugCode}`)
     } finally {
       setLoading(false)
     }

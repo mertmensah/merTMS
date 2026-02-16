@@ -202,9 +202,9 @@ function OrderManagement() {
       </div>
 
       <div className="orders-summary">
-        <p><strong>Total Orders:</strong> {orders.length} {orders.length >= 1000 && '(Supabase limit)'}</p>
+        <p><strong>Total Orders:</strong> {orders.length.toLocaleString()}</p>
         <p><strong>Pending:</strong> {orders.filter(o => o.status === 'Pending').length}</p>
-        <p><strong>Page:</strong> {currentPage} of {totalPages} | <strong>Showing:</strong> {startIndex + 1}-{Math.min(endIndex, orders.length)} of {orders.length}</p>
+        <p><strong>Page:</strong> {currentPage} of {totalPages} | <strong>Showing:</strong> {startIndex + 1}-{Math.min(endIndex, orders.length)} of {orders.length.toLocaleString()}</p>
         {selectedRows.size > 0 && <p><strong>Selected:</strong> {selectedRows.size} orders</p>}
         <p className="info-note">💡 <em>Right-click on any row for export options. Use Ctrl+Click for multi-select, Shift+Click for range select.</em></p>
       </div>

@@ -33,23 +33,37 @@ function SyntheticDataGenerator() {
     try {
       setLoading(true)
       const [ordersRes, loadsRes, facilitiesRes, productsRes] = await Promise.all([
-        tmsAPI.getOrders(),
-        tmsAPI.getLoads(),
-        tmsAPI.getFacilities(),
-        tmsAPI.getProducts()
+        tmsAPI.getOrders().catch(e => ({ data: [] })),
+        tmsAPI.getLoads().catch(e => ({ data: [] })),
+        tmsAPI.getFacilities().catch(e => ({ data: [] })),
+        tmsAPI.getProducts().catch(e => ({ data: [] }))
       ])
       
+      // Handle different response structures (data.data vs data)
+      const getArrayLength = (response) => {
+        if (!response) return 0
+        const data = response.data?.data || response.data
+        return Array.isArray(data) ? data.length : 0
+      }
+      
       setStats({
-        orders: ordersRes.data.length,
-        loads: loadsRes.data.length,
-        facilities: facilitiesRes.data.length,
-        products: productsRes.data.length
+        orders: getArrayLength(ordersRes),
+        loads: getArrayLength(loadsRes),
+        facilities: getArrayLength(facilitiesRes),
+        products: getArrayLength(productsRes)
       })
       
-      setFacilitiesSeeded(facilitiesRes.data.length > 0)
-      setProductsSeeded(productsRes.data.length > 0)
+      setFacilitiesSeeded(getArrayLength(facilitiesRes) > 0)
+      setProductsSeeded(getArrayLength(productsRes) > 0)
     } catch (error) {
       console.error('Error fetching stats:', error)
+      // Set defaults so UI doesn't crash
+      setStats({
+        orders: 0,
+        loads: 0,
+        facilities: 0,
+        products: 0
+      })
     } finally {
       setLoading(false)
     }
@@ -167,7 +181,7 @@ function SyntheticDataGenerator() {
           <div className="stat-icon">📋</div>
           <div className="stat-content">
             <h3>Orders</h3>
-            <p className="stat-value">{stats.orders.toLocaleString()}</p>
+            <p className="stat-value">{(stats.orders || 0).toLocaleString()}</p>
             <span className="stat-label">Total in database</span>
           </div>
         </div>
@@ -175,7 +189,7 @@ function SyntheticDataGenerator() {
           <div className="stat-icon">🚛</div>
           <div className="stat-content">
             <h3>Loads</h3>
-            <p className="stat-value">{stats.loads.toLocaleString()}</p>
+            <p className="stat-value">{(stats.loads || 0).toLocaleString()}</p>
             <span className="stat-label">Total in database</span>
           </div>
         </div>
@@ -183,7 +197,7 @@ function SyntheticDataGenerator() {
           <div className="stat-icon">🏭</div>
           <div className="stat-content">
             <h3>Facilities</h3>
-            <p className="stat-value">{stats.facilities}</p>
+            <p className="stat-value">{stats.facilities || 0}</p>
             <span className="stat-label status">{facilitiesSeeded ? '✅ Seeded' : '⚠️ Not seeded'}</span>
           </div>
         </div>
@@ -191,7 +205,7 @@ function SyntheticDataGenerator() {
           <div className="stat-icon">📦</div>
           <div className="stat-content">
             <h3>Products</h3>
-            <p className="stat-value">{stats.products}</p>
+            <p className="stat-value">{stats.products || 0}</p>
             <span className="stat-label status">{productsSeeded ? '✅ Seeded' : '⚠️ Not seeded'}</span>
           </div>
         </div>
@@ -283,7 +297,7 @@ function SyntheticDataGenerator() {
                       <div key={idx} className="history-item">
                         <span className="history-time">{entry.timestamp}</span>
                         <span className="history-details">
-                          Generated {entry.count.toLocaleString()} orders ({entry.type})
+                          Generated {(entry.count || 0).toLocaleString()} orders ({entry.type})
                         </span>
                       </div>
                     ))}

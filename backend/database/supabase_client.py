@@ -36,7 +36,8 @@ class SupabaseClient:
     # Facilities Operations
     def get_all_facilities(self):
         """Get all facilities from database"""
-        response = self.client.table('facilities').select('*').execute()
+        # Supabase defaults to 1000 record limit - use range() to get more
+        response = self.client.table('facilities').select('*').range(0, 19999).execute()
         return response.data
     
     def get_facility_by_city(self, city):
@@ -67,7 +68,8 @@ class SupabaseClient:
     # Products Operations
     def get_all_products(self):
         """Get all products from database"""
-        response = self.client.table('products').select('*').execute()
+        # Supabase defaults to 1000 record limit - use range() to get more
+        response = self.client.table('products').select('*').range(0, 19999).execute()
         return response.data
     
     def get_product_by_id(self, product_id):
@@ -99,8 +101,8 @@ class SupabaseClient:
     def get_all_orders(self):
         """Get all orders from database (with increased limit for large datasets)"""
         # Supabase PostgREST has a default limit of 1000 rows
-        # Use range() to get more rows: range(0, 9999) gets rows 0-9999 (10k total)
-        response = self.client.table('orders').select('*').range(0, 9999).execute()
+        # Use range() to get more rows: range(0, 19999) gets rows 0-19999 (20k total)
+        response = self.client.table('orders').select('*').range(0, 19999).execute()
         print(f"[SUPABASE] Retrieved {len(response.data)} orders from database")
         return response.data
     
@@ -168,8 +170,8 @@ class SupabaseClient:
     # Loads Operations
     def get_all_loads(self):
         """Get all loads with their orders (optimized)"""
-        # Fetch all loads
-        response = self.client.table('loads').select('*').execute()
+        # Fetch all loads - use range() to handle more than 1000 loads
+        response = self.client.table('loads').select('*').range(0, 19999).execute()
         loads = response.data
         
         if not loads:
@@ -177,7 +179,7 @@ class SupabaseClient:
         
         # Fetch ALL load_orders in one query
         load_ids = [load['id'] for load in loads]
-        load_orders_response = self.client.table('load_orders').select('*, orders(*)').in_('load_id', load_ids).order('sequence_number').execute()
+        load_orders_response = self.client.table('load_orders').select('*, orders(*)').in_('load_id', load_ids).order('sequence_number').range(0, 19999).execute()
         
         # Group orders by load_id
         orders_by_load = {}
@@ -224,7 +226,8 @@ class SupabaseClient:
     # Carriers Operations
     def get_all_carriers(self):
         """Get all carriers"""
-        response = self.client.table('carriers').select('*').execute()
+        # Supabase defaults to 1000 record limit - use range() to get more
+        response = self.client.table('carriers').select('*').range(0, 19999).execute()
         return response.data
     
     def create_carrier(self, carrier_data):

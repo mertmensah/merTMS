@@ -28,6 +28,7 @@ export const tmsAPI = {
   
   // Loads
   getLoads: () => api.get('/loads'),
+  createLoad: (loadData) => api.post('/loads', loadData),
   getLoadById: (loadId) => api.get(`/loads/${loadId}`),
   simulateTodayLoads: () => api.post('/loads/simulate-today'),
   
@@ -53,6 +54,7 @@ export const tmsAPI = {
   
   // Facilities
   getFacilities: () => api.get('/facilities'),
+  createFacility: (facilityData) => api.post('/facilities', facilityData),
   getFacilityByCode: (facilityCode) => api.get(`/facilities/code/${facilityCode}`),
   getFacilityByCity: (city) => api.get(`/facilities/city/${city}`),
   getOrigins: () => api.get('/facilities/origins'),

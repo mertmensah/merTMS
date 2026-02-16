@@ -69,6 +69,121 @@ function ControlTower() {
   const [mapStyle, setMapStyle] = useState('mapbox://styles/mapbox/satellite-streets-v12')
   const [mapReady, setMapReady] = useState(false)
 
+  // Function to add markers to map (reusable)
+  const addMarkersToMap = () => {
+    if (!map.current || mapMarkers.length === 0) {
+      console.log('[MAP] Skip adding markers - map not ready or no markers')
+      return
+    }
+    
+    console.log('[MAP] Adding markers to map...')
+    
+    // Remove existing markers
+    markersRef.current.forEach(marker => marker.remove())
+    markersRef.current = []
+
+    // Add new markers
+    mapMarkers.forEach((markerData, index) => {
+      // Create custom marker element with label
+      const el = document.createElement('div')
+      el.className = 'custom-marker-container'
+      el.style.position = 'relative'
+      el.style.cursor = 'pointer'
+      
+      // Create the pin
+      const pin = document.createElement('div')
+      pin.className = 'custom-marker'
+      pin.style.backgroundColor = MARKER_COLORS[markerData.status]
+      pin.style.width = '32px'
+      pin.style.height = '32px'
+      pin.style.borderRadius = '50%'
+      pin.style.border = '4px solid white'
+      pin.style.boxShadow = '0 4px 8px rgba(0,0,0,0.4)'
+      pin.style.position = 'relative'
+      pin.style.transition = 'transform 0.2s'
+      
+      // Create the label
+      const label = document.createElement('div')
+      label.className = 'marker-label'
+      label.textContent = markerData.load.load_number
+      label.style.position = 'absolute'
+      label.style.top = '-30px'
+      label.style.left = '50%'
+      label.style.transform = 'translateX(-50%)'
+      label.style.backgroundColor = 'rgba(0, 0, 0, 0.85)'
+      label.style.color = 'white'
+      label.style.padding = '4px 8px'
+      label.style.borderRadius = '4px'
+      label.style.fontSize = '11px'
+      label.style.fontWeight = 'bold'
+      label.style.whiteSpace = 'nowrap'
+      label.style.pointerEvents = 'none'
+      label.style.boxShadow = '0 2px 4px rgba(0,0,0,0.3)'
+      
+      pin.appendChild(label)
+      el.appendChild(pin)
+      
+      // Hover effect
+      el.addEventListener('mouseenter', () => {
+        pin.style.transform = 'scale(1.2)'
+        label.style.opacity = '1'
+      })
+      el.addEventListener('mouseleave', () => {
+        pin.style.transform = 'scale(1)'
+      })
+
+      // Create enhanced popup
+      const statusEmoji = markerData.status === 'delivered' ? '✅' : 
+                         markerData.status === 'onTime' ? '🚛' : '⚠️'
+      const statusText = markerData.status === 'delivered' ? 'Delivered' : 
+                        markerData.status === 'onTime' ? 'On Time / In Transit' : 'Past Due'
+      const statusColor = MARKER_COLORS[markerData.status]
+      
+      const popup = new mapboxgl.Popup({ offset: 25 }).setHTML(`
+        <div style="min-width: 250px; font-family: system-ui;">
+          <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 12px;">
+            <strong style="font-size: 15px; color: #1a1a1a;">${markerData.load.load_number}</strong>
+            <span style="background: ${statusColor}; color: white; padding: 3px 8px; border-radius: 4px; font-size: 11px; font-weight: bold;">
+              ${statusEmoji} ${statusText}
+            </span>
+          </div>
+          <div style="font-size: 13px; line-height: 1.8; color: #333;">
+            <div style="margin-bottom: 8px; padding-bottom: 8px; border-bottom: 1px solid #eee;">
+              <strong>Order:</strong> ${markerData.order.order_number}<br/>
+              <strong>Customer:</strong> ${markerData.order.customer}
+            </div>
+            <div style="margin-bottom: 8px;">
+              <strong>📍 Destination:</strong><br/>
+              ${markerData.order.destination}
+            </div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; background: #f5f5f5; padding: 8px; border-radius: 4px;">
+              <div>
+                <strong>Weight:</strong><br/>
+                ${markerData.order.weight_lbs} lbs
+              </div>
+              <div>
+                <strong>Volume:</strong><br/>
+                ${markerData.order.volume_cuft} cu.ft
+              </div>
+            </div>
+            ${markerData.load.truck_type ? `<div style="margin-top: 8px;"><strong>🚚 Truck:</strong> ${markerData.load.truck_type}</div>` : ''}
+            ${markerData.load.utilization_percent ? `<div style="margin-top: 4px;"><strong>📊 Utilization:</strong> ${markerData.load.utilization_percent}%</div>` : ''}
+          </div>
+        </div>
+      `)
+
+      // Create and add marker
+      const marker = new mapboxgl.Marker(el)
+        .setLngLat([markerData.lng, markerData.lat])
+        .setPopup(popup)
+        .addTo(map.current)
+
+      markersRef.current.push(marker)
+    })
+    
+    console.log(`[MAP] ✅ Successfully added ${markersRef.current.length} markers to map`)
+  }
+
   // Initialize map when container becomes available
   useEffect(() => {
     if (map.current || !mapContainer.current) return
@@ -119,7 +234,14 @@ function ControlTower() {
   // Update map style when changed
   useEffect(() => {
     if (map.current && mapReady) {
+      console.log('[MAP] Changing style to:', mapStyle)
       map.current.setStyle(mapStyle)
+      
+      // Re-add markers after style loads
+      map.current.once('styledata', () => {
+        console.log('[MAP] Style loaded, re-adding markers...')
+        addMarkersToMap()
+      })
     }
   }, [mapStyle, mapReady])
 
@@ -132,121 +254,13 @@ function ControlTower() {
     
     console.log('[MAP] Updating markers, count:', mapMarkers.length)
 
-    // Wait for map to load before adding markers
-    const addMarkers = () => {
-      console.log('[MAP] Adding markers to map...')
-      // Remove existing markers
-      markersRef.current.forEach(marker => marker.remove())
-      markersRef.current = []
-
-      // Add new markers
-      mapMarkers.forEach((markerData, index) => {
-        // Create custom marker element with label
-        const el = document.createElement('div')
-        el.className = 'custom-marker-container'
-        el.style.position = 'relative'
-        el.style.cursor = 'pointer'
-        
-        // Create the pin
-        const pin = document.createElement('div')
-        pin.className = 'custom-marker'
-        pin.style.backgroundColor = MARKER_COLORS[markerData.status]
-        pin.style.width = '32px'
-        pin.style.height = '32px'
-        pin.style.borderRadius = '50%'
-        pin.style.border = '4px solid white'
-        pin.style.boxShadow = '0 4px 8px rgba(0,0,0,0.4)'
-        pin.style.position = 'relative'
-        pin.style.transition = 'transform 0.2s'
-        
-        // Create the label
-        const label = document.createElement('div')
-        label.className = 'marker-label'
-        label.textContent = markerData.load.load_number
-        label.style.position = 'absolute'
-        label.style.top = '-30px'
-        label.style.left = '50%'
-        label.style.transform = 'translateX(-50%)'
-        label.style.backgroundColor = 'rgba(0, 0, 0, 0.85)'
-        label.style.color = 'white'
-        label.style.padding = '4px 8px'
-        label.style.borderRadius = '4px'
-        label.style.fontSize = '11px'
-        label.style.fontWeight = 'bold'
-        label.style.whiteSpace = 'nowrap'
-        label.style.pointerEvents = 'none'
-        label.style.boxShadow = '0 2px 4px rgba(0,0,0,0.3)'
-        
-        pin.appendChild(label)
-        el.appendChild(pin)
-        
-        // Hover effect
-        el.addEventListener('mouseenter', () => {
-          pin.style.transform = 'scale(1.2)'
-          label.style.opacity = '1'
-        })
-        el.addEventListener('mouseleave', () => {
-          pin.style.transform = 'scale(1)'
-        })
-
-        // Create enhanced popup
-        const statusEmoji = markerData.status === 'delivered' ? '✅' : 
-                           markerData.status === 'onTime' ? '🚛' : '⚠️'
-        const statusText = markerData.status === 'delivered' ? 'Delivered' : 
-                          markerData.status === 'onTime' ? 'On Time / In Transit' : 'Past Due'
-        const statusColor = MARKER_COLORS[markerData.status]
-        
-        const popup = new mapboxgl.Popup({ offset: 25 }).setHTML(`
-          <div style="min-width: 250px; font-family: system-ui;">
-            <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 12px;">
-              <strong style="font-size: 15px; color: #1a1a1a;">${markerData.load.load_number}</strong>
-              <span style="background: ${statusColor}; color: white; padding: 3px 8px; border-radius: 4px; font-size: 11px; font-weight: bold;">
-                ${statusEmoji} ${statusText}
-              </span>
-            </div>
-            <div style="font-size: 13px; line-height: 1.8; color: #333;">
-              <div style="margin-bottom: 8px; padding-bottom: 8px; border-bottom: 1px solid #eee;">
-                <strong>Order:</strong> ${markerData.order.order_number}<br/>
-                <strong>Customer:</strong> ${markerData.order.customer}
-              </div>
-              <div style="margin-bottom: 8px;">
-                <strong>📍 Destination:</strong><br/>
-                ${markerData.order.destination}
-              </div>
-              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; background: #f5f5f5; padding: 8px; border-radius: 4px;">
-                <div>
-                  <strong>Weight:</strong><br/>
-                  ${markerData.order.weight_lbs} lbs
-                </div>
-                <div>
-                  <strong>Volume:</strong><br/>
-                  ${markerData.order.volume_cuft} cu.ft
-                </div>
-              </div>
-              ${markerData.load.truck_type ? `<div style="margin-top: 8px;"><strong>🚚 Truck:</strong> ${markerData.load.truck_type}</div>` : ''}
-              ${markerData.load.utilization_percent ? `<div style="margin-top: 4px;"><strong>📊 Utilization:</strong> ${markerData.load.utilization_percent}%</div>` : ''}
-            </div>
-          </div>
-        `)
-
-        // Create and add marker
-        const marker = new mapboxgl.Marker(el)
-          .setLngLat([markerData.lng, markerData.lat])
-          .setPopup(popup)
-          .addTo(map.current)
-
-        markersRef.current.push(marker)
-      })
-      
-      console.log(`[MAP] ✅ Successfully added ${markersRef.current.length} markers to map`)
-    }
-
+    // Add markers when map is ready
     if (map.current.isStyleLoaded()) {
       console.log('[MAP] Map style loaded, adding markers immediately')
-      addMarkers()
+      addMarkersToMap()
     } else {
       console.log('[MAP] Waiting for map to load before adding markers')
-      map.current.on('load', addMarkers)
+      map.current.once('load', addMarkersToMap)
     }
   }, [mapMarkers])
 

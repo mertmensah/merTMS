@@ -87,7 +87,6 @@ function ControlTower() {
       // Create custom marker element with label
       const el = document.createElement('div')
       el.className = 'custom-marker-container'
-      el.style.position = 'relative'
       el.style.cursor = 'pointer'
       
       // Create the pin

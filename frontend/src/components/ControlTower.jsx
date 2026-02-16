@@ -349,6 +349,7 @@ function ControlTower() {
 
       // Create map markers with colors based on load destinations
       const markers = []
+      const markerCounts = { delivered: 0, onTime: 0, pastDue: 0 }
       
       categorized.delivered.forEach(load => {
         if (load.orders && load.orders.length > 0) {
@@ -361,6 +362,7 @@ function ControlTower() {
               load,
               status: 'delivered'
             })
+            markerCounts.delivered++
           })
         }
       })
@@ -376,6 +378,7 @@ function ControlTower() {
               load,
               status: 'onTime'
             })
+            markerCounts.onTime++
           })
         }
       })
@@ -391,11 +394,14 @@ function ControlTower() {
               load,
               status: 'pastDue'
             })
+            markerCounts.pastDue++
           })
         }
       })
 
       console.log('[CONTROL TOWER] Total markers created:', markers.length)
+      console.log('[CONTROL TOWER] Marker breakdown:', markerCounts)
+      setDeliveries({ ...categorized, markerCounts })
       setMapMarkers(markers)
 
     } catch (error) {
@@ -598,7 +604,7 @@ function ControlTower() {
                     border: '2px solid white',
                     boxShadow: '0 2px 4px rgba(0,0,0,0.2)'
                   }} />
-                  <span style={{ color: '#1a1a1a' }}>✓ Delivered ({deliveries.delivered.length})</span>
+                  <span style={{ color: '#1a1a1a' }}>✓ Delivered ({deliveries.markerCounts?.delivered || 0})</span>
                 </div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '12px' }}>
                   <div style={{
@@ -609,7 +615,7 @@ function ControlTower() {
                     border: '2px solid white',
                     boxShadow: '0 2px 4px rgba(0,0,0,0.2)'
                   }} />
-                  <span style={{ color: '#1a1a1a' }}>🚛 In Transit ({deliveries.onTime.length})</span>
+                  <span style={{ color: '#1a1a1a' }}>🚛 In Transit ({deliveries.markerCounts?.onTime || 0})</span>
                 </div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '12px' }}>
                   <div style={{
@@ -620,7 +626,7 @@ function ControlTower() {
                     border: '2px solid white',
                     boxShadow: '0 2px 4px rgba(0,0,0,0.2)'
                   }} />
-                  <span style={{ color: '#1a1a1a' }}>⚠️ Past Due ({deliveries.pastDue.length})</span>
+                  <span style={{ color: '#1a1a1a' }}>⚠️ Past Due ({deliveries.markerCounts?.pastDue || 0})</span>
                 </div>
               </div>
             </div>

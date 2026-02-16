@@ -57,6 +57,7 @@ export const tmsAPI = {
   getFacilityByCity: (city) => api.get(`/facilities/city/${city}`),
   getOrigins: () => api.get('/facilities/origins'),
   getDestinations: () => api.get('/facilities/destinations'),
+  seedFacilities: () => api.post('/facilities/seed'),
   
   // Map Visualization
   getLoadRoutesMapData: (loadPlan) => api.post('/map/load-routes', { load_plan: loadPlan }),

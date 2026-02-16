@@ -22,6 +22,16 @@
   letter-spacing: -0.5px;
 }
 
+.module-description {
+  margin: 8px 0 0 0;
+  color: var(--text-secondary);
+  font-size: 14px;
+  padding: 10px 15px;
+  background: #ebf8ff;
+  border-left: 3px solid #4299e1;
+  border-radius: 4px;
+}
+
 .button-group {
   display: flex;
   gap: var(--space-m);

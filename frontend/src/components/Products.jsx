@@ -65,10 +65,8 @@ function Products() {
         <div>
           <h2>Products Catalog</h2>
           <p>Manage product SKUs, dimensions, weights, and handling requirements</p>
+          <p className="info-note">💡 To seed product data, use the <strong>Synthetic Data Generator</strong> in the Innovation Hub</p>
         </div>
-        <button className="btn-primary" onClick={handleSeedProducts} disabled={loading}>
-          {products.length === 0 ? 'Seed Sample Products' : 'Refresh Products'}
-        </button>
       </div>
 
       <div className="products-stats">
@@ -89,7 +87,7 @@ function Products() {
       <div className="products-list">
         {products.length === 0 ? (
           <div className="empty-state">
-            <p>No products in catalog. Click "Seed Sample Products" to add sample data.</p>
+            <p>No products in catalog. Use the Synthetic Data Generator to seed product data.</p>
           </div>
         ) : (
           products.map(product => (

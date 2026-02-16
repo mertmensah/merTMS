@@ -13,6 +13,7 @@ import NetworkEngineering from './components/NetworkEngineering'
 import AIDocuscan from './components/AIDocuscan'
 import AutomationHub from './components/AutomationHub'
 import ProjectManagement from './components/ProjectManagement'
+import SyntheticDataGenerator from './components/SyntheticDataGenerator'
 import './App.css'
 
 function App() {
@@ -115,6 +116,12 @@ function App() {
           label: 'Network Design & Engineering', 
           icon: '🌐',
           description: 'Use AI to evaluate your current and optimal network layout based on your demand'
+        },
+        { 
+          id: 'synthetic-data', 
+          label: 'Synthetic Data Generator', 
+          icon: '🧪',
+          description: 'Generate realistic test data for development and demos'
         }
       ]
     },
@@ -232,6 +239,7 @@ function App() {
           {activeTab === 'products' && <Products />}
           {activeTab === 'mertsights-ai' && <MertsightsAI />}
           {activeTab === 'network-engineering' && <NetworkEngineering />}
+          {activeTab === 'synthetic-data' && <SyntheticDataGenerator />}
           {activeTab === 'ai-docuscan' && <AIDocuscan />}
           {activeTab === 'automation-hub' && <AutomationHub />}
           {activeTab === 'project-management' && <ProjectManagement />}

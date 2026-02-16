@@ -873,6 +873,41 @@ def get_destinations():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
+@app.route('/api/facilities/seed', methods=['POST'])
+def seed_facilities_endpoint():
+    """Seed facilities table with origin and destination coordinates"""
+    from database.supabase_client import SupabaseClient
+    try:
+        client = SupabaseClient()
+        
+        # Check if already seeded
+        existing = client.get_all_facilities()
+        if existing:
+            return jsonify({
+                "message": f"Facilities already seeded",
+                "count": len(existing),
+                "facilities": existing
+            }), 200
+        
+        # Import seed function
+        import sys
+        import os
+        sys.path.append(os.path.dirname(__file__))
+        from seed_facilities import seed_facilities
+        
+        # Run seed
+        result = seed_facilities()
+        
+        return jsonify({
+            "message": f"Successfully seeded {len(result)} facilities",
+            "count": len(result),
+            "facilities": result
+        }), 201
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
+        return jsonify({"error": str(e)}), 500
+
 # Loads API
 @app.route('/api/loads', methods=['GET'])
 def get_loads():

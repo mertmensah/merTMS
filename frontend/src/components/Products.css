@@ -20,6 +20,16 @@
   margin: 0;
 }
 
+.info-note {
+  margin: 8px 0 0 0;
+  color: var(--text-secondary);
+  font-size: 13px;
+  padding: 10px 15px;
+  background: #ebf8ff;
+  border-left: 3px solid #4299e1;
+  border-radius: 4px;
+}
+
 .products-stats {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));

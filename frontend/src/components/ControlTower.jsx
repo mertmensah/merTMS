@@ -4,8 +4,11 @@ import mapboxgl from 'mapbox-gl'
 import 'mapbox-gl/dist/mapbox-gl.css'
 import './ControlTower.css'
 
-// Mapbox access token - MUST be set before creating any maps
-const MAPBOX_TOKEN = 'pk.eyJ1IjoibWVydG1lbnNhaCIsImEiOiJjbHlhZThxeHQxMGozMmpxNmxucXV3OHBsIn0.qww7_SmWmLkXjVlM_JUQ0g'
+// Mapbox access token from environment variable
+const MAPBOX_TOKEN = import.meta.env.VITE_MAPBOX_TOKEN
+if (!MAPBOX_TOKEN) {
+  console.error('VITE_MAPBOX_TOKEN not set in environment variables')
+}
 mapboxgl.accessToken = MAPBOX_TOKEN
 
 // Marker colors by status
@@ -305,21 +308,6 @@ function ControlTower() {
     }
   }
 
-  const handleGenerateOrders = async () => {
-    try {
-      setGenerating(true)
-      const response = await tmsAPI.generateOrders(50)
-      console.log('Generate orders response:', response.data)
-      alert(`Successfully generated 50 new orders! Total orders: ${response.data.count || 50}`)
-      // No need to refresh Control Tower as it doesn't display orders directly
-    } catch (error) {
-      console.error('Error generating orders:', error)
-      alert(`Failed to generate orders: ${error.response?.data?.error || error.message}`)
-    } finally {
-      setGenerating(false)
-    }
-  }
-
   if (loading) {
     return <div className="control-tower"><p>Loading Control Tower...</p></div>
   }
@@ -339,14 +327,6 @@ function ControlTower() {
           })}</p>
         </div>
         <div style={{ display: 'flex', gap: '10px', alignSelf: 'flex-start', marginTop: '10px' }}>
-          <button 
-            className="btn-secondary" 
-            onClick={handleGenerateOrders}
-            disabled={generating || loading}
-            title="Generate 50 sample orders for testing"
-          >
-            {generating ? 'Generating...' : '📦 Simulate Orders'}
-          </button>
           <button 
             className="btn-secondary" 
             onClick={handleSimulateLoads}

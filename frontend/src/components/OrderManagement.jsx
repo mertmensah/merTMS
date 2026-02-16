@@ -5,7 +5,6 @@ import './OrderManagement.css'
 function OrderManagement() {
   const [orders, setOrders] = useState([])
   const [loading, setLoading] = useState(false)
-  const [generating, setGenerating] = useState(false)
   const [clearing, setClearing] = useState(false)
   const [currentPage, setCurrentPage] = useState(1)
   const [selectedRows, setSelectedRows] = useState(new Set())
@@ -27,21 +26,6 @@ function OrderManagement() {
       alert('Failed to fetch orders')
     } finally {
       setLoading(false)
-    }
-  }
-
-  const handleGenerate50Orders = async () => {
-    try {
-      setGenerating(true)
-      const response = await tmsAPI.generateOrders(50)
-      console.log('Generate orders response:', response.data)
-      alert(`Successfully generated 50 new orders! Total orders: ${response.data.count || 50}`)
-      await fetchOrders()
-    } catch (error) {
-      console.error('Error generating orders:', error)
-      alert(`Failed to generate orders: ${error.response?.data?.error || error.message}`)
-    } finally {
-      setGenerating(false)
     }
   }
 
@@ -214,22 +198,7 @@ function OrderManagement() {
     <div className="order-management">
       <div className="header-section">
         <h2>Order Management</h2>
-        <div className="button-group">
-          <button 
-            className="btn-primary" 
-            onClick={handleGenerate50Orders}
-            disabled={generating || clearing}
-          >
-            {generating ? 'Generating...' : '📦 Generate 50 Sample Orders'}
-          </button>
-          <button 
-            className="btn-danger" 
-            onClick={handleClearOrders}
-            disabled={generating || clearing}
-          >
-            {clearing ? 'Clearing...' : 'Clear All Orders'}
-          </button>
-        </div>
+        <p className="module-description">💡 To generate test data, use the <strong>Synthetic Data Generator</strong> in the Innovation Hub section</p>
       </div>
 
       <div className="orders-summary">

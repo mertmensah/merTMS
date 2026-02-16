@@ -62,6 +62,12 @@ function App() {
           label: 'Products', 
           icon: '📦',
           description: 'Product catalog and specifications'
+        },
+        { 
+          id: 'synthetic-data', 
+          label: 'Synthetic Data Generator', 
+          icon: '🧪',
+          description: 'Generate realistic test data for Supabase tables'
         }
       ]
     },
@@ -116,12 +122,6 @@ function App() {
           label: 'Network Design & Engineering', 
           icon: '🌐',
           description: 'Use AI to evaluate your current and optimal network layout based on your demand'
-        },
-        { 
-          id: 'synthetic-data', 
-          label: 'Synthetic Data Generator', 
-          icon: '🧪',
-          description: 'Generate realistic test data for development and demos'
         }
       ]
     },

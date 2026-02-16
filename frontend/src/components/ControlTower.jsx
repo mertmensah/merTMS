@@ -278,36 +278,6 @@ function ControlTower() {
     }
   }
 
-  const handleSimulateLoads = async () => {
-    if (!confirm('This will create 8 new test loads with today\'s delivery date. Continue?')) {
-      return
-    }
-    
-    setLoading(true)
-    try {
-      const response = await tmsAPI.simulateTodayLoads()
-      const result = response.data
-      alert(`✅ Successfully created ${result.loads_created} loads:\n\n` +
-            `- ${result.summary.delivered} Delivered\n` +
-            `- ${result.summary.on_time} On Time (In Transit)\n` +
-            `- ${result.summary.at_risk} At Risk (will be late)\n\n` +
-            `${result.orders_assigned} orders assigned for ${result.date}`)
-      fetchTodayDeliveries()
-    } catch (error) {
-      console.error('❌ FRONTEND ERROR - Error simulating loads:', error)
-      console.error('❌ Full error object:', JSON.stringify(error, null, 2))
-      console.error('❌ Response data:', error.response?.data)
-      console.error('❌ Response status:', error.response?.status)
-      console.error('❌ Response headers:', error.response?.headers)
-      
-      const debugCode = error.response?.data?.debug_code || 'FRONTEND-ERROR'
-      const errorMsg = error.response?.data?.error || error.message
-      alert(`❌ Failed to simulate loads\n\nDebug Code: ${debugCode}\nError: ${errorMsg}\nStatus: ${error.response?.status || 'N/A'}`)
-    } finally {
-      setLoading(false)
-    }
-  }
-
   if (loading) {
     return <div className="control-tower"><p>Loading Control Tower...</p></div>
   }
@@ -325,16 +295,6 @@ function ControlTower() {
             month: 'long', 
             day: 'numeric' 
           })}</p>
-        </div>
-        <div style={{ display: 'flex', gap: '10px', alignSelf: 'flex-start', marginTop: '10px' }}>
-          <button 
-            className="btn-secondary" 
-            onClick={handleSimulateLoads}
-            disabled={generating || loading}
-            title="Create test loads for today's delivery"
-          >
-            🎬 Simulate Loads
-          </button>
         </div>
       </div>
 

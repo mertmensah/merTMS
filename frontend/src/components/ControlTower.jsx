@@ -125,10 +125,16 @@ function ControlTower() {
 
   // Update markers when mapMarkers change
   useEffect(() => {
-    if (!map.current) return
+    if (!map.current) {
+      console.log('[MAP] Skipping marker update - map not initialized')
+      return
+    }
+    
+    console.log('[MAP] Updating markers, count:', mapMarkers.length)
 
     // Wait for map to load before adding markers
     const addMarkers = () => {
+      console.log('[MAP] Adding markers to map...')
       // Remove existing markers
       markersRef.current.forEach(marker => marker.remove())
       markersRef.current = []
@@ -231,11 +237,15 @@ function ControlTower() {
 
         markersRef.current.push(marker)
       })
+      
+      console.log(`[MAP] ✅ Successfully added ${markersRef.current.length} markers to map`)
     }
 
     if (map.current.isStyleLoaded()) {
+      console.log('[MAP] Map style loaded, adding markers immediately')
       addMarkers()
     } else {
+      console.log('[MAP] Waiting for map to load before adding markers')
       map.current.on('load', addMarkers)
     }
   }, [mapMarkers])
@@ -250,18 +260,32 @@ function ControlTower() {
       const response = await tmsAPI.getLoads()
       const loads = response.data?.data || response.data || []
       
+      console.log('[CONTROL TOWER] Total loads fetched:', loads.length)
+      
       // Get today's date
       const today = new Date().toISOString().split('T')[0]
+      const todayDate = new Date(today)
       
-      // Filter loads where customer expects delivery today
+      console.log('[CONTROL TOWER] Today\'s date:', today)
+      
+      // Filter loads - show loads expected within +/- 7 days to handle date mismatches
+      const sevenDaysBefore = new Date(todayDate)
+      sevenDaysBefore.setDate(todayDate.getDate() - 7)
+      const sevenDaysAfter = new Date(todayDate)
+      sevenDaysAfter.setDate(todayDate.getDate() + 7)
+      
       const todayLoads = []
       for (const load of loads) {
         if (load.orders && load.orders.length > 0) {
-          // Check if any order has customer_expected_delivery_date = today
+          // Check if any order has customer_expected_delivery_date within range
           const hasTodayExpectation = load.orders.some(order => {
             const expectedDate = order.customer_expected_delivery_date?.split('T')[0]
-            return expectedDate === today
+            if (!expectedDate) return false
+            
+            const orderDate = new Date(expectedDate)
+            return orderDate >= sevenDaysBefore && orderDate <= sevenDaysAfter
           })
+          
           if (hasTodayExpectation) {
             // Add risk assessment based on estimated_delivery_date
             const estimatedDate = load.estimated_delivery_date?.split('T')[0]
@@ -269,8 +293,21 @@ function ControlTower() {
             load.isLate = load.status !== 'Delivered' && (!estimatedDate || estimatedDate < today)
             todayLoads.push(load)
           }
+        } else if (load.estimated_delivery_date) {
+          // Fallback: If no orders, check load's estimated_delivery_date
+          const estimatedDate = load.estimated_delivery_date?.split('T')[0]
+          if (estimatedDate) {
+            const loadDate = new Date(estimatedDate)
+            if (loadDate >= sevenDaysBefore && loadDate <= sevenDaysAfter) {
+              load.isAtRisk = estimatedDate && estimatedDate > today
+              load.isLate = load.status !== 'Delivered' && (!estimatedDate || estimatedDate < today)
+              todayLoads.push(load)
+            }
+          }
         }
       }
+      
+      console.log('[CONTROL TOWER] Loads within date range:', todayLoads.length)
 
       // Categorize by delivery status and risk
       const categorized = {
@@ -286,6 +323,12 @@ function ControlTower() {
       }
       
       setDeliveries(categorized)
+      
+      console.log('[CONTROL TOWER] Categorized:', {
+        delivered: categorized.delivered.length,
+        onTime: categorized.onTime.length,
+        pastDue: categorized.pastDue.length
+      })
 
       // Create map markers with colors based on load destinations
       const markers = []
@@ -294,6 +337,7 @@ function ControlTower() {
         if (load.orders && load.orders.length > 0) {
           load.orders.forEach(order => {
             const coords = getDestinationCoordinates(order.destination)
+            console.log('[MARKER] Delivered:', load.load_number, '→', order.destination, coords)
             markers.push({
               ...coords,
               order,
@@ -308,6 +352,7 @@ function ControlTower() {
         if (load.orders && load.orders.length > 0) {
           load.orders.forEach(order => {
             const coords = getDestinationCoordinates(order.destination)
+            console.log('[MARKER] On Time:', load.load_number, '→', order.destination, coords)
             markers.push({
               ...coords,
               order,
@@ -322,6 +367,7 @@ function ControlTower() {
         if (load.orders && load.orders.length > 0) {
           load.orders.forEach(order => {
             const coords = getDestinationCoordinates(order.destination)
+            console.log('[MARKER] Past Due:', load.load_number, '→', order.destination, coords)
             markers.push({
               ...coords,
               order,
@@ -332,6 +378,7 @@ function ControlTower() {
         }
       })
 
+      console.log('[CONTROL TOWER] Total markers created:', markers.length)
       setMapMarkers(markers)
 
     } catch (error) {
@@ -351,19 +398,22 @@ function ControlTower() {
     <div className="control-tower">
       <div className="tower-header">
         <div>
-          <h2>🚛 Control Tower - Today's Loads</h2>
+          <h2>🚛 Control Tower - Active Loads</h2>
           <p className="tower-date">{new Date().toLocaleDateString('en-US', { 
             weekday: 'long', 
             year: 'numeric', 
             month: 'long', 
             day: 'numeric' 
           })}</p>
+          <p className="tower-subtitle" style={{ fontSize: '13px', color: '#666', marginTop: '4px' }}>
+            Showing loads within 7 days
+          </p>
         </div>
       </div>
 
       <div className="tower-summary">
         <div className="summary-card">
-          <h3>Total Loads Today</h3>
+          <h3>Total Active Loads</h3>
           <p className="summary-value">{totalToday}</p>
         </div>
         <div className="summary-card success">

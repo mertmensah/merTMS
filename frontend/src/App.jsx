@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { useAuth } from './contexts/AuthContext'
 import Dashboard from './components/Dashboard'
 import OrderManagement from './components/OrderManagement'
 import LoadPlanning from './components/LoadPlanning'
@@ -14,11 +15,14 @@ import AIDocuscan from './components/AIDocuscan'
 import AutomationHub from './components/AutomationHub'
 import ProjectManagement from './components/ProjectManagement'
 import SyntheticDataGenerator from './components/SyntheticDataGenerator'
+import UserProfile from './components/UserProfile'
 import './App.css'
 
 function App() {
+  const { user, profile, signOut } = useAuth()
   const [activeTab, setActiveTab] = useState('control-tower')
   const [sidebarExpanded, setSidebarExpanded] = useState(true)
+  const [showUserMenu, setShowUserMenu] = useState(false)
   const [expandedSections, setExpandedSections] = useState({ 
     database: true,
     innovation: true,
@@ -130,6 +134,12 @@ function App() {
       label: 'Settings', 
       icon: '🔧',
       description: 'System configuration and preferences'
+    },
+    { 
+      id: 'profile', 
+      label: 'My Profile', 
+      icon: '👤',
+      description: 'View and edit your user profile'
     }
   ]
 
@@ -228,6 +238,110 @@ function App() {
              navItems.find(item => item.children?.some(child => child.id === activeTab))?.children?.find(child => child.id === activeTab)?.label || 
              'merTMS'}
           </h1>
+          
+          {/* User Menu */}
+          <div className="user-menu-container" style={{ position: 'relative' }}>
+            <button 
+              className="user-menu-button"
+              onClick={() => setShowUserMenu(!showUserMenu)}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px',
+                padding: '8px 16px',
+                background: 'rgba(102, 126, 234, 0.1)',
+                border: '1px solid rgba(102, 126, 234, 0.2)',
+                borderRadius: '8px',
+                cursor: 'pointer',
+                transition: 'all 0.2s'
+              }}
+            >
+              <span style={{ fontSize: '20px' }}>👤</span>
+              <span style={{ fontWeight: '500', fontSize: '14px' }}>
+                {profile?.full_name || user?.email?.split('@')[0] || 'User'}
+              </span>
+              <span style={{ fontSize: '12px', opacity: 0.7 }}>▼</span>
+            </button>
+            
+            {showUserMenu && (
+              <div 
+                className="user-menu-dropdown"
+                style={{
+                  position: 'absolute',
+                  top: '100%',
+                  right: 0,
+                  marginTop: '8px',
+                  background: 'white',
+                  border: '1px solid #e0e0e0',
+                  borderRadius: '8px',
+                  boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+                  minWidth: '200px',
+                  zIndex: 1000
+                }}
+              >
+                <div style={{ padding: '12px 16px', borderBottom: '1px solid #f0f0f0' }}>
+                  <div style={{ fontWeight: '600', fontSize: '14px' }}>{profile?.full_name || 'User'}</div>
+                  <div style={{ fontSize: '12px', color: '#666', marginTop: '2px' }}>{user?.email}</div>
+                  {profile?.role && (
+                    <div style={{ 
+                      fontSize: '11px', 
+                      color: '#667eea', 
+                      marginTop: '4px',
+                      textTransform: 'capitalize',
+                      fontWeight: '500'
+                    }}>
+                      {profile.role}
+                    </div>
+                  )}
+                </div>
+                
+                <button
+                  onClick={() => {
+                    setActiveTab('profile')
+                    setShowUserMenu(false)
+                  }}
+                  style={{
+                    width: '100%',
+                    padding: '10px 16px',
+                    background: 'none',
+                    border: 'none',
+                    textAlign: 'left',
+                    cursor: 'pointer',
+                    fontSize: '14px',
+                    transition: 'background 0.2s'
+                  }}
+                  onMouseEnter={(e) => e.target.style.background = '#f5f5f5'}
+                  onMouseLeave={(e) => e.target.style.background = 'none'}
+                >
+                  👤 My Profile
+                </button>
+                
+                <button
+                  onClick={() => {
+                    signOut()
+                    setShowUserMenu(false)
+                  }}
+                  style={{
+                    width: '100%',
+                    padding: '10px 16px',
+                    background: 'none',
+                    border: 'none',
+                    borderTop: '1px solid #f0f0f0',
+                    textAlign: 'left',
+                    cursor: 'pointer',
+                    fontSize: '14px',
+                    color: '#f44336',
+                    fontWeight: '500',
+                    transition: 'background 0.2s'
+                  }}
+                  onMouseEnter={(e) => e.target.style.background = '#fff5f5'}
+                  onMouseLeave={(e) => e.target.style.background = 'none'}
+                >
+                  🚪 Sign Out
+                </button>
+              </div>
+            )}
+          </div>
         </header>
 
         <main className="app-content">
@@ -244,6 +358,7 @@ function App() {
           {activeTab === 'automation-hub' && <AutomationHub />}
           {activeTab === 'project-management' && <ProjectManagement />}
           {activeTab === 'settings' && <Settings />}
+          {activeTab === 'profile' && <UserProfile />}
         </main>
       </div>
       

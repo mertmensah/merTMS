@@ -306,6 +306,9 @@
   padding: var(--space-xl) var(--space-3xl);
   border-bottom: 1px solid var(--border-default);
   box-shadow: var(--shadow-xs);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
 .app-header h1 {

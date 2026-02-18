@@ -15,7 +15,7 @@ function AuthCallback() {
 
         if (error) {
           setMessage(`❌ ${errorDescription || error}`)
-          setTimeout(() => window.location.href = '/', 3000)
+          setTimeout(() => window.location.href = '/merTMS/', 3000)
           return
         }
 
@@ -28,15 +28,15 @@ function AuthCallback() {
 
         if (session) {
           setMessage('✅ Authentication successful! Redirecting...')
-          setTimeout(() => window.location.href = '/', 1000)
+          setTimeout(() => window.location.href = '/merTMS/', 1000)
         } else {
           setMessage('⚠️ No active session found. Redirecting...')
-          setTimeout(() => window.location.href = '/', 2000)
+          setTimeout(() => window.location.href = '/merTMS/', 2000)
         }
       } catch (error) {
         console.error('Auth callback error:', error)
         setMessage(`❌ Authentication failed: ${error.message}`)
-        setTimeout(() => window.location.href = '/', 3000)
+        setTimeout(() => window.location.href = '/merTMS/', 3000)
       }
     }
 

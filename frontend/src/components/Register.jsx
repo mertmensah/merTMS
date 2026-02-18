@@ -184,10 +184,6 @@ function Register() {
             {loading ? 'Creating Account...' : 'Create Account'}
           </button>
         </form>
-
-        <div className="auth-footer">
-          <p>Already have an account? <Link to="/auth/login">Sign In</Link></p>
-        </div>
       </div>
     </div>
   )

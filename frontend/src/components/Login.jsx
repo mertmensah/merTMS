@@ -125,10 +125,6 @@ function Login() {
             >
               {loading ? 'Signing in...' : 'Sign In'}
             </button>
-
-            <div className="auth-links">
-              <Link to="/auth/forgot-password">Forgot password?</Link>
-            </div>
           </form>
         )}
 
@@ -162,11 +158,6 @@ function Login() {
             </button>
           </form>
         )}
-
-        {/* Sign Up Link */}
-        <div className="auth-footer">
-          <p>Don't have an account? <Link to="/auth/register">Sign Up</Link></p>
-        </div>
       </div>
     </div>
   )

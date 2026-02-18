@@ -1,6 +1,5 @@
 import { useState } from 'react'
 import { useAuth } from '../contexts/AuthContext'
-import { Link, useNavigate } from 'react-router-dom'
 import './Auth.css'
 
 function Register() {
@@ -17,7 +16,6 @@ function Register() {
   const [loading, setLoading] = useState(false)
   
   const { signUp } = useAuth()
-  const navigate = useNavigate()
 
   const handleChange = (e) => {
     setFormData({
@@ -67,9 +65,6 @@ function Register() {
           companyName: '',
           phone: ''
         })
-        
-        // Redirect to login after 3 seconds
-        setTimeout(() => navigate('/auth/login'), 3000)
       }
     } catch (err) {
       setError(err.message || 'Registration failed')

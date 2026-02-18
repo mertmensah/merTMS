@@ -1,9 +1,9 @@
-import { Navigate, useLocation } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
 
+// Note: This component is not used in tab-based navigation
+// Kept for future React Router migration if needed
 function ProtectedRoute({ children, requireAdmin = false, requireDispatcher = false }) {
   const { user, profile, loading } = useAuth()
-  const location = useLocation()
 
   if (loading) {
     return (
@@ -22,8 +22,8 @@ function ProtectedRoute({ children, requireAdmin = false, requireDispatcher = fa
   }
 
   if (!user) {
-    // Redirect to login, but save the attempted location
-    return <Navigate to="/auth/login" state={{ from: location }} replace />
+    // In tab-based navigation, AppWrapper handles showing login
+    return null
   }
 
   // Check role-based access

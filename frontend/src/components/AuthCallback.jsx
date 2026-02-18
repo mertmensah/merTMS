@@ -1,10 +1,8 @@
 import { useEffect, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
 import { supabase } from '../supabase'
 
 function AuthCallback() {
   const [message, setMessage] = useState('Verifying...')
-  const navigate = useNavigate()
 
   useEffect(() => {
     // Handle the auth callback
@@ -17,7 +15,7 @@ function AuthCallback() {
 
         if (error) {
           setMessage(`❌ ${errorDescription || error}`)
-          setTimeout(() => navigate('/auth/login'), 3000)
+          setTimeout(() => window.location.href = '/', 3000)
           return
         }
 
@@ -30,20 +28,20 @@ function AuthCallback() {
 
         if (session) {
           setMessage('✅ Authentication successful! Redirecting...')
-          setTimeout(() => navigate('/'), 1000)
+          setTimeout(() => window.location.href = '/', 1000)
         } else {
-          setMessage('⚠️ No active session found. Redirecting to login...')
-          setTimeout(() => navigate('/auth/login'), 2000)
+          setMessage('⚠️ No active session found. Redirecting...')
+          setTimeout(() => window.location.href = '/', 2000)
         }
       } catch (error) {
         console.error('Auth callback error:', error)
         setMessage(`❌ Authentication failed: ${error.message}`)
-        setTimeout(() => navigate('/auth/login'), 3000)
+        setTimeout(() => window.location.href = '/', 3000)
       }
     }
 
     handleAuthCallback()
-  }, [navigate])
+  }, [])
 
   return (
     <div style={{

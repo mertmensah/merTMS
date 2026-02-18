@@ -1,6 +1,5 @@
 import { useState } from 'react'
 import { useAuth } from '../contexts/AuthContext'
-import { useNavigate, Link } from 'react-router-dom'
 import './Auth.css'
 
 function Login() {
@@ -12,7 +11,6 @@ function Login() {
   const [loading, setLoading] = useState(false)
   
   const { signIn, signInWithMagicLink } = useAuth()
-  const navigate = useNavigate()
 
   const handlePasswordLogin = async (e) => {
     e.preventDefault()
@@ -27,7 +25,7 @@ function Login() {
         setError(error)
       } else {
         setSuccess('✅ Login successful!')
-        setTimeout(() => navigate('/'), 500)
+        // AppWrapper will automatically show app when user is authenticated
       }
     } catch (err) {
       setError(err.message || 'Login failed')

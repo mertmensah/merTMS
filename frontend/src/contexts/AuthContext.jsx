@@ -100,7 +100,7 @@ export const AuthProvider = ({ children }) => {
         password,
         options: {
           data: metadata, // Store full_name, company_name, etc.
-          emailRedirectTo: `${window.location.origin}/auth/callback`
+          emailRedirectTo: `${window.location.origin}/merTMS/`
         }
       })
 
@@ -136,7 +136,7 @@ export const AuthProvider = ({ children }) => {
       const { data, error } = await supabase.auth.signInWithOtp({
         email,
         options: {
-          emailRedirectTo: `${window.location.origin}/auth/callback`
+          emailRedirectTo: `${window.location.origin}/merTMS/`
         }
       })
 
@@ -153,7 +153,7 @@ export const AuthProvider = ({ children }) => {
   const resetPassword = async (email) => {
     try {
       const { data, error } = await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: `${window.location.origin}/auth/reset-password`
+        redirectTo: `${window.location.origin}/merTMS/`
       })
 
       if (error) throw error

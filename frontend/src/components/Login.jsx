@@ -3,7 +3,7 @@ import { useAuth } from '../contexts/AuthContext'
 import './Auth.css'
 
 function Login() {
-  const [mode, setMode] = useState('password') // 'password' or 'magic-link'
+  const [mode, setMode] = useState('magic-link') // 'password' or 'magic-link'
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')

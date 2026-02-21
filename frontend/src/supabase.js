@@ -7,4 +7,15 @@ if (!supabaseUrl || !supabaseAnonKey) {
   console.error('⚠️ Missing Supabase credentials. Set VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY in your .env file')
 }
 
-export const supabase = createClient(supabaseUrl, supabaseAnonKey)
+// Create client with safe defaults if credentials are missing (prevents undefined errors)
+export const supabase = createClient(
+  supabaseUrl || 'https://placeholder.supabase.co', 
+  supabaseAnonKey || 'placeholder-key',
+  {
+    auth: {
+      persistSession: true,
+      autoRefreshToken: true,
+      detectSessionInUrl: true
+    }
+  }
+)

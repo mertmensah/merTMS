@@ -18,6 +18,12 @@ export const AuthProvider = ({ children }) => {
   const [error, setError] = useState(null)
 
   useEffect(() => {
+    // Safety timeout - if loading takes more than 10 seconds, force it to stop
+    const timeout = setTimeout(() => {
+      console.warn('Auth loading timeout - forcing loading to complete')
+      setLoading(false)
+    }, 10000)
+
     // Check active session on mount
     supabase.auth.getSession().then(({ data: { session }, error }) => {
       if (error) {
@@ -30,6 +36,9 @@ export const AuthProvider = ({ children }) => {
       } else {
         setLoading(false)
       }
+    }).catch(err => {
+      console.error('Failed to get session:', err)
+      setLoading(false)
     })
 
     // Listen for auth changes
@@ -41,12 +50,14 @@ export const AuthProvider = ({ children }) => {
         await fetchUserProfile(session.user.id)
       } else {
         setProfile(null)
+        setLoading(false)
       }
-      
-      setLoading(false)
     })
 
-    return () => subscription.unsubscribe()
+    return () => {
+      clearTimeout(timeout)
+      subscription.unsubscribe()
+    }
   }, [])
 
   const fetchUserProfile = async (userId) => {
@@ -59,13 +70,21 @@ export const AuthProvider = ({ children }) => {
 
       if (error) {
         console.error('Error fetching profile:', error)
+        
+        // If profile doesn't exist, create it
+        if (error.code === 'PGRST116') {
+          console.log('Profile not found, will be created by trigger on next auth event')
+        }
+        
         setError(error.message)
+        setProfile(null)
       } else {
         setProfile(data)
       }
     } catch (err) {
       console.error('Profile fetch failed:', err)
       setError(err.message)
+      setProfile(null)
     } finally {
       setLoading(false)
     }

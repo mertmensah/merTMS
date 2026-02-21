@@ -1,5 +1,6 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useAuth } from './contexts/AuthContext'
+import { ActivityTracker } from './hooks/useActivityTracker'
 import Dashboard from './components/Dashboard'
 import OrderManagement from './components/OrderManagement'
 import LoadPlanning from './components/LoadPlanning'
@@ -28,6 +29,14 @@ function App() {
     innovation: true,
     operational: true
   })
+
+  // Track page views when user switches tabs
+  useEffect(() => {
+    if (user && activeTab) {
+      const pageName = navItems.find(item => item.id === activeTab)?.label || activeTab
+      ActivityTracker.trackPageView(pageName)
+    }
+  }, [activeTab, user])
 
   const navItems = [
     { 

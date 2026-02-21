@@ -1,5 +1,6 @@
 import { createContext, useContext, useEffect, useState } from 'react'
 import { supabase } from '../supabase'
+import { ActivityTracker } from '../hooks/useActivityTracker'
 
 const AuthContext = createContext({})
 
@@ -48,6 +49,11 @@ export const AuthProvider = ({ children }) => {
       
       if (session?.user) {
         await fetchUserProfile(session.user.id)
+        
+        // Start activity tracking session on sign in
+        if (_event === 'SIGNED_IN') {
+          ActivityTracker.startSession()
+        }
       } else {
         setProfile(null)
         setLoading(false)
@@ -203,6 +209,9 @@ export const AuthProvider = ({ children }) => {
   // Sign out
   const signOut = async () => {
     try {
+      // End activity tracking session before signing out
+      await ActivityTracker.endSession()
+      
       const { error } = await supabase.auth.signOut()
       if (error) throw error
 

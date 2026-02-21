@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useAuth } from '../contexts/AuthContext'
+import { useSessionHeartbeat } from '../hooks/useActivityTracker'
 import App from '../App'
 import Login from './Login'
 import Register from './Register'
@@ -8,6 +9,9 @@ import AuthCallback from './AuthCallback'
 function AppWrapper() {
   const { user, loading } = useAuth()
   const [authView, setAuthView] = useState('login') // 'login', 'register', 'callback'
+
+  // Keep session active with periodic heartbeat
+  useSessionHeartbeat()
 
   // Show loading spinner while checking auth status
   if (loading) {

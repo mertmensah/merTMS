@@ -1812,17 +1812,12 @@ def operations_intelligence_dashboard():
         db = SupabaseClient()
         
         print("[OPERATIONS INTELLIGENCE] Fetching orders...")
-        orders_response = db.get_orders()
-        print(f"[OPERATIONS INTELLIGENCE] Orders response: {type(orders_response)}, keys: {orders_response.keys() if isinstance(orders_response, dict) else 'not a dict'}")
+        orders = db.get_all_orders()
+        print(f"[OPERATIONS INTELLIGENCE] Retrieved {len(orders)} orders")
         
         print("[OPERATIONS INTELLIGENCE] Fetching loads...")
-        loads_response = db.get_loads()
-        print(f"[OPERATIONS INTELLIGENCE] Loads response: {type(loads_response)}, keys: {loads_response.keys() if isinstance(loads_response, dict) else 'not a dict'}")
-        
-        orders = orders_response.get('data', []) if isinstance(orders_response, dict) else []
-        loads = loads_response.get('data', []) if isinstance(loads_response, dict) else []
-        
-        print(f"[OPERATIONS INTELLIGENCE] Extracted {len(orders)} orders, {len(loads)} loads")
+        loads = db.get_all_loads()
+        print(f"[OPERATIONS INTELLIGENCE] Retrieved {len(loads)} loads")
         
         # Calculate date range
         today = datetime.now().date()

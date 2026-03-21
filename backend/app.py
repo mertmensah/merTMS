@@ -1754,7 +1754,6 @@ Respond in this EXACT JSON format:
 # ==================== CREWAI MULTI-AGENT ENDPOINTS ====================
 
 @app.route('/api/support/query', methods=['POST'])
-@cross_origin()
 def customer_support_query():
     """
     Enhanced customer support using crewAI multi-agent system
@@ -1811,7 +1810,6 @@ def customer_support_query():
 
 
 @app.route('/api/intelligence/dashboard', methods=['GET'])
-@cross_origin()
 def operations_intelligence_dashboard():
     """
     Operations intelligence dashboard with KPIs and natural language insights

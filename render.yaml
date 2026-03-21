@@ -3,7 +3,7 @@ services:
     name: tms-backend
     runtime: python
     buildCommand: ./build.sh
-    startCommand: cd backend && gunicorn --bind 0.0.0.0:$PORT app:app
+    startCommand: cd backend && gunicorn --bind 0.0.0.0:$PORT --timeout 120 --workers 2 app:app
     healthCheckPath: /health
     envVars:
       - key: PYTHON_VERSION

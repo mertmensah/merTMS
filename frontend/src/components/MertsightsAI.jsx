@@ -18,6 +18,7 @@ const MertsightsAI = () => {
   const [isLoading, setIsLoading] = useState(false);
   const messagesEndRef = useRef(null);
   const [conversationHistory, setConversationHistory] = useState([]);
+  const [useCrewAI, setUseCrewAI] = useState(false);
 
   const COLORS = ['#176B91', '#46B1E1', '#FF8042', '#00C49F', '#FFBB28', '#8884D8'];
 
@@ -45,8 +46,9 @@ const MertsightsAI = () => {
     setMessages(prev => [...prev, newUserMessage]);
 
     try {
-      // Call mertsightsAI API
-      const response = await api.post('/mertsights/query', {
+      // Call either mertsightsAI or Customer Support Crew based on toggle
+      const endpoint = useCrewAI ? '/support/query' : '/mertsights/query';
+      const response = await api.post(endpoint, {
         question: userMessage,
         conversation_history: conversationHistory
       });
@@ -54,8 +56,17 @@ const MertsightsAI = () => {
       const result = response.data;
 
       if (result.success) {
+        // Handle crewAI response differently (it returns 'answer' instead of data)
+        if (useCrewAI) {
+          const crewMessage = {
+            type: 'assistant',
+            text: result.answer + `\n\n*Powered by ${result.agents_used} AI agents working together*`,
+            timestamp: new Date()
+          };
+          setMessages(prev => [...prev, crewMessage]);
+        }
         // Check if this is a conversational response (no data query needed)
-        if (result.conversational) {
+        else if (result.conversational) {
           const conversationalMessage = {
             type: 'assistant',
             text: result.response,
@@ -272,8 +283,49 @@ const MertsightsAI = () => {
   return (
     <div className="mertsights-container">
       <div className="mertsights-header">
-        <h1>📊 mertsightsAI</h1>
-        <p>Ask questions about your data in plain English</p>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
+          <div>
+            <h1 style={{ margin: 0 }}>📊 mertsightsAI</h1>
+            <p style={{ margin: '5px 0 0 0' }}>Ask questions about your data in plain English</p>
+          </div>
+          <div style={{ 
+            background: 'white', 
+            padding: '12px 20px', 
+            borderRadius: '8px',
+            boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '12px'
+          }}>
+            <label style={{ 
+              fontSize: '14px', 
+              fontWeight: '600',
+              color: '#176B91',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px',
+              cursor: 'pointer'
+            }}>
+              <input 
+                type="checkbox" 
+                checked={useCrewAI}
+                onChange={(e) => setUseCrewAI(e.target.checked)}
+                style={{ width: '18px', height: '18px', cursor: 'pointer' }}
+              />
+              🤖 Multi-Agent Mode
+            </label>
+            {useCrewAI && (
+              <span style={{ 
+                fontSize: '11px', 
+                background: '#667eea',
+                color: 'white',
+                padding: '4px 10px',
+                borderRadius: '12px',
+                fontWeight: '500'
+              }}>4 AI agents collaborating</span>
+            )}
+          </div>
+        </div>
       </div>
 
       <div className="messages-container">

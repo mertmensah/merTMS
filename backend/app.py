@@ -1359,14 +1359,25 @@ def mertsights_query():
         traceback.print_exc()
         
         # Provide more helpful error messages
-        if "GEMINI_API_KEY" in error_msg:
-            error_msg = "Gemini API key not configured. Please set GEMINI_API_KEY environment variable."
-        elif "API key" in error_msg or "authentication" in error_msg.lower():
-            error_msg = "Invalid Gemini API key. Please check your API key configuration."
+        error_msg_lower = error_msg.lower()
+        
+        # Check for Google API quota/credit errors
+        if any(phrase in error_msg_lower for phrase in ['quota exceeded', 'resource exhausted', 'rate limit', '429']):
+            detailed_error = f"🚫 Google Gemini API quota exceeded. {error_msg}"
+        elif any(phrase in error_msg_lower for phrase in ['invalid api key', 'api_key_invalid', 'unauthorized', '401', '403']):
+            detailed_error = f"🔑 Invalid or unauthorized Gemini API key. {error_msg}"
+        elif "GEMINI_API_KEY" in error_msg:
+            detailed_error = "Gemini API key not configured. Please set GEMINI_API_KEY environment variable."
+        elif "API key" in error_msg or "authentication" in error_msg_lower:
+            detailed_error = f"Invalid Gemini API key. {error_msg}"
+        else:
+            # Pass through the original error from API provider
+            detailed_error = error_msg
         
         return jsonify({
             "success": False,
-            "error": f"mertsightsAI error: {error_msg}"
+            "error": f"mertsightsAI error: {detailed_error}",
+            "technical_details": error_msg
         }), 500
 
 # LangChain Query Agent API
@@ -1448,16 +1459,24 @@ def agent_query():
         traceback.print_exc()
         
         # Provide specific, actionable error messages
-        if "GEMINI_API_KEY" in error_msg or "API key" in error_msg:
+        error_msg_lower = error_msg.lower()
+        
+        # Check for Google API quota/credit errors
+        if any(phrase in error_msg_lower for phrase in ['quota exceeded', 'resource exhausted', 'rate limit', '429']):
+            detailed_error = f"🚫 Google Gemini API quota exceeded. {error_msg}"
+        elif any(phrase in error_msg_lower for phrase in ['invalid api key', 'api_key_invalid', 'unauthorized', '401', '403']):
+            detailed_error = f"🔑 Invalid or unauthorized Gemini API key. {error_msg}"
+        elif "GEMINI_API_KEY" in error_msg or "API key" in error_msg:
             detailed_error = "GEMINI_API_KEY environment variable not configured. To fix: Go to Render dashboard → tms-backend → Environment → Add GEMINI_API_KEY with your Google API key."
-        elif "langchain" in error_msg.lower() or "ModuleNotFoundError" in error_msg:
+        elif "langchain" in error_msg_lower or "ModuleNotFoundError" in error_msg:
             detailed_error = "LangChain dependencies not installed. Required: langchain==0.1.20, langchain-google-genai==0.0.11, langchain-community==0.0.38"
         elif "SupabaseClient" in error_msg:
             detailed_error = "Database connection failed. Check SUPABASE_URL and SUPABASE_KEY environment variables."
-        elif "timeout" in error_msg.lower():
+        elif "timeout" in error_msg_lower:
             detailed_error = "Request timed out. The agent query took too long to execute."
         else:
-            detailed_error = f"Agent execution failed: {error_msg}"
+            # Pass through the original error message from API provider
+            detailed_error = error_msg
         
         return jsonify({
             "success": False,

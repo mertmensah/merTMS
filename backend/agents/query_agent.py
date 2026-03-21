@@ -136,10 +136,20 @@ class TMSQueryAgent:
             }
             
         except Exception as e:
+            error_msg = str(e)
+            
+            # Check for specific Google API errors and preserve the message
+            if any(phrase in error_msg.lower() for phrase in ['quota exceeded', 'resource exhausted', 'rate limit', '429']):
+                user_friendly_error = f"Google Gemini API quota exceeded: {error_msg}"
+            elif any(phrase in error_msg.lower() for phrase in ['invalid api key', 'api_key_invalid', 'unauthorized']):
+                user_friendly_error = f"Invalid Gemini API key: {error_msg}"
+            else:
+                user_friendly_error = error_msg
+            
             return {
                 "success": False,
-                "error": str(e),
-                "answer": f"I encountered an error: {str(e)}",
+                "error": user_friendly_error,
+                "answer": f"I encountered an error: {user_friendly_error}",
                 "question": question
             }
 

@@ -3,11 +3,21 @@
 
 set -o errexit
 
-echo "Installing Python dependencies..."
-pip install --upgrade pip
+echo "Checking Python version..."
+# Try python3.11 first, fallback to python3
+if command -v python3.11 &> /dev/null; then
+    PYTHON_CMD=python3.11
+elif command -v python3 &> /dev/null; then
+    PYTHON_CMD=python3
+else
+    PYTHON_CMD=python
+fi
 
-# Install with only binary packages (no source builds that require Rust/compilers)
-pip install --only-binary=:all: -r backend/requirements.txt || \
-  pip install -r backend/requirements.txt --prefer-binary
+echo "Using Python: $PYTHON_CMD"
+$PYTHON_CMD --version
+
+echo "Installing Python dependencies..."
+$PYTHON_CMD -m pip install --upgrade pip
+$PYTHON_CMD -m pip install -r backend/requirements.txt --prefer-binary
 
 echo "Build completed successfully!"

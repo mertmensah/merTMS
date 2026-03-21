@@ -16,14 +16,8 @@ export const supabase = createClient(
       persistSession: true,
       autoRefreshToken: true,
       detectSessionInUrl: true,
-      flowType: 'pkce',
       storage: window.localStorage,
-      storageKey: 'sb-auth-token',
-      // Prevent lock timeouts by increasing timeout and retries
-      lock: {
-        acquireTimeout: 30000, // 30 seconds instead of 10
-        retryInterval: 100
-      }
+      storageKey: 'sb-auth-token'
     }
   }
 )

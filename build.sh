@@ -5,6 +5,9 @@ set -o errexit
 
 echo "Installing Python dependencies..."
 pip install --upgrade pip
-pip install -r backend/requirements.txt
+
+# Install with only binary packages (no source builds that require Rust/compilers)
+pip install --only-binary=:all: -r backend/requirements.txt || \
+  pip install -r backend/requirements.txt --prefer-binary
 
 echo "Build completed successfully!"

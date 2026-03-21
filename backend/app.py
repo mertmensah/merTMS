@@ -1751,6 +1751,116 @@ Respond in this EXACT JSON format:
             'details': str(e)
         }), 500
 
+# ==================== CREWAI MULTI-AGENT ENDPOINTS ====================
+
+@app.route('/api/support/query', methods=['POST'])
+@cross_origin()
+def customer_support_query():
+    """
+    Enhanced customer support using crewAI multi-agent system
+    POST body: {"question": "Where is my order #12345?"}
+    Returns AI-generated response from 4-agent collaboration
+    """
+    try:
+        data = request.json
+        question = data.get('question', '').strip()
+        
+        if not question:
+            return jsonify({
+                "success": False,
+                "error": "Question is required"
+            }), 400
+        
+        print(f"[CUSTOMER SUPPORT CREW] Processing query: {question}")
+        
+        # Import and get crew instance
+        try:
+            from agents.customer_support_crew import get_customer_support_crew
+            crew = get_customer_support_crew()
+        except ImportError as import_err:
+            return jsonify({
+                "success": False,
+                "error": "Customer support crew not available. Install crewAI: pip install crewai==0.28.8",
+                "details": str(import_err)
+            }), 500
+        except Exception as init_err:
+            return jsonify({
+                "success": False,
+                "error": f"Failed to initialize customer support crew: {str(init_err)}",
+                "details": str(init_err)
+            }), 500
+        
+        # Handle the query with multi-agent system
+        result = crew.handle_customer_query(question)
+        
+        if result.get('success'):
+            return jsonify(result), 200
+        else:
+            return jsonify(result), 500
+            
+    except Exception as e:
+        print(f"[CUSTOMER SUPPORT CREW] Error: {str(e)}")
+        import traceback
+        traceback.print_exc()
+        
+        return jsonify({
+            "success": False,
+            "error": "Customer support query failed",
+            "details": str(e)
+        }), 500
+
+
+@app.route('/api/intelligence/dashboard', methods=['GET'])
+@cross_origin()
+def operations_intelligence_dashboard():
+    """
+    Operations intelligence dashboard with KPIs and natural language insights
+    GET params: ?time_period=today|week|month
+    Returns KPIs, trends, and AI-generated operational insights
+    """
+    try:
+        time_period = request.args.get('time_period', 'today')
+        
+        print(f"[OPERATIONS INTELLIGENCE CREW] Generating dashboard for '{time_period}'")
+        
+        # Import and get crew instance
+        try:
+            from agents.operations_intelligence_crew import get_operations_intelligence_crew
+            crew = get_operations_intelligence_crew()
+        except ImportError as import_err:
+            return jsonify({
+                "success": False,
+                "error": "Operations intelligence crew not available. Install crewAI: pip install crewai==0.28.8",
+                "details": str(import_err)
+            }), 500
+        except Exception as init_err:
+            return jsonify({
+                "success": False,
+                "error": f"Failed to initialize operations intelligence crew: {str(init_err)}",
+                "details": str(init_err)
+            }), 500
+        
+        # Generate operations report with multi-agent system
+        result = crew.generate_operations_report(time_period)
+        
+        if result.get('success'):
+            return jsonify(result), 200
+        else:
+            return jsonify(result), 500
+            
+    except Exception as e:
+        print(f"[OPERATIONS INTELLIGENCE CREW] Error: {str(e)}")
+        import traceback
+        traceback.print_exc()
+        
+        return jsonify({
+            "success": False,
+            "error": "Operations intelligence generation failed",
+            "details": str(e)
+        }), 500
+
+# ==================== END CREWAI ENDPOINTS ====================
+
 if __name__ == '__main__':
     print(f"[merTM.S] Backend starting on port {PORT}...")
     print(f"[API] Available at: http://localhost:{PORT}")

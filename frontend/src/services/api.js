@@ -73,6 +73,13 @@ export const tmsAPI = {
     conversation_history: conversationHistory
   }),
   
+  // crewAI - Multi-Agent Systems
+  getOperationsIntelligence: (timePeriod = 'today') => api.get(`/intelligence/dashboard?time_period=${timePeriod}`),
+  queryCustomerSupport: (question, conversationHistory = []) => api.post('/support/query', {
+    question,
+    conversation_history: conversationHistory
+  }),
+  
   // Network Engineering
   analyzeFacilityLocation: (k) => api.post('/network/facility-location', { k }),
   

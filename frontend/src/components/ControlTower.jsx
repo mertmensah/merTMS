@@ -277,7 +277,7 @@ function ControlTower() {
   const fetchAIInsights = async () => {
     try {
       setLoadingInsights(true)
-      const response = await tmsAPI.get('/intelligence/dashboard?time_period=today')
+      const response = await tmsAPI.getOperationsIntelligence('today')
       if (response.data.success) {
         setAiInsights(response.data)
         console.log('[CONTROL TOWER] AI Insights loaded:', response.data)

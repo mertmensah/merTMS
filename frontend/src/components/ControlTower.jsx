@@ -460,79 +460,273 @@ function ControlTower() {
         </div>
       </div>
 
-      {/* AI-Powered Insights Section - ALWAYS VISIBLE */}
-      <div style={{ 
-        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-        padding: '24px',
-        borderRadius: '12px',
-        marginBottom: '32px',
-        color: 'white',
-        boxShadow: '0 8px 16px rgba(0,0,0,0.2)'
-      }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
-          <h3 style={{ margin: 0, fontSize: '20px', display: 'flex', alignItems: 'center', gap: '10px' }}>
-            🤖 AI Operations Intelligence
-            <span style={{ 
-              fontSize: '11px', 
-              background: 'rgba(255,255,255,0.2)', 
-              padding: '4px 8px', 
-              borderRadius: '12px',
-              fontWeight: 'normal'
-            }}>Powered by crewAI</span>
-          </h3>
+      {/* AI Operations Intelligence Dashboard */}
+      <div style={{ marginBottom: '32px' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
+          <div>
+            <h2 style={{ margin: 0, fontSize: '24px', color: '#1a1a1a', display: 'flex', alignItems: 'center', gap: '12px' }}>
+              🤖 AI Operations Intelligence
+              <span style={{ 
+                fontSize: '11px', 
+                background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                color: 'white',
+                padding: '4px 10px', 
+                borderRadius: '12px',
+                fontWeight: '500'
+              }}>4 AI Agents</span>
+            </h2>
+            <p style={{ margin: '4px 0 0 0', fontSize: '13px', color: '#666' }}>
+              Multi-agent analysis powered by LangChain + Google Gemini
+            </p>
+          </div>
           <button 
             onClick={fetchAIInsights}
             disabled={loadingInsights}
             style={{
-              background: 'rgba(255,255,255,0.2)',
-              border: '1px solid rgba(255,255,255,0.4)',
+              background: loadingInsights ? '#e0e0e0' : 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+              border: 'none',
               color: 'white',
-              padding: '8px 16px',
-              borderRadius: '6px',
+              padding: '10px 20px',
+              borderRadius: '8px',
               cursor: loadingInsights ? 'wait' : 'pointer',
-              fontSize: '13px',
-              fontWeight: '500'
+              fontSize: '14px',
+              fontWeight: '600',
+              boxShadow: '0 4px 12px rgba(102, 126, 234, 0.3)',
+              transition: 'all 0.3s ease'
             }}
           >
-            {loadingInsights ? '🔄 Analyzing...' : '🔄 Refresh Insights'}
+            {loadingInsights ? '🔄 Analyzing...' : '🔄 Refresh Intelligence'}
           </button>
         </div>
-        <div style={{ 
-          background: 'rgba(255,255,255,0.1)',
-          padding: '16px',
-          borderRadius: '8px',
-          fontSize: '14px',
-          lineHeight: '1.6',
-          whiteSpace: 'pre-wrap'
-        }}>
-          {loadingInsights ? (
-            <div style={{ textAlign: 'center', padding: '20px' }}>
-              <div>🔄 4 AI agents are analyzing your operations...</div>
-              <div style={{ fontSize: '12px', marginTop: '8px', opacity: 0.8 }}>
-                This may take 30-60 seconds
-              </div>
+
+        {loadingInsights ? (
+          <div style={{ 
+            background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+            padding: '48px',
+            borderRadius: '12px',
+            textAlign: 'center',
+            color: 'white'
+          }}>
+            <div style={{ fontSize: '48px', marginBottom: '16px' }}>🤖</div>
+            <div style={{ fontSize: '18px', fontWeight: '600', marginBottom: '8px' }}>4 AI Agents Analyzing Operations</div>
+            <div style={{ fontSize: '14px', opacity: 0.9 }}>
+              Data Analyst · Performance Monitor · Forecaster · Report Generator
             </div>
-          ) : aiInsights && aiInsights.report ? (
-            <>
-              {aiInsights.report}
+            <div style={{ fontSize: '12px', marginTop: '16px', opacity: 0.7 }}>
+              This typically takes 30-60 seconds
+            </div>
+          </div>
+        ) : aiInsights && aiInsights.kpis ? (
+          <>
+            {/* KPI Cards Grid */}
+            <div style={{ 
+              display: 'grid', 
+              gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', 
+              gap: '16px',
+              marginBottom: '20px'
+            }}>
               <div style={{ 
-                marginTop: '12px', 
-                fontSize: '11px', 
-                opacity: 0.8,
-                fontStyle: 'italic'
+                background: 'white', 
+                padding: '20px', 
+                borderRadius: '12px', 
+                boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+                border: '2px solid #e8f0fe'
               }}>
-                Generated by {aiInsights.agents_used} AI agents at {new Date(aiInsights.generated_at).toLocaleTimeString()}
+                <div style={{ fontSize: '12px', color: '#666', fontWeight: '600', marginBottom: '8px' }}>TOTAL LOADS</div>
+                <div style={{ fontSize: '32px', fontWeight: '700', color: '#1a1a1a' }}>{aiInsights.kpis.total_loads}</div>
+                <div style={{ fontSize: '11px', color: '#666', marginTop: '4px' }}>Active in system</div>
               </div>
-            </>
-          ) : (
-            <div style={{ textAlign: 'center', padding: '20px', opacity: 0.8 }}>
-              <div>⚠️ AI insights unavailable</div>
-              <div style={{ fontSize: '12px', marginTop: '8px' }}>
-                Click "Refresh Insights" to generate an operations report
+
+              <div style={{ 
+                background: aiInsights.kpis.delivery_rate >= 80 ? '#e8f5e9' : aiInsights.kpis.delivery_rate >= 60 ? '#fff3e0' : '#ffebee',
+                padding: '20px', 
+                borderRadius: '12px', 
+                boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+                border: `2px solid ${aiInsights.kpis.delivery_rate >= 80 ? '#4caf50' : aiInsights.kpis.delivery_rate >= 60 ? '#ff9800' : '#f44336'}`
+              }}>
+                <div style={{ fontSize: '12px', color: '#666', fontWeight: '600', marginBottom: '8px' }}>DELIVERY RATE</div>
+                <div style={{ fontSize: '32px', fontWeight: '700', color: aiInsights.kpis.delivery_rate >= 80 ? '#2e7d32' : aiInsights.kpis.delivery_rate >= 60 ? '#e65100' : '#c62828' }}>
+                  {aiInsights.kpis.delivery_rate}%
+                </div>
+                <div style={{ fontSize: '11px', color: '#666', marginTop: '4px' }}>
+                  {aiInsights.kpis.delivery_rate >= 80 ? '✓ Excellent' : aiInsights.kpis.delivery_rate >= 60 ? '⚠ Needs Attention' : '⚠️ Critical'}
+                </div>
+              </div>
+
+              <div style={{ 
+                background: 'white', 
+                padding: '20px', 
+                borderRadius: '12px', 
+                boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+                border: '2px solid #e8f0fe'
+              }}>
+                <div style={{ fontSize: '12px', color: '#666', fontWeight: '600', marginBottom: '8px' }}>DELIVERED</div>
+                <div style={{ fontSize: '32px', fontWeight: '700', color: '#4caf50' }}>{aiInsights.kpis.delivered}</div>
+                <div style={{ fontSize: '11px', color: '#666', marginTop: '4px' }}>Completed successfully</div>
+              </div>
+
+              <div style={{ 
+                background: aiInsights.kpis.pending > 2 ? '#ffebee' : 'white',
+                padding: '20px', 
+                borderRadius: '12px', 
+                boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+                border: `2px solid ${aiInsights.kpis.pending > 2 ? '#f44336' : '#e8f0fe'}`
+              }}>
+                <div style={{ fontSize: '12px', color: '#666', fontWeight: '600', marginBottom: '8px' }}>
+                  {aiInsights.kpis.pending > 2 ? '⚠️ PENDING' : 'PENDING'}
+                </div>
+                <div style={{ fontSize: '32px', fontWeight: '700', color: aiInsights.kpis.pending > 2 ? '#c62828' : '#666' }}>
+                  {aiInsights.kpis.pending}
+                </div>
+                <div style={{ fontSize: '11px', color: '#666', marginTop: '4px' }}>
+                  {aiInsights.kpis.pending > 2 ? 'Requires attention' : 'Under control'}
+                </div>
+              </div>
+
+              <div style={{ 
+                background: 'white', 
+                padding: '20px', 
+                borderRadius: '12px', 
+                boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+                border: '2px solid #e8f0fe'
+              }}>
+                <div style={{ fontSize: '12px', color: '#666', fontWeight: '600', marginBottom: '8px' }}>IN TRANSIT</div>
+                <div style={{ fontSize: '32px', fontWeight: '700', color: '#2196f3' }}>{aiInsights.kpis.in_transit}</div>
+                <div style={{ fontSize: '11px', color: '#666', marginTop: '4px' }}>Currently moving</div>
+              </div>
+
+              <div style={{ 
+                background: 'white', 
+                padding: '20px', 
+                borderRadius: '12px', 
+                boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+                border: '2px solid #e8f0fe'
+              }}>
+                <div style={{ fontSize: '12px', color: '#666', fontWeight: '600', marginBottom: '8px' }}>TOTAL ORDERS</div>
+                <div style={{ fontSize: '32px', fontWeight: '700', color: '#1a1a1a' }}>{aiInsights.kpis.total_orders}</div>
+                <div style={{ fontSize: '11px', color: '#666', marginTop: '4px' }}>In pipeline</div>
               </div>
             </div>
-          )}
-        </div>
+
+            {/* Agent Insights Cards */}
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(340px, 1fr))', gap: '16px', marginBottom: '20px' }}>
+              {/* Data Analyst Card */}
+              <div style={{ 
+                background: 'white', 
+                padding: '20px', 
+                borderRadius: '12px', 
+                boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+                borderTop: '4px solid #2196f3'
+              }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '12px' }}>
+                  <div style={{ fontSize: '24px' }}>📊</div>
+                  <div>
+                    <div style={{ fontSize: '16px', fontWeight: '700', color: '#1a1a1a' }}>Data Analyst</div>
+                    <div style={{ fontSize: '11px', color: '#666' }}>Operational Metrics</div>
+                  </div>
+                </div>
+                <div style={{ fontSize: '13px', lineHeight: '1.6', color: '#444' }}>
+                  {aiInsights.breakdown?.data_analysis || 'Analyzing operational data...'}
+                </div>
+              </div>
+
+              {/* Performance Monitor Card */}
+              <div style={{ 
+                background: 'white', 
+                padding: '20px', 
+                borderRadius: '12px', 
+                boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+                borderTop: `4px solid ${aiInsights.kpis.delivery_rate >= 80 ? '#4caf50' : '#ff9800'}`
+              }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '12px' }}>
+                  <div style={{ fontSize: '24px' }}>📈</div>
+                  <div>
+                    <div style={{ fontSize: '16px', fontWeight: '700', color: '#1a1a1a' }}>Performance Monitor</div>
+                    <div style={{ fontSize: '11px', color: '#666' }}>Efficiency Analysis</div>
+                  </div>
+                </div>
+                <div style={{ fontSize: '13px', lineHeight: '1.6', color: '#444' }}>
+                  {aiInsights.breakdown?.performance_analysis || 'Evaluating performance trends...'}
+                </div>
+              </div>
+
+              {/* Forecaster Card */}
+              <div style={{ 
+                background: 'white', 
+                padding: '20px', 
+                borderRadius: '12px', 
+                boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+                borderTop: '4px solid #9c27b0'
+              }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '12px' }}>
+                  <div style={{ fontSize: '24px' }}>🔮</div>
+                  <div>
+                    <div style={{ fontSize: '16px', fontWeight: '700', color: '#1a1a1a' }}>Forecaster</div>
+                    <div style={{ fontSize: '11px', color: '#666' }}>Predictive Intelligence</div>
+                  </div>
+                </div>
+                <div style={{ fontSize: '13px', lineHeight: '1.6', color: '#444' }}>
+                  {aiInsights.breakdown?.forecast || 'Generating forecasts...'}
+                </div>
+              </div>
+            </div>
+
+            {/* Detailed Technical Report - Collapsible */}
+            {aiInsights.breakdown?.technical_formulas && (
+              <details style={{ 
+                background: '#f5f5f5', 
+                padding: '16px', 
+                borderRadius: '8px',
+                marginBottom: '12px',
+                cursor: 'pointer'
+              }}>
+                <summary style={{ 
+                  fontWeight: '600', 
+                  fontSize: '14px', 
+                  color: '#1a1a1a',
+                  marginBottom: '12px'
+                }}>
+                  🔧 Technical Details & Calculation Methods
+                </summary>
+                <pre style={{ 
+                  fontSize: '12px', 
+                  lineHeight: '1.6', 
+                  color: '#444',
+                  fontFamily: 'Monaco, Consolas, monospace',
+                  margin: 0,
+                  whiteSpace: 'pre-wrap'
+                }}>
+                  {aiInsights.breakdown.technical_formulas}
+                </pre>
+              </details>
+            )}
+
+            {/* Timestamp */}
+            <div style={{ 
+              fontSize: '11px', 
+              color: '#999',
+              textAlign: 'center',
+              fontStyle: 'italic'
+            }}>
+              Analysis generated at {new Date(aiInsights.generated_at).toLocaleTimeString()} by {aiInsights.agents_used?.join(' · ')}
+            </div>
+          </>
+        ) : (
+          <div style={{ 
+            background: '#f5f5f5',
+            padding: '48px',
+            borderRadius: '12px',
+            textAlign: 'center'
+          }}>
+            <div style={{ fontSize: '48px', marginBottom: '16px', opacity: 0.3 }}>🤖</div>
+            <div style={{ fontSize: '16px', fontWeight: '600', color: '#666', marginBottom: '8px' }}>
+              No AI insights available
+            </div>
+            <div style={{ fontSize: '13px', color: '#999' }}>
+              Click "Refresh Intelligence" to generate a comprehensive operations analysis
+            </div>
+          </div>
+        )}
       </div>
 
       <div className="tower-summary">

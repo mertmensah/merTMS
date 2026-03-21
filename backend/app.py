@@ -1339,8 +1339,17 @@ def mertsights_query():
         print(f"[MERTSIGHTS] Received question: {question}")
         
         # Initialize RAG agent
-        client = SupabaseClient()
-        mertsights = MertsightsAI(client)
+        try:
+            client = SupabaseClient()
+            mertsights = MertsightsAI(client)
+        except Exception as init_error:
+            print(f"[MERTSIGHTS] Initialization error: {str(init_error)}")
+            import traceback
+            traceback.print_exc()
+            return jsonify({
+                "success": False,
+                "error": f"Failed to initialize mertsightsAI: {str(init_error)}"
+            }), 500
         
         # Analyze query and generate response
         result = mertsights.analyze_query(question, conversation_history)

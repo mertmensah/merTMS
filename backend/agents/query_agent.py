@@ -129,10 +129,22 @@ class TMSQueryAgent:
         try:
             result = self.agent_executor.invoke({"input": question})
             
+            # Convert intermediate_steps to JSON-serializable format
+            steps = []
+            for step in result.get("intermediate_steps", []):
+                # Each step is a tuple: (AgentAction, observation)
+                if len(step) >= 2:
+                    action, observation = step[0], step[1]
+                    steps.append({
+                        "tool": action.tool if hasattr(action, 'tool') else str(action),
+                        "tool_input": action.tool_input if hasattr(action, 'tool_input') else "",
+                        "observation": str(observation)[:500]  # Limit observation length
+                    })
+            
             return {
                 "success": True,
                 "answer": result.get("output", "No answer generated"),
-                "steps": result.get("intermediate_steps", []),
+                "steps": steps,
                 "question": question
             }
             

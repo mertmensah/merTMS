@@ -59,8 +59,12 @@ class MertsightsAI:
         genai.configure(api_key=GEMINI_API_KEY)
         self.model = genai.GenerativeModel(GEMINI_MODEL)
         
-        # Initialize model with function calling capabilities
-        self.function_model = self._init_function_calling_model()
+        # Initialize model with function calling capabilities (optional - won't crash if fails)
+        try:
+            self.function_model = self._init_function_calling_model()
+        except Exception as e:
+            print(f"[MERTSIGHTS] Function calling initialization failed: {e}")
+            self.function_model = None
         
         # Database schema for context
         self.schema = self._get_schema_context()

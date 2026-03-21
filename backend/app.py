@@ -1368,6 +1368,63 @@ def mertsights_query():
             "error": f"mertsightsAI error: {error_msg}"
         }), 500
 
+# LangChain Query Agent API
+@app.route('/api/agent/query', methods=['POST'])
+def agent_query():
+    """
+    LangChain-powered intelligent agent that can answer complex questions
+    about shipments, facilities, and operations by autonomously using tools.
+    
+    Example queries:
+    - "Show me all delayed shipments"
+    - "What's the on-time delivery rate?"
+    - "Find orders going to California"
+    - "Check capacity for Chicago facility"
+    - "Calculate route from Dallas to Atlanta"
+    """
+    try:
+        data = request.json
+        question = data.get('question', '').strip()
+        
+        if not question:
+            return jsonify({
+                "success": False,
+                "error": "Question is required"
+            }), 400
+        
+        print(f"[QUERY AGENT] Received question: {question}")
+        
+        # Get agent instance
+        from agents.query_agent import get_agent
+        agent = get_agent()
+        
+        # Process query
+        result = agent.query(question)
+        
+        if result.get("success"):
+            print(f"[QUERY AGENT] Success - returned answer")
+        else:
+            print(f"[QUERY AGENT] Failed - {result.get('error')}")
+        
+        return jsonify(result), 200 if result.get("success") else 500
+        
+    except Exception as e:
+        error_msg = str(e)
+        print(f"[QUERY AGENT] ERROR: {error_msg}")
+        import traceback
+        traceback.print_exc()
+        
+        # Provide helpful error messages
+        if "GEMINI_API_KEY" in error_msg:
+            error_msg = "Gemini API key not configured. Please set GEMINI_API_KEY environment variable."
+        elif "langchain" in error_msg.lower():
+            error_msg = "LangChain not properly installed. Please run: pip install langchain langchain-google-genai"
+        
+        return jsonify({
+            "success": False,
+            "error": error_msg
+        }), 500
+
 # AI Docuscan - Document OCR and Classification
 @app.route('/api/docuscan/analyze', methods=['POST'])
 def analyze_document():

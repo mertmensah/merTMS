@@ -11,6 +11,7 @@ import Products from './components/Products'
 import Settings from './components/Settings'
 import AIAssistant from './components/AIAssistant'
 import MertsightsAI from './components/MertsightsAI'
+import AIAgent from './components/AIAgent'
 import NetworkEngineering from './components/NetworkEngineering'
 import AIDocuscan from './components/AIDocuscan'
 import AutomationHub from './components/AutomationHub'
@@ -129,6 +130,12 @@ function App() {
           label: 'mertsightsAI', 
           icon: '📊',
           description: 'AI-powered analytics and insights'
+        },
+        { 
+          id: 'ai-agent', 
+          label: 'AI Query Agent', 
+          icon: '🤖',
+          description: 'LangChain agent for intelligent queries'
         },
         { 
           id: 'network-engineering', 
@@ -361,6 +368,7 @@ function App() {
           {activeTab === 'facilities' && <Facilities />}
           {activeTab === 'products' && <Products />}
           {activeTab === 'mertsights-ai' && <MertsightsAI />}
+          {activeTab === 'ai-agent' && <AIAgent />}
           {activeTab === 'network-engineering' && <NetworkEngineering />}
           {activeTab === 'synthetic-data' && <SyntheticDataGenerator />}
           {activeTab === 'ai-docuscan' && <AIDocuscan />}

@@ -6,7 +6,6 @@ Provides tools for the agent to query database, analyze metrics, and optimize op
 from database.supabase_client import SupabaseClient
 import json
 from datetime import datetime, timedelta
-import numpy as np
 
 
 def search_orders_tool(query: str) -> str:
@@ -149,7 +148,7 @@ def calculate_metrics_tool(metric_type: str) -> str:
         if 'weight' in metric_lower or 'avg' in metric_lower:
             weights = [float(o.get('weight_lbs', 0)) for o in orders if o.get('weight_lbs')]
             if weights:
-                results['avg_weight_lbs'] = round(np.mean(weights), 2)
+                results['avg_weight_lbs'] = round(sum(weights) / len(weights), 2)
                 results['total_weight_lbs'] = round(sum(weights), 2)
                 results['max_weight_lbs'] = round(max(weights), 2)
                 results['min_weight_lbs'] = round(min(weights), 2)
@@ -168,7 +167,7 @@ def calculate_metrics_tool(metric_type: str) -> str:
         if 'revenue' in metric_lower or 'cost' in metric_lower or 'rate' in metric_lower:
             rates = [float(o.get('rate_per_mile', 0)) for o in orders if o.get('rate_per_mile')]
             if rates:
-                results['avg_rate_per_mile'] = f"${round(np.mean(rates), 2)}"
+                results['avg_rate_per_mile'] = f"${round(sum(rates) / len(rates), 2)}"
                 results['total_revenue'] = f"${round(sum(rates), 2)}"
         
         # Order status distribution

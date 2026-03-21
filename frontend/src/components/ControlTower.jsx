@@ -271,7 +271,24 @@ function ControlTower() {
 
   useEffect(() => {
     fetchTodayDeliveries()
+    fetchAIInsights()
   }, [])
+
+  const fetchAIInsights = async () => {
+    try {
+      setLoadingInsights(true)
+      const response = await tmsAPI.get('/intelligence/dashboard?time_period=today')
+      if (response.data.success) {
+        setAiInsights(response.data)
+        console.log('[CONTROL TOWER] AI Insights loaded:', response.data)
+      }
+    } catch (error) {
+      console.error('[CONTROL TOWER] Failed to fetch AI insights:', error)
+      // Don't show error to user, just log it - this is optional enhancement
+    } finally {
+      setLoadingInsights(false)
+    }
+  }
 
   const fetchTodayDeliveries = async () => {
     setLoading(true)

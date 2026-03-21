@@ -1796,50 +1796,20 @@ def customer_support_query():
 @app.route('/api/intelligence/dashboard', methods=['GET'])
 def operations_intelligence_dashboard():
     """
-    Operations intelligence dashboard with KPIs and natural language insights
+    Operations intelligence dashboard with  KPIs and natural language insights
     GET params: ?time_period=today|week|month
     Returns KPIs, trends, and AI-generated operational insights
     """
-    try:
-        time_period = request.args.get('time_period', 'today')
-        
-        print(f"[OPERATIONS INTELLIGENCE] Generating dashboard for '{time_period}'")
-        
-        # Temporary: Return mock data directly (lightweight agent has issues on Render)
-        # TODO: Debug and re-enable lightweight multi-agent simulation
-        print(f"[OPERATIONS INTELLIGENCE] → Using mock data fallback")
-        return jsonify({
-            "success": True,
-            "report": "🤖 Multi-Agent Operations Analysis\n\nOur 4-agent AI system (Data Analyst, Performance Monitor, Forecaster, Report Generator) is analyzing your operations 24/7.\n\nKey Findings:\n• Operations running smoothly with strong delivery rates\n• Load distribution balanced across facilities\n• Performance metrics trending positive\n• No critical issues detected at this time\n\nForecast: Continued stable operations expected. System optimizations underway.\n\nRecommendation: Current operations strategy is performing well. Monitor for any changes in delivery patterns.",
-            "kpis": {
-                "total_loads": 8,
-                "total_orders": 176,
-                "delivery_rate": 87.5,
-                "delivered": 7,
-                "in_transit": 1,
-                "pending": 0
-            },
-            "breakdown": {
-                "data_analysis": "8 loads analyzed for today with 87.5% delivery completion rate",
-                "performance_analysis": "Strong performance across all metrics - on-time delivery exceeding targets",
-                "forecast": "Stable operations forecast for next 24-48 hours based on current patterns"
-            },
-            "agents_used": ["Data Analyst", "Performance Monitor", "Forecaster", "Report Generator"],
-            "generated_at": datetime.now().isoformat(),
-            "framework": "mock_data_demonstration",
-            "note": "Multi-agent AI demonstration mode - showing simulated insights"
-        }), 200
-            
-    except Exception as e:
-        print(f"[OPERATIONS INTELLIGENCE CREW] Error: {str(e)}")
-        import traceback
-        traceback.print_exc()
-        
-        return jsonify({
-            "success": False,
-            "error": "Operations intelligence generation failed",
-            "details": str(e)
-        }), 500
+    time_period = request.args.get('time_period', 'today')
+    print(f"[OPERATIONS INTELLIGENCE] Endpoint hit with time_period='{time_period}'")
+    
+    # Return simple mock data
+    return jsonify({
+        "success": True,
+        "report": "Multi-agent AI insights coming soon!",
+        "kpis": {"total_loads": 8},
+        "generated_at": "2026-03-21T12:00:00"
+    }), 200
 
 # ==================== END CREWAI ENDPOINTS ====================
 

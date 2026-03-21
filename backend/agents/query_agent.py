@@ -8,6 +8,7 @@ from langchain.agents import AgentExecutor, create_react_agent
 from langchain.tools import Tool
 from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain.prompts import PromptTemplate
+from config.settings import GEMINI_MODEL
 from agents.query_agent_tools import (
     search_orders_tool,
     get_facility_info_tool,
@@ -58,9 +59,9 @@ class TMSQueryAgent:
         if not api_key:
             raise ValueError("GEMINI_API_KEY environment variable not set")
         
-        # Initialize LLM
+        # Initialize LLM with current Gemini model
         self.llm = ChatGoogleGenerativeAI(
-            model="gemini-pro",
+            model=GEMINI_MODEL,  # Use model from settings (gemini-2.5-flash)
             google_api_key=api_key,
             temperature=0,  # More deterministic for factual queries
             convert_system_message_to_human=True  # Gemini-specific setting

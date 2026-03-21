@@ -1,9 +1,11 @@
 """
-mertsightsAI - RAG-powered conversational analytics for TMS data
+mertsightsAI - RAG-powered conversational analytics for TMS data with autonomous tool calling
 Converts natural language questions into SQL queries and returns insights as tables/charts
+Enhanced with Gemini function calling for autonomous tool selection and execution
 """
 
 import google.generativeai as genai
+from google.generativeai.types import FunctionDeclaration, Tool
 from config.settings import GEMINI_API_KEY, GEMINI_MODEL
 import json
 import re
@@ -17,6 +19,15 @@ import io
 import base64
 import numpy as np
 
+# Import autonomous tools for function calling
+from agents.query_agent_tools import (
+    search_orders_tool,
+    get_facility_info_tool,
+    calculate_metrics_tool,
+    check_capacity_tool,
+    optimize_route_tool
+)
+
 class MertsightsAI:
     def __init__(self, db_client):
         """Initialize with database client and Gemini API"""
@@ -29,8 +40,108 @@ class MertsightsAI:
         genai.configure(api_key=GEMINI_API_KEY)
         self.model = genai.GenerativeModel(GEMINI_MODEL)
         
+        # Initialize model with function calling capabilities
+        self.function_model = self._init_function_calling_model()
+        
         # Database schema for context
         self.schema = self._get_schema_context()
+    
+    def _init_function_calling_model(self):
+        """Initialize Gemini model with function calling tools"""
+        # Define function declarations for autonomous tool selection
+        search_orders_func = FunctionDeclaration(
+            name="search_orders",
+            description="Search shipment orders by customer, destination, status, or keywords. Use this when user asks about specific orders, delayed shipments, or order status.",
+            parameters={
+                "type": "object",
+                "properties": {
+                    "query": {
+                        "type": "string",
+                        "description": "Natural language search query (e.g., 'delayed shipments', 'Amazon orders', 'orders to California')"
+                    }
+                },
+                "required": ["query"]
+            }
+        )
+        
+        get_facility_func = FunctionDeclaration(
+            name="get_facility_info",
+            description="Get detailed information about warehouses, distribution centers, and facilities. Use when user asks about specific facilities or locations.",
+            parameters={
+                "type": "object",
+                "properties": {
+                    "facility_name": {
+                        "type": "string",
+                        "description": "Name of facility or city (e.g., 'Chicago DC', 'Dallas warehouse')"
+                    }
+                },
+                "required": ["facility_name"]
+            }
+        )
+        
+        calculate_metrics_func = FunctionDeclaration(
+            name="calculate_metrics",
+            description="Calculate performance metrics and KPIs like on-time delivery rate, average weight, top customers, revenue. Use for high-level performance questions.",
+            parameters={
+                "type": "object",
+                "properties": {
+                    "metric_type": {
+                        "type": "string",
+                        "description": "Type of metric: 'on-time delivery', 'avg weight', 'top customers', 'revenue', 'status distribution'"
+                    }
+                },
+                "required": ["metric_type"]
+            }
+        )
+        
+        check_capacity_func = FunctionDeclaration(
+            name="check_capacity",
+            description="Check facility capacity and current utilization. Use when user asks about warehouse capacity or incoming volume.",
+            parameters={
+                "type": "object",
+                "properties": {
+                    "location": {
+                        "type": "string",
+                        "description": "Facility name or city to check capacity"
+                    }
+                },
+                "required": ["location"]
+            }
+        )
+        
+        optimize_route_func = FunctionDeclaration(
+            name="optimize_route",
+            description="Calculate distance, cost, and transit time between two locations. Use when user asks about routing, shipping cost, or distance between points.",
+            parameters={
+                "type": "object",
+                "properties": {
+                    "origin": {
+                        "type": "string",
+                        "description": "Starting location or facility"
+                    },
+                    "destination": {
+                        "type": "string",
+                        "description": "Ending location or facility"
+                    }
+                },
+                "required": ["origin", "destination"]
+            }
+        )
+        
+        # Create tool with all functions
+        tool = Tool(function_declarations=[
+            search_orders_func,
+            get_facility_func,
+            calculate_metrics_func,
+            check_capacity_func,
+            optimize_route_func
+        ])
+        
+        # Return model configured with tools
+        return genai.GenerativeModel(
+            model_name=GEMINI_MODEL,
+            tools=[tool]
+        )
     
     def _get_schema_context(self):
         """Provide database schema to LLM for accurate SQL generation"""
@@ -216,9 +327,110 @@ Just ask me a question in plain English! For example:
         return "I'm here to help you analyze your transportation data. What would you like to know?"
 
     
+    def _try_function_calling(self, user_question):
+        """
+        Try to answer question using autonomous tool selection with Gemini function calling.
+        Returns: {
+            "success": bool,
+            "used_function": bool,
+            "function_name": str (if used),
+            "function_result": dict,
+            "answer": str,
+            "error": str (optional)
+        }
+        """
+        try:
+            # Use function-enabled model to analyze the question
+            prompt = f"""You are mertsightsAI, an intelligent TMS analytics assistant with autonomous tool capabilities.
+
+USER QUESTION: {user_question}
+
+Analyze the question and determine if you can answer it using one of your available functions:
+- search_orders: Find specific orders by customer, status, destination
+- get_facility_info: Get details about warehouses and facilities
+- calculate_metrics: Calculate KPIs like on-time delivery rate, top customers, revenue
+- check_capacity: Check facility utilization and incoming volume
+- optimize_route: Calculate distance, cost, and transit time between locations
+
+If you can use a function to answer this question, call it with appropriate parameters.
+If the question requires complex SQL queries or aggregations beyond function capabilities, respond with "USE_SQL" to fall back to SQL generation."""
+            
+            # Start chat with function calling
+            chat = self.function_model.start_chat()
+            response = chat.send_message(prompt)
+            
+            # Check if model wants to call a function
+            if response.candidates[0].content.parts[0].function_call:
+                function_call = response.candidates[0].content.parts[0].function_call
+                function_name = function_call.name
+                function_args = dict(function_call.args)
+                
+                print(f"[MERTSIGHTS AGENT] Tool selected: {function_name} with args: {function_args}")
+                
+                # Execute the appropriate tool
+                result_json = None
+                if function_name == "search_orders":
+                    result_json = search_orders_tool(function_args.get('query', ''))
+                elif function_name == "get_facility_info":
+                    result_json = get_facility_info_tool(function_args.get('facility_name', ''))
+                elif function_name == "calculate_metrics":
+                    result_json = calculate_metrics_tool(function_args.get('metric_type', ''))
+                elif function_name == "check_capacity":
+                    result_json = check_capacity_tool(function_args.get('location', ''))
+                elif function_name == "optimize_route":
+                    result_json = optimize_route_tool(
+                        function_args.get('origin', ''),
+                        function_args.get('destination', '')
+                    )
+                
+                if result_json:
+                    # Parse the result
+                    result_data = json.loads(result_json)
+                    
+                    # Send function result back to model for natural language response
+                    response = chat.send_message(
+                        genai.protos.Content(
+                            parts=[genai.protos.Part(
+                                function_response=genai.protos.FunctionResponse(
+                                    name=function_name,
+                                    response={'result': result_data}
+                                )
+                            )]
+                        )
+                    )
+                    
+                    # Get the natural language answer
+                    answer = response.text
+                    
+                    return {
+                        "success": True,
+                        "used_function": True,
+                        "function_name": function_name,
+                        "function_result": result_data,
+                        "answer": answer,
+                        "tool_reasoning": f"Used {function_name} to answer autonomous query"
+                    }
+            
+            # Model chose not to use a function (or said USE_SQL)
+            return {
+                "success": False,
+                "used_function": False,
+                "message": "Question requires SQL generation"
+            }
+            
+        except Exception as e:
+            print(f"[MERTSIGHTS AGENT ERROR] Function calling failed: {str(e)}")
+            return {
+                "success": False,
+                "used_function": False,
+                "error": str(e),
+                "message": "Function calling failed, falling back to SQL"
+            }
+    
     def analyze_query(self, user_question, conversation_history=None):
         """
         Main entry point: analyze question, generate SQL, execute, format response
+        Enhanced with autonomous tool calling - tries function calling first, falls back to SQL if needed
         Returns: {
             "success": bool,
             "sql": str,
@@ -242,6 +454,23 @@ Just ask me a question in plain English! For example:
                     "response": intent['response'],
                     "intent_reasoning": intent['reasoning']
                 }
+            
+            # Step 0.5: Try autonomous function calling first (simpler queries)
+            function_result = self._try_function_calling(user_question)
+            if function_result.get('used_function'):
+                print(f"[MERTSIGHTS AGENT] Answered using function: {function_result.get('function_name')}")
+                return {
+                    "success": True,
+                    "used_agent_tool": True,
+                    "tool_name": function_result.get('function_name'),
+                    "tool_data": function_result.get('function_result'),
+                    "answer": function_result.get('answer'),
+                    "visualization": {"type": "text"},
+                    "insight": function_result.get('answer')
+                }
+            
+            # If function calling didn't work, fall back to SQL generation
+            print(f"[MERTSIGHTS] Falling back to SQL generation")
             
             # Step 1: Generate SQL from natural language
             sql_result = self._generate_sql(user_question, conversation_history)

@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import './AIAgent.css'
 
-const API_URL = import.meta.env.VITE_API_URL || 'https://mertms-nwh7.onrender.com'
+const API_URL = import.meta.env.VITE_API_URL || 'https://mertms-nwh7.onrender.com/api'
 
 function AIAgent() {
   const [question, setQuestion] = useState('')
@@ -29,7 +29,7 @@ function AIAgent() {
     setResult(null)
 
     try {
-      const response = await fetch(`${API_URL}/api/agent/query`, {
+      const response = await fetch(`${API_URL}/agent/query`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

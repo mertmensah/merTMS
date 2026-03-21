@@ -729,25 +729,6 @@ function ControlTower() {
         )}
       </div>
 
-      <div className="tower-summary">
-        <div className="summary-card">
-          <h3>Total Active Loads</h3>
-          <p className="summary-value">{totalToday}</p>
-        </div>
-        <div className="summary-card success">
-          <h3>Delivered</h3>
-          <p className="summary-value">{deliveries.delivered.length}</p>
-        </div>
-        <div className="summary-card warning">
-          <h3>On Time / In Transit</h3>
-          <p className="summary-value">{deliveries.onTime.length}</p>
-        </div>
-        <div className="summary-card danger">
-          <h3>Past Due</h3>
-          <p className="summary-value">{deliveries.pastDue.length}</p>
-        </div>
-      </div>
-
       <div className="tower-buckets">
         <div className="bucket delivered-bucket">
           <h3>✓ Delivered ({deliveries.delivered.length})</h3>

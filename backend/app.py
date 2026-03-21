@@ -1770,27 +1770,11 @@ def customer_support_query():
                 "error": "Question is required"
             }), 400
         
-        print(f"[CUSTOMER SUPPORT CREW] Processing query: {question}")
+        print(f"[CUSTOMER SUPPORT] Processing query: {question}")
         
-        # Import and get crew instance
-        try:
-            from agents.customer_support_crew import get_customer_support_crew
-            crew = get_customer_support_crew()
-        except ImportError as import_err:
-            return jsonify({
-                "success": False,
-                "error": "Customer support crew not available. Install crewAI: pip install crewai==0.28.8",
-                "details": str(import_err)
-            }), 500
-        except Exception as init_err:
-            return jsonify({
-                "success": False,
-                "error": f"Failed to initialize customer support crew: {str(init_err)}",
-                "details": str(init_err)
-            }), 500
-        
-        # Handle the query with multi-agent system
-        result = crew.handle_customer_query(question)
+        # Use lightweight multi-agent simulation (crewAI too heavy for Render free tier)
+        from agents.customer_support_lightweight import handle_customer_query
+        result = handle_customer_query(question)
         
         if result.get('success'):
             return jsonify(result), 200
@@ -1819,27 +1803,11 @@ def operations_intelligence_dashboard():
     try:
         time_period = request.args.get('time_period', 'today')
         
-        print(f"[OPERATIONS INTELLIGENCE CREW] Generating dashboard for '{time_period}'")
+        print(f"[OPERATIONS INTELLIGENCE] Generating dashboard for '{time_period}'")
         
-        # Import and get crew instance
-        try:
-            from agents.operations_intelligence_crew import get_operations_intelligence_crew
-            crew = get_operations_intelligence_crew()
-        except ImportError as import_err:
-            return jsonify({
-                "success": False,
-                "error": "Operations intelligence crew not available. Install crewAI: pip install crewai==0.28.8",
-                "details": str(import_err)
-            }), 500
-        except Exception as init_err:
-            return jsonify({
-                "success": False,
-                "error": f"Failed to initialize operations intelligence crew: {str(init_err)}",
-                "details": str(init_err)
-            }), 500
-        
-        # Generate operations report with multi-agent system
-        result = crew.generate_operations_report(time_period)
+        # Use lightweight multi-agent simulation (crewAI too heavy for Render free tier)
+        from agents.operations_intelligence_lightweight import get_operations_intelligence
+        result = get_operations_intelligence(time_period)
         
         if result.get('success'):
             return jsonify(result), 200

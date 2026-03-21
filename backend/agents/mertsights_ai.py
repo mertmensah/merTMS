@@ -5,7 +5,6 @@ Enhanced with Gemini function calling for autonomous tool selection and executio
 """
 
 import google.generativeai as genai
-from google.generativeai.types import FunctionDeclaration, Tool
 from config.settings import GEMINI_API_KEY, GEMINI_MODEL
 import json
 import re
@@ -19,14 +18,34 @@ import io
 import base64
 import numpy as np
 
-# Import autonomous tools for function calling
-from agents.query_agent_tools import (
-    search_orders_tool,
-    get_facility_info_tool,
-    calculate_metrics_tool,
-    check_capacity_tool,
-    optimize_route_tool
-)
+# Try to import function calling types - if it fails, function calling won't work but app won't crash
+try:
+    from google.generativeai.types import FunctionDeclaration, Tool
+    FUNCTION_CALLING_AVAILABLE = True
+except ImportError as e:
+    print(f"[MERTSIGHTS] Warning: Function calling types not available: {e}")
+    FunctionDeclaration = None
+    Tool = None
+    FUNCTION_CALLING_AVAILABLE = False
+
+# Import autonomous tools for function calling - defensive import
+try:
+    from agents.query_agent_tools import (
+        search_orders_tool,
+        get_facility_info_tool,
+        calculate_metrics_tool,
+        check_capacity_tool,
+        optimize_route_tool
+    )
+    TOOLS_AVAILABLE = True
+except ImportError as e:
+    print(f"[MERTSIGHTS] Warning: Query agent tools not available: {e}")
+    search_orders_tool = None
+    get_facility_info_tool = None
+    calculate_metrics_tool = None
+    check_capacity_tool = None
+    optimize_route_tool = None
+    TOOLS_AVAILABLE = False
 
 class MertsightsAI:
     def __init__(self, db_client):
@@ -48,100 +67,109 @@ class MertsightsAI:
     
     def _init_function_calling_model(self):
         """Initialize Gemini model with function calling tools"""
-        # Define function declarations for autonomous tool selection
-        search_orders_func = FunctionDeclaration(
-            name="search_orders",
-            description="Search shipment orders by customer, destination, status, or keywords. Use this when user asks about specific orders, delayed shipments, or order status.",
-            parameters={
-                "type": "object",
-                "properties": {
-                    "query": {
-                        "type": "string",
-                        "description": "Natural language search query (e.g., 'delayed shipments', 'Amazon orders', 'orders to California')"
-                    }
-                },
-                "required": ["query"]
-            }
-        )
+        # Check if function calling is available
+        if not FUNCTION_CALLING_AVAILABLE or not TOOLS_AVAILABLE:
+            print("[MERTSIGHTS] Function calling not available - using standard model only")
+            return None
         
-        get_facility_func = FunctionDeclaration(
-            name="get_facility_info",
-            description="Get detailed information about warehouses, distribution centers, and facilities. Use when user asks about specific facilities or locations.",
-            parameters={
-                "type": "object",
-                "properties": {
-                    "facility_name": {
-                        "type": "string",
-                        "description": "Name of facility or city (e.g., 'Chicago DC', 'Dallas warehouse')"
-                    }
-                },
-                "required": ["facility_name"]
-            }
-        )
-        
-        calculate_metrics_func = FunctionDeclaration(
-            name="calculate_metrics",
-            description="Calculate performance metrics and KPIs like on-time delivery rate, average weight, top customers, revenue. Use for high-level performance questions.",
-            parameters={
-                "type": "object",
-                "properties": {
-                    "metric_type": {
-                        "type": "string",
-                        "description": "Type of metric: 'on-time delivery', 'avg weight', 'top customers', 'revenue', 'status distribution'"
-                    }
-                },
-                "required": ["metric_type"]
-            }
-        )
-        
-        check_capacity_func = FunctionDeclaration(
-            name="check_capacity",
-            description="Check facility capacity and current utilization. Use when user asks about warehouse capacity or incoming volume.",
-            parameters={
-                "type": "object",
-                "properties": {
-                    "location": {
-                        "type": "string",
-                        "description": "Facility name or city to check capacity"
-                    }
-                },
-                "required": ["location"]
-            }
-        )
-        
-        optimize_route_func = FunctionDeclaration(
-            name="optimize_route",
-            description="Calculate distance, cost, and transit time between two locations. Use when user asks about routing, shipping cost, or distance between points.",
-            parameters={
-                "type": "object",
-                "properties": {
-                    "origin": {
-                        "type": "string",
-                        "description": "Starting location or facility"
+        try:
+            # Define function declarations for autonomous tool selection
+            search_orders_func = FunctionDeclaration(
+                name="search_orders",
+                description="Search shipment orders by customer, destination, status, or keywords. Use this when user asks about specific orders, delayed shipments, or order status.",
+                parameters={
+                    "type": "object",
+                    "properties": {
+                        "query": {
+                            "type": "string",
+                            "description": "Natural language search query (e.g., 'delayed shipments', 'Amazon orders', 'orders to California')"
+                        }
                     },
-                    "destination": {
-                        "type": "string",
-                        "description": "Ending location or facility"
-                    }
-                },
-                "required": ["origin", "destination"]
-            }
-        )
-        
-        # Create tool with all functions
-        tool = Tool(function_declarations=[
-            search_orders_func,
-            get_facility_func,
-            calculate_metrics_func,
-            check_capacity_func,
-            optimize_route_func
-        ])
-        
-        # Return model configured with tools
-        return genai.GenerativeModel(
-            model_name=GEMINI_MODEL,
-            tools=[tool]
-        )
+                    "required": ["query"]
+                }
+            )
+            
+            get_facility_func = FunctionDeclaration(
+                name="get_facility_info",
+                description="Get detailed information about warehouses, distribution centers, and facilities. Use when user asks about specific facilities or locations.",
+                parameters={
+                    "type": "object",
+                    "properties": {
+                        "facility_name": {
+                            "type": "string",
+                            "description": "Name of facility or city (e.g., 'Chicago DC', 'Dallas warehouse')"
+                        }
+                    },
+                    "required": ["facility_name"]
+                }
+            )
+            
+            calculate_metrics_func = FunctionDeclaration(
+                name="calculate_metrics",
+                description="Calculate performance metrics and KPIs like on-time delivery rate, average weight, top customers, revenue. Use for high-level performance questions.",
+                parameters={
+                    "type": "object",
+                    "properties": {
+                        "metric_type": {
+                            "type": "string",
+                            "description": "Type of metric: 'on-time delivery', 'avg weight', 'top customers', 'revenue', 'status distribution'"
+                        }
+                    },
+                    "required": ["metric_type"]
+                }
+            )
+            
+            check_capacity_func = FunctionDeclaration(
+                name="check_capacity",
+                description="Check facility capacity and current utilization. Use when user asks about warehouse capacity or incoming volume.",
+                parameters={
+                    "type": "object",
+                    "properties": {
+                        "location": {
+                            "type": "string",
+                            "description": "Facility name or city to check capacity"
+                        }
+                    },
+                    "required": ["location"]
+                }
+            )
+            
+            optimize_route_func = FunctionDeclaration(
+                name="optimize_route",
+                description="Calculate distance, cost, and transit time between two locations. Use when user asks about routing, shipping cost, or distance between points.",
+                parameters={
+                    "type": "object",
+                    "properties": {
+                        "origin": {
+                            "type": "string",
+                            "description": "Starting location or facility"
+                        },
+                        "destination": {
+                            "type": "string",
+                            "description": "Ending location or facility"
+                        }
+                    },
+                    "required": ["origin", "destination"]
+                }
+            )
+            
+            # Create tool with all functions
+            tool = Tool(function_declarations=[
+                search_orders_func,
+                get_facility_func,
+                calculate_metrics_func,
+                check_capacity_func,
+                optimize_route_func
+            ])
+            
+            # Return model configured with tools
+            return genai.GenerativeModel(
+                model_name=GEMINI_MODEL,
+                tools=[tool]
+            )
+        except Exception as e:
+            print(f"[MERTSIGHTS] Error initializing function calling: {e}")
+            return None
     
     def _get_schema_context(self):
         """Provide database schema to LLM for accurate SQL generation"""
@@ -339,6 +367,14 @@ Just ask me a question in plain English! For example:
             "error": str (optional)
         }
         """
+        # Check if function calling is available
+        if not self.function_model:
+            return {
+                "success": False,
+                "used_function": False,
+                "message": "Function calling not available - using SQL generation"
+            }
+        
         try:
             # Use function-enabled model to analyze the question
             prompt = f"""You are mertsightsAI, an intelligent TMS analytics assistant with autonomous tool capabilities.

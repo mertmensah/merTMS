@@ -1395,9 +1395,41 @@ def agent_query():
         
         print(f"[QUERY AGENT] Received question: {question}")
         
-        # Get agent instance
-        from agents.query_agent import get_agent
-        agent = get_agent()
+        # Try to import and get agent instance - fail fast with clear errors
+        try:
+            from agents.query_agent import get_agent
+        except ImportError as import_err:
+            error_detail = str(import_err)
+            if 'langchain' in error_detail.lower():
+                return jsonify({
+                    "success": False,
+                    "error": "LangChain not installed. Run: pip install langchain==0.1.20 langchain-google-genai==0.0.11",
+                    "details": error_detail
+                }), 500
+            else:
+                return jsonify({
+                    "success": False,
+                    "error": f"Failed to import query agent: {error_detail}",
+                    "details": error_detail
+                }), 500
+        except Exception as import_err:
+            return jsonify({
+                "success": False,
+                "error": f"Query agent import error: {str(import_err)}",
+                "details": str(import_err)
+            }), 500
+        
+        # Try to instantiate agent - will fail if GEMINI_API_KEY missing
+        try:
+            agent = get_agent()
+        except ValueError as val_err:
+            if 'GEMINI_API_KEY' in str(val_err):
+                return jsonify({
+                    "success": False,
+                    "error": "GEMINI_API_KEY environment variable not set. Add it to Render environment variables.",
+                    "details": str(val_err)
+                }), 500
+            raise
         
         # Process query
         result = agent.query(question)
@@ -1415,15 +1447,23 @@ def agent_query():
         import traceback
         traceback.print_exc()
         
-        # Provide helpful error messages
-        if "GEMINI_API_KEY" in error_msg:
-            error_msg = "Gemini API key not configured. Please set GEMINI_API_KEY environment variable."
-        elif "langchain" in error_msg.lower():
-            error_msg = "LangChain not properly installed. Please run: pip install langchain langchain-google-genai"
+        # Provide specific, actionable error messages
+        if "GEMINI_API_KEY" in error_msg or "API key" in error_msg:
+            detailed_error = "GEMINI_API_KEY environment variable not configured. To fix: Go to Render dashboard → tms-backend → Environment → Add GEMINI_API_KEY with your Google API key."
+        elif "langchain" in error_msg.lower() or "ModuleNotFoundError" in error_msg:
+            detailed_error = "LangChain dependencies not installed. Required: langchain==0.1.20, langchain-google-genai==0.0.11, langchain-community==0.0.38"
+        elif "SupabaseClient" in error_msg:
+            detailed_error = "Database connection failed. Check SUPABASE_URL and SUPABASE_KEY environment variables."
+        elif "timeout" in error_msg.lower():
+            detailed_error = "Request timed out. The agent query took too long to execute."
+        else:
+            detailed_error = f"Agent execution failed: {error_msg}"
         
         return jsonify({
             "success": False,
-            "error": error_msg
+            "error": detailed_error,
+            "technical_details": error_msg,
+            "type": type(e).__name__
         }), 500
 
 # AI Docuscan - Document OCR and Classification

@@ -37,6 +37,32 @@ function AIAgent() {
         body: JSON.stringify({ question: queryText })
       })
 
+      // Check if response is ok before parsing
+      if (!response.ok) {
+        let errorMessage = `Server error (${response.status}): `
+        
+        // Try to parse error from JSON response
+        try {
+          const errorData = await response.json()
+          errorMessage += errorData.error || errorData.message || 'Unknown error'
+        } catch {
+          // If response isn't JSON, use status text
+          if (response.status === 502) {
+            errorMessage = '🔧 Backend service is starting up or experiencing issues. This usually means the GEMINI_API_KEY is missing or LangChain has import errors. Check Render logs.'
+          } else if (response.status === 500) {
+            errorMessage = '⚠️ Server error - likely missing GEMINI_API_KEY environment variable or LangChain dependency issue. Check backend logs.'
+          } else if (response.status === 404) {
+            errorMessage = '❌ Agent endpoint not found. The AI Query Agent may not be deployed properly.'
+          } else {
+            errorMessage += response.statusText || 'Request failed'
+          }
+        }
+        
+        setError(errorMessage)
+        setLoading(false)
+        return
+      }
+
       const data = await response.json()
 
       if (data.success) {
@@ -52,7 +78,14 @@ function AIAgent() {
         setError(data.error || 'Agent failed to process query')
       }
     } catch (err) {
-      setError(`Failed to connect to agent: ${err.message}`)
+      // Network errors, CORS issues, or JSON parse failures
+      if (err.name === 'TypeError' && err.message.includes('fetch')) {
+        setError(`🌐 Network error: Cannot reach backend server at ${API_URL}. Check if backend is deployed and CORS is configured.`)
+      } else if (err instanceof SyntaxError) {
+        setError(`📄 Invalid response from server - expected JSON but received HTML/text. Backend may be returning error page.`)
+      } else {
+        setError(`❌ Unexpected error: ${err.message}`)
+      }
     } finally {
       setLoading(false)
     }

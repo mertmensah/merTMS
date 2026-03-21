@@ -18,13 +18,24 @@ def get_operations_intelligence(time_period='today'):
     try:
         print(f"[LIGHTWEIGHT INTEL] Starting multi-agent analysis for {time_period}")
         
-        # Initialize database and LLM
-        db_client = SupabaseClient()
-        llm = ChatGoogleGenerativeAI(
-            model=GEMINI_MODEL,
-            google_api_key=GEMINI_API_KEY,
-            temperature=0.4
-        )
+        # Initialize database and LLM with error handling
+        try:
+            db_client = SupabaseClient()
+            print("[LIGHTWEIGHT INTEL] ✓ Database client initialized")
+        except Exception as db_err:
+            print(f"[LIGHTWEIGHT INTEL] ❌ Database init failed: {db_err}")
+            raise
+            
+        try:
+            llm = ChatGoogleGenerativeAI(
+                model=GEMINI_MODEL,
+                google_api_key=GEMINI_API_KEY,
+                temperature=0.4
+            )
+            print("[LIGHTWEIGHT INTEL] ✓ LLM initialized")
+        except Exception as llm_err:
+            print(f"[LIGHTWEIGHT INTEL] ❌ LLM init failed: {llm_err}")
+            raise
         
         # Agent 1: Data Analyst - Fetch and analyze data
         print("[AGENT 1/4] Data Analyst - Fetching operations data...")
